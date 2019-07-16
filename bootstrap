@@ -1,0 +1,25 @@
+#!/bin/bash
+
+# load helpers
+source ./helpers/text.sh
+source ./helpers/requires.sh
+
+# bootstrap installs things.
+bot 'joelwmale/dotfiles'
+read -p 'This will reset configure defaults and install some useful applications. Are you sure you want to continue? (y/n) ' reply
+
+if [[ $reply =~ ^[Yy]$ ]]
+then
+    source ./scripts/defaults.sh
+    source ./scripts/install.sh
+else
+    error 'cancelled...'
+fi
+
+bot 'Finished configuring details and installing applications!'
+read -p 'You should restart your computer to apply all of the changes. Restart now? (y/n) ' restart
+
+if [[ $restart =~ ^[Yy]$ ]]
+then
+    shutdown -r now
+fi
