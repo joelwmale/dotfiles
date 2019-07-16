@@ -289,15 +289,3 @@ defaults write com.apple.messageshelper.MessageController SOInputLineSettings -d
 
 running 'Disable continuous spell checking'
 defaults write com.apple.messageshelper.MessageController SOInputLineSettings -dict-add "continuousSpellCheckingEnabled" -bool false;ok
-
-###############################################################################
-# Kill affected applications                                                  #
-###############################################################################
-
-action 'restarting affected applications'
-for app in "Activity Monitor" "Address Book" "Calendar" "Contacts" "cfprefsd" \
-	"Dock" "Finder" "Mail" "Messages" "Safari" "SizeUp" "SystemUIServer" \
-	"Terminal"; do
-	killall "${app}" > /dev/null 2>&1
-done
-ok

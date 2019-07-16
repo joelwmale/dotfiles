@@ -6,8 +6,7 @@ ROOT=$(pwd)
 bot "Starting installs..."
 
 # update existing hosts file with someonewhocares.org
-read -r -p "Overwrite /etc/hosts with the ad-blocking hosts file from someonewhocares.org? (from ./configs/hosts file) [y|N] " response
-if [[ $response =~ (yes|y|Y) ]];then
+if ask 'Overwrite /etc/hosts with the ad-blocking hosts file from someonewhocares.org? (from ./configs/hosts file)' Y; then
     action "cp /etc/hosts /etc/hosts.backup"
     sudo cp /etc/hosts /etc/hosts.backup
     ok
@@ -56,29 +55,27 @@ mkdir -p $HOME/Code;ok
 # Brew                                                                        #
 ###############################################################################
 
-running "install brew if not already installed..."
+bot 'checking brew installation...'
+
 brew_bin=$(which brew) 2>&1 > /dev/null
 if [[ $? != 0 ]]; then
-  action "installing homebrew"
-  ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
-  if [[ $? != 0 ]]; then
-    error "unable to install homebrew, script $0 abort!"
-    exit 2
-  fi
+    action "installing homebrew"
+    ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+    if [[ $? != 0 ]]; then
+        error "unable to install homebrew, aborting script.."
+        exit -1
+    fi
 else
-  ok
-  bot "Homebrew"
-  read -r -p "run brew update && upgrade? [y|N] " response
-  if [[ $response =~ (y|yes|Y) ]]; then
-    action "updating homebrew..."
-    brew update
-    ok "homebrew updated"
-    action "upgrading brew packages..."
-    brew upgrade
-    ok "brews upgraded"
-  else
-    ok "skipped brew package upgrades."
-  fi
+    if ask 'run brew update && upgrade?' Y; then
+        action "updating homebrew..."
+        brew update
+        ok "homebrew updated"
+        action "upgrading brew packages..."
+        brew upgrade
+        ok "brews upgraded"
+    else
+        ok "skipped brew package upgrades."
+    fi
 fi
 
 require_brew git
@@ -93,20 +90,19 @@ require_brew bat
 require_brew doctl
 require_brew yarn
 require_brew php@7.3
+require_brew composer
 
 require_brew mariadb
-running 'brew services start mariadb'
-brew services start mariadb;ok
+start_service mariadb
 
 require_brew redis
-running 'brew services start redis'
-brew services start redis;ok
+start_service redis
 
 running 'tapping brew-cask'
 brew tap caskroom/cask
-require_brew brew-cask
 
 # casks
+require_cask google-chrome
 require_cask visual-studio-code
 require_cask fork
 require_cask transmit
@@ -114,7 +110,6 @@ require_cask sequel-pro
 require_cask hyper
 require_cask spotify
 require_cask insomnia
-require_cask google-chrome
 
 action 'symlink .hyper.js'
 rm $HOME/.hyper.js

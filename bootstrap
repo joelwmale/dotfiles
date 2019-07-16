@@ -1,15 +1,12 @@
 #!/bin/bash
 
 # load helpers
-source ./helpers/text.sh
-source ./helpers/requires.sh
+source ./helpers.sh
 
 # bootstrap installs things.
 bot 'joelwmale/dotfiles'
-read -p 'This will reset configure defaults and install some useful applications. Are you sure you want to continue? (y/n) ' reply
 
-if [[ $reply =~ ^[Yy]$ ]]
-then
+if ask 'This will reset configure defaults and install some useful applications. Are you sure you want to continue?' Y; then
     source ./scripts/defaults.sh
     source ./scripts/install.sh
 else
@@ -17,9 +14,15 @@ else
 fi
 
 bot 'Finished configuring details and installing applications!'
-read -p 'You should restart your computer to apply all of the changes. Restart now? (y/n) ' restart
 
-if [[ $restart =~ ^[Yy]$ ]]
-then
+if ask 'You should restart your computer to apply all of the changes. Restart now?' Y; then
     shutdown -r now
+else
+    action 'restarting affected applications'
+    for app in "Activity Monitor" "Address Book" "Calendar" "Contacts" "cfprefsd" \
+        "Dock" "Finder" "Mail" "Messages" "Safari" "SizeUp" "SystemUIServer" \
+        "Terminal"; do
+        killall "${app}" > /dev/null 2>&1
+    done
+    ok
 fi
