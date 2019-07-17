@@ -110,6 +110,9 @@ require_cask sequel-pro
 require_cask hyper
 require_cask spotify
 require_cask insomnia
+require_cask spectacle
+require_cask alfred
+require_cask spark
 
 action 'symlink .hyper.js'
 rm $HOME/.hyper.js
@@ -133,7 +136,7 @@ brew install zsh-autosuggestions
 bot 'Installing composer packages'
 
 running 'installing laravel/valet'
-composer global require laravel/valet;ok
+composer_global laravel/valet
 
 action 'configuring laravel/valet'
 valet install
@@ -141,7 +144,7 @@ valet park ~/Code
 valet tld app;ok
 
 running 'installing hirak/prestissimo'
-composer global require hirak/prestissimo;ok
+composer_global hirak/prestissimo
 
 running "installing spatie/phpunit-watcher"
-composer global require spatie/phpunit-watcher;ok
+composer_global spatie/phpunit-watcher

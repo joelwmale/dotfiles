@@ -11,38 +11,50 @@ $ ./bootstrap
 
 ## 🛠 Tools / Programs Installed
 
-It contains the installation of the following tools & programs from brew:
+It contains installation of the following tools:
 
-* Host file from [someonewhocares.org](https://someonewhocares.org/hosts/)
-* [brew](https://brew.sh)
-* git
-* [node](https://nodejs.org)
-* pkg-config
-* [wget](https://formulae.brew.sh/formula/wget)
-* [httpie](https://httpie.org/)
-* [ncdu](https://github.com/rofl0r/ncdu)
-* [hub](https://hub.github.com/)
-* [ack](https://beyondgrep.com/)
-* [bat](https://github.com/sharkdp/bat)
-* [doctl](https://github.com/digitalocean/doctl)
-* [yarn](https://github.com/yarnpkg/yarn)
-* [php@7.3](https://php.net/)
-* [mariadb](https://mariadb.org/)
-* [redis](https://redis.io/)
-* [vscode](https://code.visualstudio.com/)
-* [fork](https://git-fork.com/)
-* [transmit](https://panic.com/transmit/)
-* [sequel-pro](https://www.sequelpro.com/)
-* [hyper](https://hyper.is/)
-* [spotify](https://www.spotify.com/au/)
-* [insomnia](https://insomnia.rest/)
-* [google-chrome](https://www.google.com/chrome/)
+| Tool                                                                     | Description                                                                      |
+| ------------------------------------------------------------------------ | -------------------------------------------------------------------------------- |
+| Host file from [someonewhocares.org](https://someonewhocares.org/hosts/) | prevent your computer from connecting to many types of spyware, advertising, etc |
+| [brew](https://brew.sh)                                                  | package management for macos                                                     |
+| git                                                                      | vcs system                                                                       |
+| [node](https://nodejs.org)                                               | javascript runtime                                                               |
+| pkg-config                                                               | helper when compiling applications                                               |
+| [wget](https://formulae.brew.sh/formula/wget)                            | wget for macos                                                                   |
+| [httpie](https://httpie.org/)                                            | cleaner cURL                                                                     |
+| [ncdu](https://github.com/rofl0r/ncdu)                                   | disk analyzer                                                                    |
+| [hub](https://hub.github.com/)                                           | better git cli                                                                   |
+| [ack](https://beyondgrep.com/)                                           | better grep                                                                      |
+| [bat](https://github.com/sharkdp/bat)                                    | better cat                                                                       |
+| [doctl](https://github.com/digitalocean/doctl)                           | digital ocean cli                                                                |
+| [yarn](https://github.com/yarnpkg/yarn)                                  | npm package management                                                           |
+| [php@7.3](https://php.net/)                                              | php                                                                              |
+| [mariadb](https://mariadb.org/)                                          | database                                                                         |
+| [redis](https://redis.io/)                                               | cache                                                                            |
 
-The following tools from composer:
+The following applications:
 
-* [laravel/valet](https://laravel.com/docs/5.8/valet)
-* [hirak/prestissimo](https://github.com/hirak/prestissimo)
-* [spatie/phpunit-watcher](https://github.com/spatie/phpunit-watcher)
+| Application                                     | Description                         |
+| ----------------------------------------------- | ----------------------------------- |
+| [vscode](https://code.visualstudio.com/)        | text editor                         |
+| [fork](https://git-fork.com/)                   | git gui                             |
+| [transmit](https://panic.com/transmit/)         | ftp tool                            |
+| [sequel-pro](https://www.sequelpro.com/)        | database management                 |
+| [hyper](https://hyper.is/)                      | better terminal built in electron   |
+| [spotify](https://www.spotify.com/au/)          | music                               |
+| [insomnia](https://insomnia.rest/)              | REST client                         |
+| [google-chrome](https://www.google.com/chrome/) | internet browser                    |
+| [spectacle](https://www.spectacleapp.com/)      | window management                   |
+| [alfred](https://www.alfredapp.com/)            | productivity app & better spotlight |
+| [spark](https://sparkmailapp.com/)              | email client                        |
+
+The following composer packages:
+
+| Package                                                             | Description                                                  |
+| ------------------------------------------------------------------- | ------------------------------------------------------------ |
+| [laravel/valet](https://laravel.com/docs/5.8/valet)                 | configuration free local hosting                             |
+| [hirak/prestissimo](https://github.com/hirak/prestissimo)           | composer parallel install plugin                             |
+| [spatie/phpunit-watcher](https://github.com/spatie/phpunit-watcher) | automatically re-runs phpunit tests when source code changes |
 
 ## 📚 Aliases
 

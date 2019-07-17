@@ -106,3 +106,13 @@ function start_service() {
         ok
     fi
 }
+
+function composer_global() {
+    action "composer global require $1 $2"
+    composer global require $1 $2 > /dev/null 2>&1
+    if [[ $? != 0 ]]; then
+        error "failed to install $1 globally! skipping..."
+    else
+        ok
+    fi
+}
