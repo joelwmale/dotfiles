@@ -46,7 +46,6 @@ The following applications:
 | [google-chrome](https://www.google.com/chrome/) | internet browser                    |
 | [spectacle](https://www.spectacleapp.com/)      | window management                   |
 | [alfred](https://www.alfredapp.com/)            | productivity app & better spotlight |
-| [spark](https://sparkmailapp.com/)              | email client                        |
 
 The following composer packages:
 

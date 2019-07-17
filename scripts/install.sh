@@ -112,7 +112,6 @@ require_cask spotify
 require_cask insomnia
 require_cask spectacle
 require_cask alfred
-require_cask spark
 
 action 'symlink .hyper.js'
 rm $HOME/.hyper.js
