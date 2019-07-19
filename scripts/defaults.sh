@@ -116,6 +116,9 @@ defaults write NSGlobalDomain com.apple.swipescrolldirection -bool false;ok
 running 'Stop itunes from launching on media key press'
 launchctl unload -w /System/Library/LaunchAgents/com.apple.rcd.plist 2> /dev/null;ok
 
+running 'Stop itunes from opening when a device is plugged in'
+defaults write com.apple.iTunesHelper ignore-devices 1;ok
+
 ###############################################################################
 # Spotlight                                                                      #
 ###############################################################################
