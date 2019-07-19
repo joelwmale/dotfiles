@@ -195,7 +195,7 @@ defaults write com.apple.frameworks.diskimages skip-verify-locked -bool true
 defaults write com.apple.frameworks.diskimages skip-verify-remote -bool true;ok
 
 running 'Use list view in all finder windows'
-defaults write com.apple.finder FXPreferredViewStyle -string "clmv";ok
+defaults write com.apple.finder FXPreferredViewStyle -string "Nlsv";ok
 
 running 'Disable warning when emptying trash'
 defaults write com.apple.finder WarnOnEmptyTrash -bool false;ok
