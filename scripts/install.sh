@@ -110,8 +110,12 @@ require_cask sequel-pro
 require_cask hyper
 require_cask spotify
 require_cask insomnia
-require_cask spectacle
 require_cask alfred
+require_cask spectacle
+
+if ask 'would you like to have spectacle start upon startup?' Y; then
+    osascript -e 'tell application "System Events" to make login item at end with properties {path:"/Applications/Spectacle.app", hidden:false}'
+fi
 
 action 'symlink .hyper.js'
 rm $HOME/.hyper.js

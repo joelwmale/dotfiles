@@ -44,8 +44,8 @@ The following applications:
 | [spotify](https://www.spotify.com/au/)          | music                               |
 | [insomnia](https://insomnia.rest/)              | REST client                         |
 | [google-chrome](https://www.google.com/chrome/) | internet browser                    |
-| [spectacle](https://www.spectacleapp.com/)      | window management                   |
 | [alfred](https://www.alfredapp.com/)            | productivity app & better spotlight |
+| [spectacle](https://www.spectacleapp.com/)      | window management                   |
 
 The following composer packages:
 
