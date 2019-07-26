@@ -47,6 +47,10 @@ action 'symlink .zshrc'
 rm $HOME/.zshrc
 ln -s $ROOT/dotfiles/vendor/.zshrc $HOME/.zshrc;ok
 
+action 'symlink .gitconfig'
+rm $HOME/.gitconfig
+ln -s $ROOT/dotfiles/vendor/.gitconfig $HOME/.gitconfig;ok
+
 # Create directories
 action 'creating code directory at ~/Code'
 mkdir -p $HOME/Code;ok
@@ -91,6 +95,7 @@ require_brew doctl
 require_brew yarn
 require_brew php@7.3
 require_brew composer
+require_brew diff-so-fancy
 
 require_brew mariadb
 start_service mariadb

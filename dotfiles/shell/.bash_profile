@@ -8,7 +8,7 @@ alias pa="php artisan"
 alias dbfresh="pa migrate:fresh --seed"
 alias code='cd ~/Code'
 alias codecept="./vendor/bin/codecept"
-alias phpunit="./vendor/bin/phpunit"
+alias phpunit="php ./vendor/bin/phpunit"
 
 alias tplan='terragrunt plan-all'
 alias tapply='terragrunt apply-all'
@@ -52,6 +52,12 @@ alias weather='curl wttr.in/brisbane'
 #########################################
 # Paths & OS                            #
 #########################################
+export PATH=/usr/local/bin:$PATH
 export PATH=/usr/local/sbin:$PATH
 export PATH=$HOME/.composer/vendor/bin:$PATH
 export PATH=$HOME/.npm-global/bin:$PATH
+
+#########################################
+# Exports                               #
+#########################################
+source ~/.aliases

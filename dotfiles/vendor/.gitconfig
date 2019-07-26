@@ -1,0 +1,4 @@
+[core]
+	pager = diff-so-fancy | less --tabs=4 -RFX
+[alias]
+	permission-reset = !git diff -p -R --no-color | grep -E \"^(diff|(old|new) mode)\" --color=never | git apply

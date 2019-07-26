@@ -54,6 +54,7 @@ The following composer packages:
 | [laravel/valet](https://laravel.com/docs/5.8/valet)                 | configuration free local hosting                             |
 | [hirak/prestissimo](https://github.com/hirak/prestissimo)           | composer parallel install plugin                             |
 | [spatie/phpunit-watcher](https://github.com/spatie/phpunit-watcher) | automatically re-runs phpunit tests when source code changes |
+| [so-fancy/diff-so-fancy](https://github.com/so-fancy/diff-so-fancy) | good-lookin' diffs. actually… nah… the best-lookin' diffs. |
 
 ## 📚 Aliases
 
