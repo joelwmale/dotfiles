@@ -147,9 +147,8 @@ running 'installing laravel/valet'
 composer_global laravel/valet
 
 action 'configuring laravel/valet'
-valet install
-valet park ~/Code
-valet tld app;ok
+valet install > /dev/null 2>&1
+valet park ~/Code > /dev/null 2>&1;ok
 
 running 'installing hirak/prestissimo'
 composer_global hirak/prestissimo
