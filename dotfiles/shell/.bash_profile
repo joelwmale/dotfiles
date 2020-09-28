@@ -45,7 +45,7 @@ alias cat='bat'
 # Git/hub                               #
 #########################################
 alias repush='git pull --rebase && git push'
-alias gitclean="git checkout master && git fetch -p && git branch -vv | awk '/: gone]/{print $1}' | xargs git branch -d"
+alias gitclean="git checkout master && git fetch -p && git branch -vv | grep 'origin/.*: gone]' | awk '{print $1}' | xargs git branch -D"
 alias publish='git push --set-upstream origin $(git branch | grep \* | cut -d " " -f2)'
 
 # one line log
