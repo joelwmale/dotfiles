@@ -20,16 +20,25 @@ vs () { VSCODE_CWD="$PWD" open -n -b "com.microsoft.VSCode" --args $* ;}
 #########################################
 # Productivity stuff                    #
 #########################################
-alias pa="php artisan"
-alias dbfresh="pa migrate:fresh --seed"
+# general
 alias code='cd ~/Code'
+
+# code
 alias codecept="./vendor/bin/codecept"
 alias phpunit="php ./vendor/bin/phpunit"
+alias cdump="composer dumpautoload"
 
+# laravel
+alias pawipe="php artisan config:cache && composer dumpautoload"
+alias pa="php artisan"
+alias dbfresh="pa migrate:fresh --seed"
+
+# infrastructure
 alias tplan='terragrunt plan-all'
 alias tapply='terragrunt apply-all'
 alias minio='minio server ~/data'
 
+# misc
 alias cat='bat'
 
 #########################################
@@ -43,8 +52,7 @@ alias publish='git push --set-upstream origin $(git branch | grep \* | cut -d " 
 alias gl='git log --pretty=format:"%C(yellow)%h %ad%Cred%d %Creset%s%Cblue [%cn]" --decorate --date=short'
 alias gr='git pull --rebase && git push'
 
-alias ga='git add -p'
-alias gaa='git add .'
+alias ga='git add .'
 alias gc='git commit --verbose'
 alias gcm='git commit -m'
 alias gcom='git checkout master'
