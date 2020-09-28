@@ -96,6 +96,7 @@ require_brew yarn
 require_brew php@7.3
 require_brew composer
 require_brew diff-so-fancy
+require_brew zsh-autosuggestions
 
 require_brew mariadb
 start_service mariadb
@@ -130,11 +131,12 @@ ln -s $ROOT/dotfiles/vendor/.hyper.js $HOME/.hyper.js;ok
 # Node/NPM                                                                    #
 ###############################################################################
 
+running 'configure global npm packages to ~/.npm-global'
+mkdir ~/.npm-global
+npm config set prefix ~/.npm-global;ok
+
 running 'install pure-prompt'
 npm install --g pure-prompt;ok
-
-echo 'Install zsh-autosuggestions'
-echo '---------------------------'
 brew install zsh-autosuggestions
 
 ###############################################################################

@@ -13,5 +13,6 @@ plugins=(
 autoload -U promptinit; promptinit
 prompt pure
 
+ZSH_DISABLE_COMPFIX="true"
 source $ZSH/oh-my-zsh.sh
 source ~/.bash_profile

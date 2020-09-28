@@ -1,6 +1,22 @@
 # Use vs instead of code
 vs () { VSCODE_CWD="$PWD" open -n -b "com.microsoft.VSCode" --args $* ;}
 
+# opendb () {
+#    [ ! -f .env ] && { echo "No .env file found."; exit 1; }
+
+#    DB_CONNECTION='mysql'
+#    DB_HOST=$(grep DB_HOST .env | grep -v -e '^\s*#' | cut -d '=' -f 2-)
+#    DB_PORT=$(grep DB_PORT .env | grep -v -e '^\s*#' | cut -d '=' -f 2-)
+#    DB_DATABASE=$(grep DB_DATABASE .env | grep -v -e '^\s*#' | cut -d '=' -f 2-)
+#    DB_USERNAME=$(grep DB_USERNAME .env | grep -v -e '^\s*#' | cut -d '=' -f 2-)
+#    DB_PASSWORD=$(grep DB_PASSWORD .env | grep -v -e '^\s*#' | cut -d '=' -f 2-)
+
+#    DB_URL="${DB_CONNECTION}://${DB_USERNAME}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_DATABASE}"
+
+#    echo "Opening ${DB_URL}"
+#    open $DB_URL
+# }
+
 #########################################
 # Productivity stuff                    #
 #########################################
@@ -21,6 +37,7 @@ alias cat='bat'
 #########################################
 alias repush='git pull --rebase && git push'
 alias gitclean="git checkout master && git fetch -p && git branch -vv | awk '/: gone]/{print $1}' | xargs git branch -d"
+alias publish='git push --set-upstream origin $(git branch | grep \* | cut -d " " -f2)'
 
 # one line log
 alias gl='git log --pretty=format:"%C(yellow)%h %ad%Cred%d %Creset%s%Cblue [%cn]" --decorate --date=short'
