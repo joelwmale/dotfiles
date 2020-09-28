@@ -3,7 +3,32 @@
 # variables
 ROOT=$(pwd)
 
+# close any open System Preferences panes, to prevent them from overriding
+# settings we’re about to change
+osascript -e 'tell application "System Preferences" to quit'
+
+# ask for the administrator password upfront
+sudo -v
+
+# keep-alive: update existing `sudo` time stamp until `.macos` has finished
+while true; do sudo -n true; sleep 60; kill -0 "$$" || exit; done 2>/dev/null &
+
 bot "Starting installs..."
+
+# set a computer name
+if ask 'Set a computer name now?' Y; then
+    say 'What computer name would you like to set?'
+
+    # store computer name
+    read computerName
+
+    sudo scutil --set ComputerName $computerName
+    sudo scutil --set HostName $computerName
+    sudo scutil --set LocalHostName $computerName
+
+    ok
+    bot 'Computer name has been set successfully'
+fi
 
 # update existing hosts file with someonewhocares.org
 if ask 'Overwrite /etc/hosts with the ad-blocking hosts file from someonewhocares.org? (from ./configs/hosts file)' Y; then
@@ -51,6 +76,10 @@ action 'symlink .gitconfig'
 rm $HOME/.gitconfig
 ln -s $ROOT/dotfiles/vendor/.gitconfig $HOME/.gitconfig;ok
 
+action 'symlink .hushlogin'
+rm $HOME/.hushlogin
+ln -s $ROOT/dotfiles/shell/.hushlogin $HOME/.hushlogin;ok
+
 # Create directories
 action 'creating code directory at ~/Code'
 mkdir -p $HOME/Code;ok
@@ -83,6 +112,7 @@ else
 fi
 
 require_brew git
+require_brew gh
 require_brew node
 require_brew pkg-config
 require_brew wget --overwrite
@@ -93,7 +123,7 @@ require_brew ack
 require_brew bat
 require_brew doctl
 require_brew yarn
-require_brew php@7.3
+require_brew php@7.4
 require_brew composer
 require_brew diff-so-fancy
 require_brew zsh-autosuggestions
@@ -154,6 +184,3 @@ valet park ~/Code > /dev/null 2>&1;ok
 
 running 'installing hirak/prestissimo'
 composer_global hirak/prestissimo
-
-running "installing spatie/phpunit-watcher"
-composer_global spatie/phpunit-watcher

@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 
-# Ask for the administrator password upfront
+# ask for the administrator password upfront
 sudo -v
 
-# Keep-alive: update existing `sudo` time stamp until `.osx` has finished
+# keep-alive: update existing `sudo` time stamp until `.osx` has finished
 while true; do sudo -n true; sleep 60; kill -0 "$$" || exit; done 2>/dev/null &
 
 ###############################################################################
@@ -63,9 +63,6 @@ defaults write com.apple.menuextra.battery ShowTime -string "YES";ok
 
 bot 'SSD tweaks'
 
-running 'Disable local Time Machine snapshots'
-sudo tmutil disablelocal;ok
-
 running 'Disable hibernation'
 sudo pmset -a hibernatemode 0;ok
 
@@ -107,8 +104,23 @@ running 'Allow key repeating'
 defaults write -g ApplePressAndHoldEnabled -bool false;ok
 
 running 'Set keyboard repeat rate'
-defaults write NSGlobalDomain KeyRepeat -int 2
-defaults write NSGlobalDomain InitialKeyRepeat -int 15;ok
+defaults write NSGlobalDomain KeyRepeat -int 1
+defaults write NSGlobalDomain InitialKeyRepeat -int 10;ok
+
+running 'Disable automatic capitalization as it’s annoying when typing code'
+defaults write NSGlobalDomain NSAutomaticCapitalizationEnabled -bool false;ok
+
+running 'Disable smart dashes as they’re annoying when typing code'
+defaults write NSGlobalDomain NSAutomaticDashSubstitutionEnabled -bool false;ok
+
+running 'Disable automatic period substitution as it’s annoying when typing code'
+defaults write NSGlobalDomain NSAutomaticPeriodSubstitutionEnabled -bool false;ok
+
+running 'Disable smart quotes as they’re annoying when typing code'
+defaults write NSGlobalDomain NSAutomaticQuoteSubstitutionEnabled -bool false;ok
+
+running 'Disable auto-correct'
+defaults write NSGlobalDomain NSAutomaticSpellingCorrectionEnabled -bool false;ok
 
 running 'Disable natural scrolling'
 defaults write NSGlobalDomain com.apple.swipescrolldirection -bool false;ok
@@ -138,12 +150,6 @@ running 'Require password immediately after sleep or screen saver'
 defaults write com.apple.screensaver askForPassword -int 1
 defaults write com.apple.screensaver askForPasswordDelay -int 0;ok
 
-###############################################################################
-# Screenshots                                                                 #
-###############################################################################
-
-bot 'Configuring screenshot settings'
-
 running 'Save screenshots to the desktop'
 defaults write com.apple.screencapture location -string "${HOME}/Desktop";ok
 
@@ -153,11 +159,14 @@ defaults write com.apple.screencapture type -string "png";ok
 running 'Disable shadow in screenshots'
 defaults write com.apple.screencapture disable-shadow -bool true;ok
 
+running 'Disable screenshot preview thumbnail'
+defaults write com.apple.screencapture show-thumbnail -bool false;ok
+
 ###############################################################################
 # Finder                                                                      #
 ###############################################################################
 
-bot 'Configuring finder settings'
+bot 'Configuring finder'
 
 running 'Set default finder window ~/Desktop'
 defaults write com.apple.finder NewWindowTarget -string "PfDe"
@@ -182,7 +191,8 @@ running 'Disable warning when changing a file extension'
 defaults write com.apple.finder FXEnableExtensionChangeWarning -bool false;ok
 
 running 'Disable DS_Store files on network volumes'
-defaults write com.apple.desktopservices DSDontWriteNetworkStores -bool true;ok
+defaults write com.apple.desktopservices DSDontWriteNetworkStores -bool true
+defaults write com.apple.desktopservices DSDontWriteUSBStores -bool true;ok
 
 running 'Automatically open a new Finder window when a volume is mounted'
 defaults write com.apple.frameworks.diskimages auto-open-ro-root -bool true
@@ -247,11 +257,17 @@ defaults write com.apple.dock mru-spaces -bool false;ok
 running 'Make dock icons of hidden applications translucent'
 defaults write com.apple.dock showhidden -bool true;ok
 
+running 'Disable transparency in the menu bar and elsewhere'
+defaults write com.apple.universalaccess reduceTransparency -bool true;ok
+
+running 'Set highlight colour to purple'
+defaults write NSGlobalDomain AppleHighlightColor -string "0.541176471 0.168627451 0.88627451";ok
+
 ###############################################################################
 # Safari & WebKit                                                             #
 ###############################################################################
 
-bot 'Safari & Webkit'
+bot 'Configuring Safari & Webkit'
 
 running 'Enable safaris debug menu'
 defaults write com.apple.Safari IncludeInternalDebugMenu -bool true;ok
@@ -261,12 +277,23 @@ defaults write com.apple.Safari IncludeDevelopMenu -bool true
 defaults write com.apple.Safari WebKitDeveloperExtrasEnabledPreferenceKey -bool true
 defaults write com.apple.Safari com.apple.Safari.ContentPageGroupIdentifier.WebKit2DeveloperExtrasEnabled -bool true;ok
 
+###############################################################################
+# Time Machine                                                                #
+###############################################################################
+
+bot 'Configuring time machine'
+
+running 'Disable local Time Machine snapshots'
+sudo tmutil disablelocal;ok
+
 running 'Prevent time machine from prompting to use new hard drives as backup volumes'
 defaults write com.apple.TimeMachine DoNotOfferNewDisksForBackup -bool true;ok
 
 ###############################################################################
 # Activity Monitor                                                            #
 ###############################################################################
+
+bot 'Changing Activity monitor settings'
 
 running 'Show main window when launching activity monitor'
 defaults write com.apple.ActivityMonitor OpenMainWindow -bool true;ok
@@ -282,13 +309,52 @@ defaults write com.apple.ActivityMonitor SortColumn -string "CPUUsage"
 defaults write com.apple.ActivityMonitor SortDirection -int 0;ok
 
 ###############################################################################
+# App Store                                                                   #
+###############################################################################
+
+bot 'Configuring mac app store'
+
+running 'Enable the automatic update check'
+defaults write com.apple.SoftwareUpdate AutomaticCheckEnabled -bool true;ok
+
+running 'Check for software updates daily, not just once per week'
+defaults write com.apple.SoftwareUpdate ScheduleFrequency -int 1;ok
+
+running 'Download newly available updates in background'
+defaults write com.apple.SoftwareUpdate AutomaticDownload -int 1;ok
+
+running 'Install System data files & security updates'
+defaults write com.apple.SoftwareUpdate CriticalUpdateInstall -int 1;ok
+
+###############################################################################
 # Messages                                                                    #
 ###############################################################################
 
-bot 'Messages'
+bot 'Configuring Messages app'
 
 running 'Disable smart quotes for messages that contain code'
 defaults write com.apple.messageshelper.MessageController SOInputLineSettings -dict-add "automaticQuoteSubstitutionEnabled" -bool false;ok
 
 running 'Disable continuous spell checking'
 defaults write com.apple.messageshelper.MessageController SOInputLineSettings -dict-add "continuousSpellCheckingEnabled" -bool false;ok
+
+###############################################################################
+# Photos                                                                      #
+###############################################################################
+
+bot 'Configuring photos'
+
+running 'Prevent Photos from opening automatically when devices are plugged in'
+defaults -currentHost write com.apple.ImageCapture disableHotPlug -bool true;ok
+
+###############################################################################
+# Energy Savings                                                              #
+###############################################################################
+
+bot 'Updating the Energy saving settings'
+
+running 'Enable lid wakeup'
+sudo pmset -a lidwake 1;ok
+
+running 'Disable machine sleep while charging'
+sudo pmset -c sleep 0;ok

@@ -71,6 +71,10 @@ ask() {
     done
 }
 
+say() {
+    echo "$1"
+}
+
 function require_cask() {
     brew cask list $1 > /dev/null 2>&1 | true
     if [[ ${PIPESTATUS[0]} != 0 ]]; then
