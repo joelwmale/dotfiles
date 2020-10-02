@@ -59,6 +59,8 @@ alias gcom='git checkout master'
 alias gcod='git checkout develop'
 alias gca='git commit -a --verbose'
 alias gcam='git commit --amend --verbose'
+alias gf='git fetch'
+alias gfa='git fetch --all'
 
 alias grh='git reset --hard'
 
@@ -81,6 +83,8 @@ export PATH=/usr/local/bin:$PATH
 export PATH=/usr/local/sbin:$PATH
 export PATH=$HOME/.composer/vendor/bin:$PATH
 export PATH=$HOME/.npm-global/bin:$PATH
+export LDFLAGS="-L/usr/local/opt/libffi/lib"
+export CPPFLAGS="-I/usr/local/opt/libffi/include"
 
 #########################################
 # Exports                               #
