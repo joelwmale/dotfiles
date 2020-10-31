@@ -50,7 +50,7 @@ alias publish='git push --set-upstream origin $(git branch | grep \* | cut -d " 
 
 # one line log
 alias gl='git log --pretty=format:"%C(yellow)%h %ad%Cred%d %Creset%s%Cblue [%cn]" --decorate --date=short'
-alias gr='git pull --rebase && git push'
+alias gr='git reset'
 
 alias ga='git add .'
 alias gc='git commit --verbose'
