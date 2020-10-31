@@ -8,7 +8,7 @@ module.exports = {
     fontSize: 13,
 
     // font family with optional fallbacks
-    fontFamily: 'Dank Mono, Fira Code, Menlo, monospace',
+    fontFamily: 'Fira Code, Dank Mono, Menlo, monospace',
 
     // default font weight: 'normal' or 'bold'
     fontWeight: 'normal',
@@ -121,7 +121,7 @@ module.exports = {
     // for advanced config flags please refer to https://hyper.is/#cfg
     hypercwd: {
 	    initialWorkingDirectory: '~'
-    },
+    }
   },
 
   // a list of plugins to fetch and install from npm
@@ -131,10 +131,13 @@ module.exports = {
   //   `@company/project`
   //   `project#1.0.1`
   plugins: [
-    'hyper-chesterish',
+    // 'hyper-chesterish',
+    'hyper-horizon-theme',
     'hypercwd',
     'hyperterm-paste',
     'hyper-search',
+    'hyper-tabs-enhanced',
+    'hyperterm-tabs'
   ],
 
   // in development, you can create a directory under

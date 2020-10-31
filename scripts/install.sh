@@ -128,8 +128,8 @@ require_brew composer
 require_brew diff-so-fancy
 require_brew zsh-autosuggestions
 
-require_brew mariadb
-start_service mariadb
+require_brew mysql@5.7
+start_service mysql@5.7
 
 require_brew redis
 start_service redis
@@ -165,9 +165,9 @@ running 'configure global npm packages to ~/.npm-global'
 mkdir ~/.npm-global
 npm config set prefix ~/.npm-global;ok
 
-running 'install pure-prompt'
-npm install --g pure-prompt;ok
-brew install zsh-autosuggestions
+# running 'install pure-prompt'
+# npm install --g pure-prompt;ok
+# brew install zsh-autosuggestions
 
 ###############################################################################
 # Composer                                                                    #
@@ -182,5 +182,20 @@ action 'configuring laravel/valet'
 valet install > /dev/null 2>&1
 valet park ~/Code > /dev/null 2>&1;ok
 
-running 'installing hirak/prestissimo'
-composer_global hirak/prestissimo
+###############################################################################
+# Shell/misc                                                                  #
+###############################################################################
+
+running 'installing powerline font for shell'
+cd ~/Desktop
+git clone https://github.com/powerline/fonts.git --depth=1
+cd fonts
+./install.sh
+cd ..
+rm -rf fonts;ok
+
+running 'install spaceship prompt'
+npm install -g spaceship-prompt;ok
+
+running 'installing zsh autosuggestions'
+brew install zsh-autosuggestions;ok
