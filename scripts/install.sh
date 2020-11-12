@@ -129,10 +129,14 @@ require_brew diff-so-fancy
 require_brew zsh-autosuggestions
 
 require_brew mysql@5.7
-start_service mysql@5.7
+service_start mysql@5.7
+brew_link mysql@5.7
 
 require_brew redis
-start_service redis
+service_start redis
+
+action 'setting mysql@5.7 root password to "root"'
+$(brew --prefix mysql)/bin/mysqladmin -u root password root;ok
 
 running 'tapping brew-cask'
 brew tap caskroom/cask

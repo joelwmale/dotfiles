@@ -29,7 +29,7 @@ It contains installation of the following tools:
 | [doctl](https://github.com/digitalocean/doctl)                           | digital ocean cli                                                                |
 | [yarn](https://github.com/yarnpkg/yarn)                                  | npm package management                                                           |
 | [php@7.3](https://php.net/)                                              | php                                                                              |
-| [mariadb](https://mariadb.org/)                                          | database                                                                         |
+| [mysql@5.7](https://dev.mysql.com/downloads/mysql/5.7.html)              | database                                                                         |
 | [redis](https://redis.io/)                                               | cache                                                                            |
 
 The following applications:

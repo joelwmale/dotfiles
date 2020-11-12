@@ -101,11 +101,21 @@ function require_brew() {
     fi
 }
 
-function start_service() {
+function service_start() {
     action "brew services start $1 $2"
     brew services start $1 $2 > /dev/null 2>&1
     if [[ $? != 0 ]]; then
         error "failed to start $1! skipping..."
+    else
+        ok
+    fi
+}
+
+function brew_link() {
+    action "brew link --force $1"
+    brew services start $1 > /dev/null 2>&1
+    if [[ $? != 0 ]]; then
+        error "failed to force link $1! skipping..."
     else
         ok
     fi
