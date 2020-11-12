@@ -90,3 +90,8 @@ export CPPFLAGS="-I/usr/local/opt/libffi/include"
 # Exports                               #
 #########################################
 source ~/.aliases
+
+# BEGIN SNIPPET: Magento Cloud CLI configuration
+HOME=${HOME:-'/Users/joel'}
+export PATH="$HOME/"'.magento-cloud/bin':"$PATH"
+if [ -f "$HOME/"'.magento-cloud/shell-config.rc' ]; then . "$HOME/"'.magento-cloud/shell-config.rc'; fi # END SNIPPET

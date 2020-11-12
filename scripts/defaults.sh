@@ -12,6 +12,9 @@ while true; do sudo -n true; sleep 60; kill -0 "$$" || exit; done 2>/dev/null &
 
 bot 'General ui/ux'
 
+running 'Show battery percentage'
+defaults write com.apple.menuextra.battery ShowPercent YES;ok
+
 running 'Disable sound effects on boot'
 sudo nvram SystemAudioVolume=" ";ok
 
@@ -99,13 +102,6 @@ systemsetup -settimezone 'Australia/Brisbane' > /dev/null;ok
 
 running 'Disable auto correct'
 defaults write NSGlobalDomain NSAutomaticSpellingCorrectionEnabled -bool false;ok
-
-running 'Allow key repeating'
-defaults write -g ApplePressAndHoldEnabled -bool false;ok
-
-running 'Set keyboard repeat rate'
-defaults write NSGlobalDomain KeyRepeat -int 1
-defaults write NSGlobalDomain InitialKeyRepeat -int 10;ok
 
 running 'Disable automatic capitalization as it’s annoying when typing code'
 defaults write NSGlobalDomain NSAutomaticCapitalizationEnabled -bool false;ok

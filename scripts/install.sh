@@ -138,8 +138,8 @@ service_start redis
 action 'setting mysql@5.7 root password to "root"'
 $(brew --prefix mysql)/bin/mysqladmin -u root password root;ok
 
-running 'tapping brew-cask'
-brew tap caskroom/cask
+running 'tapping homebrew-cask'
+brew tap homebrew/cask
 
 # casks
 require_cask google-chrome
