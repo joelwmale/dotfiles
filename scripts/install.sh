@@ -44,6 +44,21 @@ else
 fi
 
 ###############################################################################
+# Dev Tools                                                                   #
+###############################################################################
+
+running 'hide xcode-select --install'
+# xcode-select --install;ok
+touch /tmp/.com.apple.dt.CommandLineTools.installondemand.in-progress;
+PROD=$(softwareupdate -l |
+  grep "\*.*Command Line" |
+  head -n 1 | awk -F"*" '{print $2}' |
+  sed -e 's/^ *//' |
+  tr -d '\n')
+softwareupdate -i "$PROD" --verbose
+rm /tmp/.com.apple.dt.CommandLineTools.installondemand.in-progress;ok
+
+###############################################################################
 # Terminal                                                                    #
 ###############################################################################
 
@@ -127,6 +142,7 @@ require_brew php@7.4
 require_brew composer
 require_brew diff-so-fancy
 require_brew zsh-autosuggestions
+require_brew awscli
 
 require_brew mysql@5.7
 service_start mysql@5.7
@@ -143,18 +159,24 @@ brew tap homebrew/cask
 
 # casks
 require_cask google-chrome
+require_cask firefox-developer-edition
 require_cask visual-studio-code
 require_cask fork
 require_cask transmit
-require_cask sequel-pro
+require_cask tableplus
 require_cask hyper
 require_cask spotify
 require_cask insomnia
 require_cask alfred
 require_cask spectacle
+require_cask dozer
 
 if ask 'would you like to have spectacle start upon startup?' Y; then
     osascript -e 'tell application "System Events" to make login item at end with properties {path:"/Applications/Spectacle.app", hidden:false}'
+fi
+
+if ask 'would you like to have dozer start upon startup?' Y; then
+    osascript -e 'tell application "System Events" to make login item at end with properties {path:"/Applications/Dozer.app", hidden:false}'
 fi
 
 action 'symlink .hyper.js'
