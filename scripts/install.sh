@@ -91,6 +91,10 @@ action 'symlink .gitconfig'
 rm $HOME/.gitconfig
 ln -s $ROOT/dotfiles/vendor/.gitconfig $HOME/.gitconfig;ok
 
+action 'symlink .gitignore_global'
+rm $HOME/.gitignore_global
+ln -s $ROOT/dotfiles/vendor/.gitignore_global $HOME/.gitignore_global;ok
+
 action 'symlink .hushlogin'
 rm $HOME/.hushlogin
 ln -s $ROOT/dotfiles/shell/.hushlogin $HOME/.hushlogin;ok

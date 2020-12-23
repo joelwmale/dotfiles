@@ -8,6 +8,7 @@ ZSH_THEME="robbyrussell"
 
 plugins=(
   git
+  brew
 )
 
 #autoload -U promptinit; promptinit
