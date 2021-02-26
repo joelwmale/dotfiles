@@ -156,7 +156,7 @@ require_brew redis
 service_start redis
 
 action 'setting mysql@5.7 root password to "root"'
-$(brew --prefix mysql)/bin/mysqladmin -u root password root;ok
+$(brew --prefix mysql@5.7)/bin/mysqladmin -u root password root;ok
 
 running 'tapping homebrew-cask'
 brew tap homebrew/cask

@@ -1,27 +1,32 @@
 # Use vs instead of code
 vs () { VSCODE_CWD="$PWD" open -n -b "com.microsoft.VSCode" --args $* ;}
 
-# opendb () {
-#    [ ! -f .env ] && { echo "No .env file found."; exit 1; }
+php-switch () { 
+    brew-php-switcher $1 -s=valet 
+}
 
-#    DB_CONNECTION='mysql'
-#    DB_HOST=$(grep DB_HOST .env | grep -v -e '^\s*#' | cut -d '=' -f 2-)
-#    DB_PORT=$(grep DB_PORT .env | grep -v -e '^\s*#' | cut -d '=' -f 2-)
-#    DB_DATABASE=$(grep DB_DATABASE .env | grep -v -e '^\s*#' | cut -d '=' -f 2-)
-#    DB_USERNAME=$(grep DB_USERNAME .env | grep -v -e '^\s*#' | cut -d '=' -f 2-)
-#    DB_PASSWORD=$(grep DB_PASSWORD .env | grep -v -e '^\s*#' | cut -d '=' -f 2-)
+opendb () {
+   [ ! -f .env ] && { echo "No .env file found."; exit 1; }
 
-#    DB_URL="${DB_CONNECTION}://${DB_USERNAME}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_DATABASE}"
+   DB_CONNECTION='mysql'
+   DB_HOST=$(grep DB_HOST .env | grep -v -e '^\s*#' | cut -d '=' -f 2-)
+   DB_PORT=$(grep DB_PORT .env | grep -v -e '^\s*#' | cut -d '=' -f 2-)
+   DB_DATABASE=$(grep DB_DATABASE .env | grep -v -e '^\s*#' | cut -d '=' -f 2-)
+   DB_USERNAME=$(grep DB_USERNAME .env | grep -v -e '^\s*#' | cut -d '=' -f 2-)
+   DB_PASSWORD=$(grep DB_PASSWORD .env | grep -v -e '^\s*#' | cut -d '=' -f 2-)
 
-#    echo "Opening ${DB_URL}"
-#    open $DB_URL
-# }
+   DB_URL="${DB_CONNECTION}://${DB_USERNAME}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_DATABASE}"
+
+   echo "Opening ${DB_URL}"
+   open $DB_URL
+}
 
 #########################################
 # Productivity stuff                    #
 #########################################
 # general
 alias code='cd ~/Code'
+alias clients='cd ~/Code/clients'
 
 # code
 alias codecept="./vendor/bin/codecept"
@@ -52,6 +57,7 @@ alias publish='git push --set-upstream origin $(git branch | grep \* | cut -d " 
 alias gl='git log --pretty=format:"%C(yellow)%h %ad%Cred%d %Creset%s%Cblue [%cn]" --decorate --date=short'
 alias gr='git reset'
 
+# misc
 alias ga='git add .'
 alias gc='git commit --verbose'
 alias gcm='git commit -m'
@@ -61,8 +67,14 @@ alias gca='git commit -a --verbose'
 alias gcam='git commit --amend --verbose'
 alias gf='git fetch'
 alias gfa='git fetch --all'
-
 alias grh='git reset --hard'
+
+# stashing
+alias gssl='git stash show -p stash@{0}'
+alias gsslp='git stash show -p stash@{1}'
+alias gsa='git stash apply'
+alias gsp='git stash pop'
+alias gspua='git stash !git stash show -p | git apply -R'
 
 alias gd='git diff'
 alias gds='git diff --stat'
@@ -95,3 +107,4 @@ source ~/.aliases
 HOME=${HOME:-'/Users/joel'}
 export PATH="$HOME/"'.magento-cloud/bin':"$PATH"
 if [ -f "$HOME/"'.magento-cloud/shell-config.rc' ]; then . "$HOME/"'.magento-cloud/shell-config.rc'; fi # END SNIPPET
+export PATH="/usr/local/opt/mysql@5.7/bin:$PATH"
