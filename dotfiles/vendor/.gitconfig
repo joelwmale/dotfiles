@@ -2,6 +2,15 @@
 	# Show most recently changed branches first.
 	sort = -committerdate
 [core]
+	excludesfile = ~/.gitignore
+	attributesfile = ~/.gitattributes
 	pager = diff-so-fancy | less --tabs=4 -RFX
 [alias]
 	permission-reset = !git diff -p -R --no-color | grep -E \"^(diff|(old|new) mode)\" --color=never | git apply
+[user]
+	email = joel@joelmale.com
+	name = Joel Male
+[pull]
+	rebase = false
+[init]
+	defaultBranch = master

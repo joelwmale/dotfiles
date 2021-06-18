@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+# variables
+ROOT=$(pwd)
+
 # Colors
 ESC_SEQ="\x1b["
 COL_RESET=$ESC_SEQ"39;49;00m"
@@ -78,7 +81,7 @@ say() {
 function require_cask() {
     brew cask list $1 > /dev/null 2>&1 | true
     if [[ ${PIPESTATUS[0]} != 0 ]]; then
-        action "brew cask install $1 $2"
+        action "brew install --cask $1 $2"
         brew cask install $1 > /dev/null 2>&1
         if [[ $? != 0 ]]; then
             error "failed to install $1! skipping..."

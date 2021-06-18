@@ -1,10 +1,6 @@
 # Use vs instead of code
 vs () { VSCODE_CWD="$PWD" open -n -b "com.microsoft.VSCode" --args $* ;}
 
-php-switch () { 
-    brew-php-switcher $1 -s=valet 
-}
-
 opendb () {
    [ ! -f .env ] && { echo "No .env file found."; exit 1; }
 
@@ -21,12 +17,10 @@ opendb () {
    open $DB_URL
 }
 
-#########################################
-# Productivity stuff                    #
-#########################################
 # general
 alias code='cd ~/Code'
-alias clients='cd ~/Code/clients'
+alias dotfiles='cd ~/Code/dotfiles'
+alias q="cd ~ && clear"
 
 # code
 alias codecept="./vendor/bin/codecept"
@@ -46,9 +40,7 @@ alias minio='minio server ~/data'
 # misc
 alias cat='bat'
 
-#########################################
-# Git/hub                               #
-#########################################
+# git/hub
 alias repush='git pull --rebase && git push'
 alias gitclean="git checkout master && git fetch -p && git branch -vv | grep 'origin/.*: gone]' | awk '{print $1}' | xargs git branch -D"
 alias publish='git push --set-upstream origin $(git branch | grep \* | cut -d " " -f2)'
@@ -83,14 +75,27 @@ alias gs='git status -s'
 alias gc='git checkout'
 alias gcb='git checkout -b'
 
-#########################################
-# Random stuff                          #
-#########################################
+# get macOS Software Updates, and update installed Ruby gems, Homebrew, npm, and their installed packages
+alias update='sudo softwareupdate -i -a; brew update; brew upgrade; brew cleanup; npm install npm -g; npm update -g; sudo gem update --system; sudo gem update; sudo gem cleanup'
+
+# networking
+alias ip="dig +short myip.opendns.com @resolver1.opendns.com"
+alias localip="ipconfig getifaddr en0"
+
+# random
 alias weather='curl wttr.in/brisbane'
 
-#########################################
-# Paths & OS                            #
-#########################################
+# list all files 
+function lals { 
+   ls -l | awk '{if (NR!=1) {printf "\033[91m%s\033[0m \033[34m%s:%s\033[0m %s\n", $1, $3, $4, $9 }}'
+}
+
+# list all directories
+function lald { 
+   ls -l | grep '^d' | awk '{ printf "\033[91m%s\033[0m \033[34m%s:%s\033[0m %s\n", $1, $3, $4, $9 }'
+}
+
+# paths
 export PATH=/usr/local/bin:$PATH
 export PATH=/usr/local/sbin:$PATH
 export PATH=$HOME/.composer/vendor/bin:$PATH
@@ -98,9 +103,7 @@ export PATH=$HOME/.npm-global/bin:$PATH
 export LDFLAGS="-L/usr/local/opt/libffi/lib"
 export CPPFLAGS="-I/usr/local/opt/libffi/include"
 
-#########################################
-# Exports                               #
-#########################################
+# custom aliases
 source ~/.aliases
 
 # BEGIN SNIPPET: Magento Cloud CLI configuration

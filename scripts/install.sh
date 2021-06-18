@@ -1,8 +1,5 @@
 #!/bin/bash
 
-# variables
-ROOT=$(pwd)
-
 # close any open System Preferences panes, to prevent them from overriding
 # settings we’re about to change
 osascript -e 'tell application "System Preferences" to quit'
@@ -76,8 +73,12 @@ curl -L https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/in
 bot 'Setting up symlinks...'
 
 action 'add global gitignore'
-ln -s $ROOT/dotfiles/shell/.global-gitingore $HOME/.global-gitignore
-git config --global core.excludesfile $HOME/.global-gitignore;ok
+rm $HOME/.gitignore
+ln -s $ROOT/dotfiles/vendor/.gitignore $HOME/.gitignore;ok
+
+action 'add global gitattributes'
+rm $HOME/.gitattributes
+ln -s $ROOT/dotfiles/vendor/.gitattributes $HOME/.gitattributes;ok
 
 action 'symlink .bash_profile'
 rm $HOME/.bash_profile
@@ -90,14 +91,6 @@ ln -s $ROOT/dotfiles/vendor/.zshrc $HOME/.zshrc;ok
 action 'symlink .gitconfig'
 rm $HOME/.gitconfig
 ln -s $ROOT/dotfiles/vendor/.gitconfig $HOME/.gitconfig;ok
-
-action 'symlink .gitignore_global'
-rm $HOME/.gitignore_global
-ln -s $ROOT/dotfiles/vendor/.gitignore_global $HOME/.gitignore_global;ok
-
-action 'symlink .hushlogin'
-rm $HOME/.hushlogin
-ln -s $ROOT/dotfiles/shell/.hushlogin $HOME/.hushlogin;ok
 
 # Create directories
 action 'creating code directory at ~/Code'
@@ -130,6 +123,8 @@ else
     fi
 fi
 
+bot 'installing brew apps...'
+
 require_brew git
 require_brew gh
 require_brew node
@@ -147,6 +142,9 @@ require_brew composer
 require_brew diff-so-fancy
 require_brew zsh-autosuggestions
 require_brew awscli
+require_brew tree
+require_brew mas
+require_brew dockutil
 
 require_brew mysql@5.7
 service_start mysql@5.7
@@ -161,9 +159,12 @@ $(brew --prefix mysql@5.7)/bin/mysqladmin -u root password root;ok
 running 'tapping homebrew-cask'
 brew tap homebrew/cask
 
+bot 'installing brew casks...'
+
 # casks
 require_cask google-chrome
 require_cask firefox-developer-edition
+require_cask brave-browser
 require_cask visual-studio-code
 require_cask fork
 require_cask transmit
@@ -173,14 +174,36 @@ require_cask spotify
 require_cask insomnia
 require_cask alfred
 require_cask spectacle
-require_cask dozer
+require_cask bartender
+require_cask docker
+require_cask forklift
+require_cask fantastical
+require_cask google-backup-and-sync
+require_cask dropbox
+require_cask slack
+require_cask the-unarchiver
+require_cask appcleaner
+
+bot 'installing mac app store apps...'
+
+# mac app store
+action 'mas: install spark'
+mas install 1176895641 > /dev/null 2>&1;ok
+
+action 'mas: install things'
+mas install 904280696 > /dev/null 2>&1;ok
+
+action 'mas: install amphetamine'
+mas install 937984704 > /dev/null 2>&1;ok
+
+action 'mas: install bear'
+mas install 1091189122 > /dev/null 2>&1;ok
+
+# action 'mas: install xcode'
+# mas install 497799835 > /dev/null 2>&1;ok
 
 if ask 'would you like to have spectacle start upon startup?' Y; then
     osascript -e 'tell application "System Events" to make login item at end with properties {path:"/Applications/Spectacle.app", hidden:false}'
-fi
-
-if ask 'would you like to have dozer start upon startup?' Y; then
-    osascript -e 'tell application "System Events" to make login item at end with properties {path:"/Applications/Dozer.app", hidden:false}'
 fi
 
 action 'symlink .hyper.js'
@@ -192,12 +215,8 @@ ln -s $ROOT/dotfiles/vendor/.hyper.js $HOME/.hyper.js;ok
 ###############################################################################
 
 running 'configure global npm packages to ~/.npm-global'
-mkdir ~/.npm-global
-npm config set prefix ~/.npm-global;ok
-
-# running 'install pure-prompt'
-# npm install --g pure-prompt;ok
-# brew install zsh-autosuggestions
+mkdir ~/.npm-packages
+npm config set prefix ~/.npm-packages;ok
 
 ###############################################################################
 # Composer                                                                    #
@@ -205,8 +224,11 @@ npm config set prefix ~/.npm-global;ok
 
 bot 'Installing composer packages'
 
+running 'installing hirak/prestissimo'
+composer_global hirak/prestissimo;ok
+
 running 'installing laravel/valet'
-composer_global laravel/valet
+composer_global laravel/valet;ok
 
 action 'configuring laravel/valet'
 valet install > /dev/null 2>&1
@@ -226,6 +248,9 @@ rm -rf fonts;ok
 
 running 'install spaceship prompt'
 npm install -g spaceship-prompt;ok
+
+running 'install vsce'
+npm install -g vsce;ok
 
 running 'installing zsh autosuggestions'
 brew install zsh-autosuggestions;ok

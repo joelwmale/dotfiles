@@ -9,8 +9,9 @@ bot 'joelwmale/dotfiles'
 if ask 'This will reset configure defaults and install some useful applications. Are you sure you want to continue?' Y; then
     source ./scripts/defaults.sh
     source ./scripts/install.sh
+    source ./scripts/dock.sh
 else
-    error 'cancelled...'
+    error 'Cancelled...'
 fi
 
 bot 'Finished configuring details and installing applications!'

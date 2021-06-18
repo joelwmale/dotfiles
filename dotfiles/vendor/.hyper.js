@@ -8,7 +8,7 @@ module.exports = {
     fontSize: 13,
 
     // font family with optional fallbacks
-    fontFamily: 'Fira Code, Dank Mono, Menlo, monospace',
+    fontFamily: 'Dank Mono, Menlo, monospace',
 
     // default font weight: 'normal' or 'bold'
     fontWeight: 'normal',
@@ -131,13 +131,11 @@ module.exports = {
   //   `@company/project`
   //   `project#1.0.1`
   plugins: [
-    // 'hyper-chesterish',
     'hyper-horizon-theme',
     'hypercwd',
     'hyperterm-paste',
     'hyper-search',
-    'hyper-tabs-enhanced',
-    'hyperterm-tabs'
+    'hyper-tabs-enhanced'
   ],
 
   // in development, you can create a directory under

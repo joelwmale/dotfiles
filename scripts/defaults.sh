@@ -18,6 +18,9 @@ defaults write com.apple.menuextra.battery ShowPercent YES;ok
 running 'Disable sound effects on boot'
 sudo nvram SystemAudioVolume=" ";ok
 
+running 'Disable audio feedback when volume is changed'
+defaults write com.apple.sound.beep.feedback -bool false;ok
+
 running 'Set sidebar icon size to medium'
 defaults write NSGlobalDomain NSTableViewDefaultSizeMode -int 2;ok
 
@@ -47,8 +50,11 @@ defaults write NSGlobalDomain NSQuitAlwaysKeepsWindows -bool false;ok
 running 'Disable automatic termination of inactive apps'
 defaults write NSGlobalDomain NSDisableAutomaticTermination -bool true;ok
 
-running 'Display IP, hostname, OS version, etc. at login screen'
-sudo defaults write /Library/Preferences/com.apple.loginwindow AdminHostInfo HostName;ok
+running 'Disable crash reporter'
+defaults write com.apple.CrashReporter DialogType -string "none";ok
+
+running 'Disable notification center and remove the menu bar icon'
+launchctl unload -w /System/Library/LaunchAgents/com.apple.notificationcenterui.plist 2> /dev/null;ok
 
 running 'Disable smart quotes'
 defaults write NSGlobalDomain NSAutomaticQuoteSubstitutionEnabled -bool false;ok
@@ -56,9 +62,11 @@ defaults write NSGlobalDomain NSAutomaticQuoteSubstitutionEnabled -bool false;ok
 running 'Disable smart dashes'
 defaults write NSGlobalDomain NSAutomaticDashSubstitutionEnabled -bool false;ok
 
-running 'Hide battery percent, show battery time remaining'
-defaults write com.apple.menuextra.battery ShowPercent -string "NO"
-defaults write com.apple.menuextra.battery ShowTime -string "YES";ok
+running 'Show battery percent'
+defaults write com.apple.menuextra.battery ShowPercent -string "YES";ok
+
+running 'Restart computer automatically if it freezes'
+sudo systemsetup -setrestartfreeze on;ok
 
 ###############################################################################
 # SSD-specific tweaks                                                         #
@@ -80,15 +88,9 @@ sudo pmset -a sms 0;ok
 bot 'Configuring trackpad, mouse, keyboard, bluetooth accessories and input';
 
 running 'Increase sound quality for bluetooth headphones/headsets'
-defaults write com.apple.BluetoothAudioAgent 'Apple Bitpool Max (editable)' 80
-defaults write com.apple.BluetoothAudioAgent 'Apple Bitpool Min (editable)' 80
-defaults write com.apple.BluetoothAudioAgent 'Apple Initial Bitpool (editable)' 80
-defaults write com.apple.BluetoothAudioAgent 'Apple Initial Bitpool Min (editable)' 80
-defaults write com.apple.BluetoothAudioAgent 'Negotiated Bitpool' 80
-defaults write com.apple.BluetoothAudioAgent 'Negotiated Bitpool Max' 80
-defaults write com.apple.BluetoothAudioAgent 'Negotiated Bitpool Min' 80;ok
+defaults write com.apple.BluetoothAudioAgent "Apple Bitpool Min (editable)" -int 40;ok
 
-running  'Full keyboard access for all controls'
+running 'Full keyboard access for all controls'
 defaults write NSGlobalDomain AppleKeyboardUIMode -int 3;ok
 
 running 'Set language and text formats'
@@ -100,9 +102,6 @@ defaults write NSGlobalDomain AppleMetricUnits -bool true;ok
 running 'Set timezone to Australia/Brisbane'
 systemsetup -settimezone 'Australia/Brisbane' > /dev/null;ok
 
-running 'Disable auto correct'
-defaults write NSGlobalDomain NSAutomaticSpellingCorrectionEnabled -bool false;ok
-
 running 'Disable automatic capitalization as it’s annoying when typing code'
 defaults write NSGlobalDomain NSAutomaticCapitalizationEnabled -bool false;ok
 
@@ -113,7 +112,8 @@ running 'Disable automatic period substitution as it’s annoying when typing co
 defaults write NSGlobalDomain NSAutomaticPeriodSubstitutionEnabled -bool false;ok
 
 running 'Disable smart quotes as they’re annoying when typing code'
-defaults write NSGlobalDomain NSAutomaticQuoteSubstitutionEnabled -bool false;ok
+defaults write NSGlobalDomain NSAutomaticQuoteSubstitutionEnabled -bool false
+defaults write NSGlobalDomain NSAutomaticDashSubstitutionEnabled -bool false;ok
 
 running 'Disable auto-correct'
 defaults write NSGlobalDomain NSAutomaticSpellingCorrectionEnabled -bool false;ok
@@ -126,6 +126,12 @@ launchctl unload -w /System/Library/LaunchAgents/com.apple.rcd.plist 2> /dev/nul
 
 running 'Stop itunes from opening when a device is plugged in'
 defaults write com.apple.iTunesHelper ignore-devices 1;ok
+
+running 'Turn off keyboard illumination when computer is not used for 5 minutes'
+defaults write com.apple.BezelServices kDimTime -int 300;ok
+
+running 'Right click with 2 fingers'
+defaults write com.apple.AppleMultitouchTrackpad TrackpadRightClick -int 1;ok
 
 ###############################################################################
 # Spotlight                                                                      #
@@ -164,9 +170,12 @@ defaults write com.apple.screencapture show-thumbnail -bool false;ok
 
 bot 'Configuring finder'
 
-running 'Set default finder window ~/Desktop'
+running 'Set default finder window ~'
 defaults write com.apple.finder NewWindowTarget -string "PfDe"
-defaults write com.apple.finder NewWindowTargetPath -string "file://${HOME}/Desktop/";ok
+defaults write com.apple.finder NewWindowTargetPath -string "file://${HOME}/";ok
+
+running 'Allow quitting finder via ⌘ + Q'
+defaults write com.apple.finder QuitMenuItem -bool true;ok
 
 running 'Show all file extensions'
 defaults write NSGlobalDomain AppleShowAllExtensions -bool true;ok
@@ -238,8 +247,8 @@ defaults write com.apple.dock autohide-fullscreen-delayed -bool false;ok
 running 'Setting dock tilezie to 60 pixels'
 defaults write com.apple.dock tilesize -int 60;ok
 
-running 'Remove all default app icons from the dock'
-defaults write com.apple.dock persistent-apps -array "";ok
+running "Don't show recent applications in dock"
+defaults write com.apple.dock show-recents -bool false;ok
 
 running 'Disable dashboard'
 defaults write com.apple.dashboard mcx-disabled -bool true;ok
@@ -322,6 +331,9 @@ defaults write com.apple.SoftwareUpdate AutomaticDownload -int 1;ok
 running 'Install System data files & security updates'
 defaults write com.apple.SoftwareUpdate CriticalUpdateInstall -int 1;ok
 
+running 'Enable developer mode for mac app store'
+defaults write com.apple.appstore WebKitDeveloperExtras -bool true;ok
+
 ###############################################################################
 # Messages                                                                    #
 ###############################################################################
@@ -344,7 +356,7 @@ running 'Prevent Photos from opening automatically when devices are plugged in'
 defaults -currentHost write com.apple.ImageCapture disableHotPlug -bool true;ok
 
 ###############################################################################
-# Energy Savings                                                              #
+# Energy saving                                                               #
 ###############################################################################
 
 bot 'Updating the Energy saving settings'
