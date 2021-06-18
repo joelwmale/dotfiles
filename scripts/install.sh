@@ -41,21 +41,6 @@ else
 fi
 
 ###############################################################################
-# Dev Tools                                                                   #
-###############################################################################
-
-running 'hide xcode-select --install'
-# xcode-select --install;ok
-touch /tmp/.com.apple.dt.CommandLineTools.installondemand.in-progress;
-PROD=$(softwareupdate -l |
-  grep "\*.*Command Line" |
-  head -n 1 | awk -F"*" '{print $2}' |
-  sed -e 's/^ *//' |
-  tr -d '\n')
-softwareupdate -i "$PROD" --verbose
-rm /tmp/.com.apple.dt.CommandLineTools.installondemand.in-progress;ok
-
-###############################################################################
 # Terminal                                                                    #
 ###############################################################################
 
@@ -105,7 +90,7 @@ bot 'checking brew installation...'
 brew_bin=$(which brew) 2>&1 > /dev/null
 if [[ $? != 0 ]]; then
     action "installing homebrew"
-    ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
     if [[ $? != 0 ]]; then
         error "unable to install homebrew, aborting script.."
         exit -1
