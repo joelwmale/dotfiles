@@ -114,7 +114,7 @@ require_brew git
 require_brew gh
 require_brew node
 require_brew pkg-config
-require_brew wget --overwrite
+require_brew wget
 require_brew httpie
 require_brew ncdu
 require_brew hub
