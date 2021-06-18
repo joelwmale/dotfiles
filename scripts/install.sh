@@ -142,7 +142,10 @@ action 'setting mysql@5.7 root password to "root"'
 $(brew --prefix mysql@5.7)/bin/mysqladmin -u root password root;ok
 
 running 'tapping homebrew-cask'
-brew tap homebrew/cask
+brew tap homebrew/cask;ok
+
+running 'tapping homebrew/cask-versions'
+brew tap homebrew/cask-versions;ok
 
 bot 'installing brew casks...'
 
