@@ -47,9 +47,16 @@ fi
 running 'hide last login line when starting terminal'
 touch $HOME/.hushlogin;ok
 
-action 'install oh-my-zsh'
-rm -rf $HOME/.oh-my-zsh
-curl -L https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh | sh;ok
+if [ ! -d $HOME/.oh-my-zsh ]; then
+    action 'install oh-my-zsh'
+    curl -L https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh | sh;ok
+else
+    if ask 'Reinstall oh-my-zsh?' Y; then
+        action 'reinstall oh-my-zsh'
+        rm -rf $HOME/.oh-my-zsh
+        curl -L https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh | sh;ok
+    fi
+fi
 
 ###############################################################################
 # Directories & configurations                                                #
@@ -73,6 +80,10 @@ action 'symlink .zshrc'
 rm $HOME/.zshrc
 ln -s $ROOT/dotfiles/vendor/.zshrc $HOME/.zshrc;ok
 
+action 'creating ~/.zsh'
+rm -rf $HOME/.zsh
+mkdir $HOME/.zsh
+
 action 'symlink .gitconfig'
 rm $HOME/.gitconfig
 ln -s $ROOT/dotfiles/vendor/.gitconfig $HOME/.gitconfig;ok
@@ -80,6 +91,24 @@ ln -s $ROOT/dotfiles/vendor/.gitconfig $HOME/.gitconfig;ok
 # Create directories
 action 'creating code directory at ~/Code'
 mkdir -p $HOME/Code;ok
+
+###############################################################################
+# Default cleanup                                                             #
+###############################################################################
+
+bot 'cleaning up a few things'
+
+action 'deleting garage band'
+sudo rm -rf /Applications/GarageBand.app;ok
+
+action 'deleting imovie'
+sudo rm -rf /Applications/iMovie.app;ok
+
+action 'deleting keynote'
+sudo rm -rf /Applications/Keynote.app;ok
+
+action 'deleting podcasts'
+sudo rm -rf /Applications/Podcasts.app;ok
 
 ###############################################################################
 # Brew                                                                        #
@@ -122,8 +151,6 @@ require_brew ack
 require_brew bat
 require_brew doctl
 require_brew yarn
-require_brew php@7.4
-require_brew composer
 require_brew diff-so-fancy
 require_brew zsh-autosuggestions
 require_brew awscli
@@ -131,15 +158,17 @@ require_brew tree
 require_brew mas
 require_brew dockutil
 
+require_brew php@7.4
+service_start php@7.4
+
+require_brew composer
+
 require_brew mysql@5.7
 service_start mysql@5.7
 brew_link mysql@5.7
 
 require_brew redis
 service_start redis
-
-action 'setting mysql@5.7 root password to "root"'
-$(brew --prefix mysql@5.7)/bin/mysqladmin -u root password root;ok
 
 running 'tapping homebrew-cask'
 brew tap homebrew/cask;ok
@@ -159,6 +188,7 @@ require_cask transmit
 require_cask tableplus
 require_cask hyper
 require_cask spotify
+require_cask 1password
 require_cask insomnia
 require_cask alfred
 require_cask spectacle
@@ -175,20 +205,22 @@ require_cask appcleaner
 bot 'installing mac app store apps...'
 
 # mac app store
-action 'mas: install spark'
-mas install 1176895641 > /dev/null 2>&1;ok
+if ask 'have you signed into the app store?' Y; then
+    action 'mas: install spark'
+    mas install 1176895641 > /dev/null 2>&1;ok
 
-action 'mas: install things'
-mas install 904280696 > /dev/null 2>&1;ok
+    action 'mas: install things'
+    mas install 904280696 > /dev/null 2>&1;ok
 
-action 'mas: install amphetamine'
-mas install 937984704 > /dev/null 2>&1;ok
+    action 'mas: install amphetamine'
+    mas install 937984704 > /dev/null 2>&1;ok
 
-action 'mas: install bear'
-mas install 1091189122 > /dev/null 2>&1;ok
+    action 'mas: install bear'
+    mas install 1091189122 > /dev/null 2>&1;ok
 
-# action 'mas: install xcode'
-# mas install 497799835 > /dev/null 2>&1;ok
+    action 'mas: install xcode'
+    mas install 497799835 > /dev/null 2>&1;ok
+fi
 
 if ask 'would you like to have spectacle start upon startup?' Y; then
     osascript -e 'tell application "System Events" to make login item at end with properties {path:"/Applications/Spectacle.app", hidden:false}'
@@ -202,15 +234,23 @@ ln -s $ROOT/dotfiles/vendor/.hyper.js $HOME/.hyper.js;ok
 # Node/NPM                                                                    #
 ###############################################################################
 
+bot 'configurating node & npm and installing packages'
+
 running 'configure global npm packages to ~/.npm-global'
 mkdir ~/.npm-packages
 npm config set prefix ~/.npm-packages;ok
+
+running 'installing gulp globally'
+npm install -g gulp > /dev/null 2>&1;ok
+
+running 'install vsce'
+npm install -g vsce;ok
 
 ###############################################################################
 # Composer                                                                    #
 ###############################################################################
 
-bot 'Installing composer packages'
+bot 'installing global composer packages'
 
 running 'installing hirak/prestissimo'
 composer_global hirak/prestissimo;ok
@@ -220,10 +260,14 @@ composer_global laravel/valet;ok
 
 action 'configuring laravel/valet'
 valet install > /dev/null 2>&1
+valet tld test > /dev/null 2>&1
 valet park ~/Code > /dev/null 2>&1;ok
 
+action 'installing laravel/installer'
+composer global require laravel/installer /dev/null 2>&1;ok
+
 ###############################################################################
-# Shell/misc                                                                  #
+# Shell                                                                       #
 ###############################################################################
 
 running 'installing powerline font for shell'
@@ -237,8 +281,11 @@ rm -rf fonts;ok
 running 'install spaceship prompt'
 npm install -g spaceship-prompt;ok
 
-running 'install vsce'
-npm install -g vsce;ok
-
 running 'installing zsh autosuggestions'
 brew install zsh-autosuggestions;ok
+
+running 'installing zsh git completion'
+curl https://raw.githubusercontent.com/git/git/master/contrib/completion/git-completion.zsh -o ~/.zsh/_git-completion;ok
+
+running 'installing zsh autocomplete git completion'
+git clone https://github.com/zsh-users/zsh-autosuggestions ~/.zsh/zsh-autosuggestions;ok

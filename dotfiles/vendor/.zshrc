@@ -1,5 +1,9 @@
-# If you come from bash you might have to change your $PATH.
-export PATH=$HOME/bin:/usr/local/bin:$PATH
+# paths
+export PATH=/opt/homebrew/bin:$PATH
+export PATH=/usr/local/bin:$PATH
+export PATH=/usr/local/sbin:$PATH
+export PATH=$HOME/.composer/vendor/bin:$PATH
+export PATH=$HOME/.npm-global/bin:$PATH
 
 # Path to your oh-my-zsh installation.
 export ZSH=$HOME/.oh-my-zsh
@@ -17,6 +21,7 @@ eval "$(hub alias -s)"
 ZSH_DISABLE_COMPFIX="true"
 source $ZSH/oh-my-zsh.sh
 source ~/.bash_profile
+source ~/.aliases
 
 # Set Spaceship ZSH as a prompt
 autoload -U promptinit; promptinit
@@ -59,3 +64,15 @@ SPACESHIP_PROMPT_ORDER=(
   exit_code     # Exit code section
   char          # Prompt character
 )
+
+# load plugins
+fpath=(~/.zsh $fpath)
+source ~/.zsh/zsh-autosuggestions/zsh-autosuggestions.zsh 2> /dev/null
+
+# randomize suggest color
+randomSuggestColor=$(( $RANDOM % 2 + 1 ));
+if (( $randomSuggestColor == 1)); then
+  export ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE="fg=#D2506F,bold" 
+else
+  export ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE="fg=#BB766C,bold"
+fi

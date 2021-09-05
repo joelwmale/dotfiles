@@ -17,6 +17,18 @@ opendb () {
    open $DB_URL
 }
 
+difpm () {
+   directory=${PWD##*/} 
+   fpmContainer="${directory}_fpm_1"
+
+   if [ ! "$(docker ps -q -f name=${fpmContainer})" ]; then
+      echo "Unable to find fpm container: ${fpmContainer}"
+      return
+   fi
+
+   docker exec -it $fpmContainer bash
+}
+
 # general
 alias code='cd ~/Code'
 alias dotfiles='cd ~/Code/dotfiles'
@@ -31,6 +43,9 @@ alias cdump="composer dumpautoload"
 alias pawipe="php artisan config:cache && composer dumpautoload"
 alias pa="php artisan"
 alias dbfresh="pa migrate:fresh --seed"
+
+# docker
+alias dockerbuild="docker-compose up -d --no-deps --build"
 
 # infrastructure
 alias tplan='terragrunt plan-all'
@@ -51,29 +66,28 @@ alias gr='git reset'
 
 # misc
 alias ga='git add .'
+alias gp='git push'
 alias gc='git commit --verbose'
 alias gcm='git commit -m'
-alias gcom='git checkout master'
-alias gcod='git checkout develop'
 alias gca='git commit -a --verbose'
 alias gcam='git commit --amend --verbose'
-alias gf='git fetch'
 alias gfa='git fetch --all'
-alias grh='git reset --hard'
+alias grh='git add . && git reset --hard'
 
-# stashing
-alias gssl='git stash show -p stash@{0}'
-alias gsslp='git stash show -p stash@{1}'
-alias gsa='git stash apply'
-alias gsp='git stash pop'
-alias gspua='git stash !git stash show -p | git apply -R'
+# merging
+alias gmp='git merge -' # merge previous branch
 
+ # diffs
 alias gd='git diff'
 alias gds='git diff --stat'
 
+# statuses
 alias gs='git status -s'
+
+# branches
 alias gc='git checkout'
 alias gcb='git checkout -b'
+alias gcp='git checkout -' # checkout previous branch
 
 # get macOS Software Updates, and update installed Ruby gems, Homebrew, npm, and their installed packages
 alias update='sudo softwareupdate -i -a; brew update; brew upgrade; brew cleanup; npm install npm -g; npm update -g; sudo gem update --system; sudo gem update; sudo gem cleanup'
@@ -95,19 +109,14 @@ function lald {
    ls -l | grep '^d' | awk '{ printf "\033[91m%s\033[0m \033[34m%s:%s\033[0m %s\n", $1, $3, $4, $9 }'
 }
 
-# paths
-export PATH=/usr/local/bin:$PATH
-export PATH=/usr/local/sbin:$PATH
-export PATH=$HOME/.composer/vendor/bin:$PATH
-export PATH=$HOME/.npm-global/bin:$PATH
+# composer fix
+export COMPOSER_MEMORY_LIMIT=-1
+
 export LDFLAGS="-L/usr/local/opt/libffi/lib"
 export CPPFLAGS="-I/usr/local/opt/libffi/include"
 
-# custom aliases
-source ~/.aliases
-
 # BEGIN SNIPPET: Magento Cloud CLI configuration
-HOME=${HOME:-'/Users/joel'}
+HOME=${HOME:-'/home/root'}
 export PATH="$HOME/"'.magento-cloud/bin':"$PATH"
 if [ -f "$HOME/"'.magento-cloud/shell-config.rc' ]; then . "$HOME/"'.magento-cloud/shell-config.rc'; fi # END SNIPPET
 export PATH="/usr/local/opt/mysql@5.7/bin:$PATH"

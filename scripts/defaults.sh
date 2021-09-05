@@ -238,6 +238,9 @@ bot 'Setting up dock, dashboard and hot corners'
 running 'Stop bouncing in dock'
 defaults write com.apple.dock no-bouncing -bool true;ok
 
+running 'Show recents in dock'
+defaults write com.apple.dock show-recents -bool true;ok
+
 running 'Automatically hide and show the dock'
 defaults write com.apple.dock autohide -bool true;ok
 
@@ -246,9 +249,6 @@ defaults write com.apple.dock autohide-fullscreen-delayed -bool false;ok
 
 running 'Setting dock tilezie to 60 pixels'
 defaults write com.apple.dock tilesize -int 60;ok
-
-running "Don't show recent applications in dock"
-defaults write com.apple.dock show-recents -bool false;ok
 
 running 'Disable dashboard'
 defaults write com.apple.dashboard mcx-disabled -bool true;ok
@@ -263,7 +263,7 @@ running 'Make dock icons of hidden applications translucent'
 defaults write com.apple.dock showhidden -bool true;ok
 
 running 'Disable transparency in the menu bar and elsewhere'
-defaults write com.apple.universalaccess reduceTransparency -bool true;ok
+defaults write com.apple.universalaccess reduceTransparency 0;ok
 
 running 'Set highlight colour to purple'
 defaults write NSGlobalDomain AppleHighlightColor -string "0.541176471 0.168627451 0.88627451";ok
