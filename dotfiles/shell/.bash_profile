@@ -29,6 +29,9 @@ difpm () {
    docker exec -it $fpmContainer bash
 }
 
+# brew
+alias archbrew='arch -x86_64 /usr/local/homebrew/bin/brew install'
+
 # general
 alias code='cd ~/Code'
 alias dotfiles='cd ~/Code/dotfiles'
