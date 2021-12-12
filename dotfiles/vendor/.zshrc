@@ -8,7 +8,7 @@ export PATH=$HOME/.npm-global/bin:$PATH
 # Path to your oh-my-zsh installation.
 export ZSH=$HOME/.oh-my-zsh
 
-ZSH_THEME="robbyrussell"
+ZSH_THEME="spaceship"
 
 plugins=(
   git
@@ -22,10 +22,6 @@ ZSH_DISABLE_COMPFIX="true"
 source $ZSH/oh-my-zsh.sh
 source ~/.bash_profile
 source ~/.aliases
-
-# Set Spaceship ZSH as a prompt
-autoload -U promptinit; promptinit
-prompt spaceship
 
 SPACESHIP_TIME_SHOW=true
 SPACESHIP_PROMPT_ORDER=(
@@ -76,3 +72,6 @@ if (( $randomSuggestColor == 1)); then
 else
   export ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE="fg=#BB766C,bold"
 fi
+
+fpath=($fpath "/Users/joelmale/.zfunctions")
+eval "$(/opt/homebrew/bin/brew shellenv)"

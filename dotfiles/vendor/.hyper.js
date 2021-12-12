@@ -131,7 +131,8 @@ module.exports = {
   //   `@company/project`
   //   `project#1.0.1`
   plugins: [
-    'hyper-horizon-theme',
+    'hyper-aura-theme',
+    // 'hyper-horizon-theme',
     'hypercwd',
     'hyperterm-paste',
     'hyper-search',

@@ -44,6 +44,9 @@ alias pawipe="php artisan config:cache && composer dumpautoload"
 alias pa="php artisan"
 alias dbfresh="pa migrate:fresh --seed"
 
+# frontend stuff
+alias twatch="TAILWIND_MODE=watch npx mix watch" 
+
 # docker
 alias dockerbuild="docker-compose up -d --no-deps --build"
 
@@ -115,8 +118,12 @@ export COMPOSER_MEMORY_LIMIT=-1
 export LDFLAGS="-L/usr/local/opt/libffi/lib"
 export CPPFLAGS="-I/usr/local/opt/libffi/include"
 
+export PATH="$HOME/.npm-packages/bin:$PATH"
+export PATH="/usr/local/bin:$PATH"
+
 # BEGIN SNIPPET: Magento Cloud CLI configuration
 HOME=${HOME:-'/home/root'}
 export PATH="$HOME/"'.magento-cloud/bin':"$PATH"
 if [ -f "$HOME/"'.magento-cloud/shell-config.rc' ]; then . "$HOME/"'.magento-cloud/shell-config.rc'; fi # END SNIPPET
 export PATH="/usr/local/opt/mysql@5.7/bin:$PATH"
+export JAVA_HOME="/Library/Java/JavaVirtualMachines/jdk-15.0.1.jdk/Contents/Home"

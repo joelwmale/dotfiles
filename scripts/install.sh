@@ -76,6 +76,10 @@ action 'symlink .bash_profile'
 rm $HOME/.bash_profile
 ln -s $ROOT/dotfiles/shell/.bash_profile $HOME/.bash_profile;ok
 
+action 'touch .aliases'
+rm $HOME/.aliases
+touch $HOME/.aliases;ok
+
 action 'symlink .zshrc'
 rm $HOME/.zshrc
 ln -s $ROOT/dotfiles/vendor/.zshrc $HOME/.zshrc;ok
@@ -160,12 +164,14 @@ require_brew dockutil
 
 require_brew php@7.4
 service_start php@7.4
+brew link --overwrite --force php@7.4
 
 require_brew composer
 
 require_brew mysql@5.7
 service_start mysql@5.7
 brew_link mysql@5.7
+# ALTER USER 'root'@'localhost' IDENTIFIED BY 'root';
 
 require_brew redis
 service_start redis
@@ -264,7 +270,7 @@ valet tld test > /dev/null 2>&1
 valet park ~/Code > /dev/null 2>&1;ok
 
 action 'installing laravel/installer'
-composer global require laravel/installer /dev/null 2>&1;ok
+composer global require laravel/installer > /dev/null 2>&1;ok
 
 ###############################################################################
 # Shell                                                                       #
@@ -279,7 +285,8 @@ cd ..
 rm -rf fonts;ok
 
 running 'install spaceship prompt'
-npm install -g spaceship-prompt;ok
+git clone https://github.com/spaceship-prompt/spaceship-prompt.git "$ZSH_CUSTOM/themes/spaceship-prompt" --depth=1
+ln -s "$ZSH_CUSTOM/themes/spaceship-prompt/spaceship.zsh-theme" "$ZSH_CUSTOM/themes/spaceship.zsh-theme";ok
 
 running 'installing zsh autosuggestions'
 brew install zsh-autosuggestions;ok
