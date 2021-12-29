@@ -1,0 +1,106 @@
+# Use vs instead of code
+vs () { VSCODE_CWD="$PWD" open -n -b "com.microsoft.VSCode" --args $* ;}
+
+function tc() {
+   if [ -f app/Console/Commands/TestCommand.php ]; then
+      pa test:command
+   else
+      pa make:command TestCommand
+      sed -i 's/command:name/test:command/' app/Console/Commands/TestCommand.php
+   fi
+}
+
+# Run tests
+function p() {
+   if [ -f vendor/bin/pest ]; then
+      vendor/bin/pest "$@"
+   else
+      vendor/bin/phpunit "$@"
+   fi
+}
+
+function pf() {
+   if [ -f vendor/bin/pest ]; then
+      vendor/bin/pest --filter "$@"
+   else
+      vendor/bin/phpunit --filter "$@"
+   fi
+}
+
+# Docker
+function ssh-docker() {
+   docker exec -it "$@" bash
+}
+
+# Create a new directory and enter it
+function mkd() {
+   mkdir -p "$@" && cd "$@"
+}
+
+# All the dig info
+function digga() {
+	dig +nocmd "$1" any +multiline +noall +answer
+}
+
+function tinker()
+{
+  if [ -z "$1" ]
+    then
+       php artisan tinker
+    else
+       php artisan tinker --execute="dd($1);"
+  fi
+}
+
+function weather() {
+   city="$1"
+
+   if [ -z "$city" ]; then
+      city="Antwerp"
+   fi
+
+   eval "curl http://wttr.in/${city}"
+}
+
+alias mysqladm='mysql -u root'
+
+#  Commit everything
+function commit() {
+  commitMessage="$1"
+
+  if [ "$commitMessage" = "" ]; then
+     commitMessage="wip"
+  fi
+
+  git add .
+  eval "git commit -a -m '${commitMessage}'"
+  eval "git push"
+}
+
+function db () {
+   [ ! -f .env ] && { echo "No .env file found."; exit 1; }
+
+   DB_CONNECTION=$(grep DB_CONNECTION .env | grep -v -e '^\s*#' | cut -d '=' -f 2-)
+   DB_HOST=$(grep DB_HOST .env | grep -v -e '^\s*#' | cut -d '=' -f 2-)
+   DB_PORT=$(grep DB_PORT .env | grep -v -e '^\s*#' | cut -d '=' -f 2-)
+   DB_DATABASE=$(grep DB_DATABASE .env | grep -v -e '^\s*#' | cut -d '=' -f 2-)
+   DB_USERNAME=$(grep DB_USERNAME .env | grep -v -e '^\s*#' | cut -d '=' -f 2-)
+   DB_PASSWORD=$(grep DB_PASSWORD .env | grep -v -e '^\s*#' | cut -d '=' -f 2-)
+
+   DB_URL="${DB_CONNECTION}://${DB_USERNAME}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_DATABASE}"
+
+   echo "Opening ${DB_URL}"
+   open $DB_URL
+}
+
+function scheduler () {
+    while :; do
+        php artisan schedule:run
+	echo "Sleeping 60 seconds..."
+        sleep 60
+    done
+}
+
+function silent() {
+   "$@" >& /dev/null
+}

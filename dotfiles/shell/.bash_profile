@@ -1,44 +1,13 @@
-# Use vs instead of code
-vs () { VSCODE_CWD="$PWD" open -n -b "com.microsoft.VSCode" --args $* ;}
-
-opendb () {
-   [ ! -f .env ] && { echo "No .env file found."; exit 1; }
-
-   DB_CONNECTION='mysql'
-   DB_HOST=$(grep DB_HOST .env | grep -v -e '^\s*#' | cut -d '=' -f 2-)
-   DB_PORT=$(grep DB_PORT .env | grep -v -e '^\s*#' | cut -d '=' -f 2-)
-   DB_DATABASE=$(grep DB_DATABASE .env | grep -v -e '^\s*#' | cut -d '=' -f 2-)
-   DB_USERNAME=$(grep DB_USERNAME .env | grep -v -e '^\s*#' | cut -d '=' -f 2-)
-   DB_PASSWORD=$(grep DB_PASSWORD .env | grep -v -e '^\s*#' | cut -d '=' -f 2-)
-
-   DB_URL="${DB_CONNECTION}://${DB_USERNAME}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_DATABASE}"
-
-   echo "Opening ${DB_URL}"
-   open $DB_URL
-}
-
-difpm () {
-   directory=${PWD##*/} 
-   fpmContainer="${directory}_fpm_1"
-
-   if [ ! "$(docker ps -q -f name=${fpmContainer})" ]; then
-      echo "Unable to find fpm container: ${fpmContainer}"
-      return
-   fi
-
-   docker exec -it $fpmContainer bash
-}
-
-# brew
-alias archbrew='arch -x86_64 /usr/local/homebrew/bin/brew install'
-
 # general
 alias code='cd ~/Code'
 alias dotfiles='cd ~/Code/dotfiles'
 alias q="cd ~ && clear"
+alias desktop='cd ~/Desktop'
+
+alias top="sudo htop"
 
 # code
-alias codecept="./vendor/bin/codecept"
+alias pest="./vendor/bin/pest"
 alias phpunit="php ./vendor/bin/phpunit"
 alias cdump="composer dumpautoload"
 
@@ -56,7 +25,6 @@ alias dockerbuild="docker-compose up -d --no-deps --build"
 # infrastructure
 alias tplan='terragrunt plan-all'
 alias tapply='terragrunt apply-all'
-alias minio='minio server ~/data'
 
 # misc
 alias cat='bat'
@@ -130,3 +98,4 @@ export PATH="$HOME/"'.magento-cloud/bin':"$PATH"
 if [ -f "$HOME/"'.magento-cloud/shell-config.rc' ]; then . "$HOME/"'.magento-cloud/shell-config.rc'; fi # END SNIPPET
 export PATH="/usr/local/opt/mysql@5.7/bin:$PATH"
 export JAVA_HOME="/Library/Java/JavaVirtualMachines/jdk-15.0.1.jdk/Contents/Home"
+. "$HOME/.cargo/env"

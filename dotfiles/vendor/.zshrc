@@ -21,6 +21,7 @@ eval "$(hub alias -s)"
 ZSH_DISABLE_COMPFIX="true"
 source $ZSH/oh-my-zsh.sh
 source ~/.bash_profile
+source ~/.functions
 source ~/.aliases
 
 SPACESHIP_TIME_SHOW=true
