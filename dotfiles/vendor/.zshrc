@@ -76,3 +76,6 @@ fi
 
 fpath=($fpath "/Users/joelmale/.zfunctions")
 eval "$(/opt/homebrew/bin/brew shellenv)"
+# Set Spaceship ZSH as a prompt
+autoload -U promptinit; promptinit
+prompt spaceship

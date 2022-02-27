@@ -4,6 +4,8 @@ alias dotfiles='cd ~/Code/dotfiles'
 alias q="cd ~ && clear"
 alias desktop='cd ~/Desktop'
 
+alias expose="/opt/homebrew/Cellar/php@8.0/8.0.15.reinstall/bin/php ~/.composer/vendor/bin/expose"
+
 alias top="sudo htop"
 
 # code
@@ -33,6 +35,8 @@ alias cat='bat'
 alias repush='git pull --rebase && git push'
 alias gitclean="git checkout master && git fetch -p && git branch -vv | grep 'origin/.*: gone]' | awk '{print $1}' | xargs git branch -D"
 alias publish='git push --set-upstream origin $(git branch | grep \* | cut -d " " -f2)'
+
+alias grc="gh repo clone"
 
 # one line log
 alias gl='git log --pretty=format:"%C(yellow)%h %ad%Cred%d %Creset%s%Cblue [%cn]" --decorate --date=short'
