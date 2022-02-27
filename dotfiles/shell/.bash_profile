@@ -95,11 +95,6 @@ export CPPFLAGS="-I/usr/local/opt/libffi/include"
 
 export PATH="$HOME/.npm-packages/bin:$PATH"
 export PATH="/usr/local/bin:$PATH"
-
-# BEGIN SNIPPET: Magento Cloud CLI configuration
-HOME=${HOME:-'/home/root'}
-export PATH="$HOME/"'.magento-cloud/bin':"$PATH"
-if [ -f "$HOME/"'.magento-cloud/shell-config.rc' ]; then . "$HOME/"'.magento-cloud/shell-config.rc'; fi # END SNIPPET
 export PATH="/usr/local/opt/mysql@5.7/bin:$PATH"
-export JAVA_HOME="/Library/Java/JavaVirtualMachines/jdk-15.0.1.jdk/Contents/Home"
-. "$HOME/.cargo/env"
+
+eval $(/opt/homebrew/bin/brew shellenv)

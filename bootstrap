@@ -17,7 +17,7 @@ fi
 bot 'Finished configuring details and installing applications!'
 
 if ask 'You should restart your computer to apply all of the changes. Restart now?' Y; then
-    shutdown -r now
+    sudo -s shutdown -r now
 else
     action 'restarting affected applications'
     for app in "Activity Monitor" "Address Book" "Calendar" "Contacts" "cfprefsd" \

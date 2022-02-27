@@ -244,9 +244,6 @@ if ask 'have you signed into the app store?' Y; then
 
     action 'mas: install bear'
     mas install 1091189122 > /dev/null 2>&1;ok
-
-    action 'mas: install xcode'
-    mas install 497799835 > /dev/null 2>&1;ok
 fi
 
 if ask 'would you like to have spectacle start upon startup?' Y; then
@@ -310,10 +307,3 @@ curl https://raw.githubusercontent.com/git/git/master/contrib/completion/git-com
 
 running 'installing zsh autocomplete git completion'
 git clone https://github.com/zsh-users/zsh-autosuggestions ~/.zsh/zsh-autosuggestions;ok
-
-if ask 'Would you like to restore settings using your mackup config?' Y; then
-    if ask 'Is dropbox installed and logged in?' Y; then
-        running 'restoring settings using mackup'
-        mackup restore;ok
-    fi
-fi
