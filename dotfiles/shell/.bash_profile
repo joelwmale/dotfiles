@@ -2,34 +2,31 @@
 alias code='cd ~/Code'
 alias dotfiles='cd ~/Code/dotfiles'
 alias q="cd ~ && clear"
-alias desktop='cd ~/Desktop'
-
-alias expose="/opt/homebrew/Cellar/php@8.0/8.0.15.reinstall/bin/php ~/.composer/vendor/bin/expose"
 
 alias top="sudo htop"
 
 # code
-alias pest="./vendor/bin/pest"
-alias phpunit="php ./vendor/bin/phpunit"
+alias p="./vendor/bin/pest"
+alias pc="p --type-coverage"
+alias stan="vendor/bin/phpstan analyse --memory-limit=2G"
+
 alias cdump="composer dumpautoload"
 
 # laravel
-alias pawipe="php artisan config:cache && composer dumpautoload"
+alias optimize="php artisan optimize"
 alias pa="php artisan"
 alias dbfresh="pa migrate:fresh --seed"
+
+alias op="php artisan optimize"
+alias mfs="pa migrate:fresh --seed"
+alias mr="php artisan migrate:rollback"
 
 # frontend stuff
 alias twatch="TAILWIND_MODE=watch npx mix watch" 
 
-# docker
-alias dockerbuild="docker-compose up -d --no-deps --build"
-
-# infrastructure
-alias tplan='terragrunt plan-all'
-alias tapply='terragrunt apply-all'
-
 # misc
 alias cat='bat'
+alias shrug="echo '¯\_(ツ)_/¯' | pbcopy"
 
 # git/hub
 alias repush='git pull --rebase && git push'
@@ -43,24 +40,18 @@ alias gl='git log --pretty=format:"%C(yellow)%h %ad%Cred%d %Creset%s%Cblue [%cn]
 alias gr='git reset'
 
 # misc
-alias ga='git add .'
+alias gaa='git add .'
 alias gp='git push'
-alias gc='git commit --verbose'
-alias gcm='git commit -m'
-alias gca='git commit -a --verbose'
-alias gcam='git commit --amend --verbose'
 alias gfa='git fetch --all'
 alias grh='git add . && git reset --hard'
 
 # merging
 alias gmp='git merge -' # merge previous branch
+alias mpb='gcp && git pull && gcp && gmp && git push' # swap to previous branch, pull, swab back to current branch, merge, and push
 
  # diffs
 alias gd='git diff'
 alias gds='git diff --stat'
-
-# statuses
-alias gs='git status -s'
 
 # branches
 alias gc='git checkout'
@@ -87,14 +78,23 @@ function lald {
    ls -l | grep '^d' | awk '{ printf "\033[91m%s\033[0m \033[34m%s:%s\033[0m %s\n", $1, $3, $4, $9 }'
 }
 
+# Navigation Shortcuts
+alias home='clear && cd ~ && ls'
+alias downloads='clear && cd ~/Downloads && ls'
+alias desktop='clear && cd ~/Desktop && ls'
+
 # composer fix
 export COMPOSER_MEMORY_LIMIT=-1
 
 export LDFLAGS="-L/usr/local/opt/libffi/lib"
 export CPPFLAGS="-I/usr/local/opt/libffi/include"
 
-export PATH="$HOME/.npm-packages/bin:$PATH"
+export PATH="./vendor/bin:$PATH"
+export PATH="/.npm-packages/bin:$PATH"
 export PATH="/usr/local/bin:$PATH"
 export PATH="/usr/local/opt/mysql@5.7/bin:$PATH"
+
+export GEM_HOME="$HOME/.gem"
+export PATH="$GEM_HOME/bin:$PATH"
 
 eval $(/opt/homebrew/bin/brew shellenv)

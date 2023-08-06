@@ -18,3 +18,5 @@
 	defaultBranch = master
 [hub]
 	protocol = ssh
+[push]
+	autoSetupRemote = true

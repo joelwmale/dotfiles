@@ -80,16 +80,6 @@ action 'symlink .functions'
 rm $HOME/.functions
 ln -s $ROOT/dotfiles/shell/.functions $HOME/.functions;ok
 
-action 'setting up vim'
-rm $HOME/.vimrc
-ln -s $ROOT/dotfiles/vendor/.vimrc $HOME/.vimrc
-rm $HOME/.vim
-ln -s $ROOT/dotfiles/vendor/.vim $HOME/.vim;ok
-
-action 'symlink z'
-rm $HOME/.z.sh
-ln -s $ROOT/dotfiles/vendor/z.sh $HOME/z.sh;ok
-
 action 'touch .aliases'
 rm $HOME/.aliases
 touch $HOME/.aliases;ok
@@ -105,10 +95,6 @@ mkdir $HOME/.zsh
 action 'symlink .gitconfig'
 rm $HOME/.gitconfig
 ln -s $ROOT/dotfiles/vendor/.gitconfig $HOME/.gitconfig;ok
-
-action 'symlink .mackup.cfg'
-rm $HOME/.mackup.cfg
-ln -s $ROOT/dotfiles/vendor/.mackup.cfg $HOME/.mackup.cfg;ok
 
 action 'symlink .hyper.js'
 rm $HOME/.hyper.js
@@ -165,38 +151,36 @@ fi
 
 bot 'installing brew apps...'
 
-require_brew git
-require_brew gh
-require_brew node
-require_brew pkg-config
-require_brew wget
-require_brew httpie
-require_brew ncdu
-require_brew hub
-require_brew ack
-require_brew bat
-require_brew doctl
-require_brew yarn
-require_brew diff-so-fancy
-require_brew zsh-autosuggestions
-require_brew awscli
-require_brew tree
-require_brew mas
-require_brew dockutil
-require_brew htop
-require_brew mackup
+brew git
+brew gh
+brew node
+brew pkg-config
+brew wget
+brew httpie
+brew ncdu
+brew hub
+brew ack
+brew bat
+brew doctl
+brew yarn
+brew diff-so-fancy
+brew zsh-autosuggestions
+brew awscli
+brew tree
+brew mas
+brew dockutil
+brew htop
 
-require_brew php@8.1
-service_start php@8.1
-brew link --overwrite --force php@8.1
+brew composer
 
-require_brew composer
-
-require_brew mariadb
+brew mariadb
 service_start mariadb
 brew_link mariadb
 
-require_brew redis
+running 'setting root mariadb password to root'
+sudo $(brew --prefix mariadb)/bin/mysqladmin -u root password root;
+
+brew redis
 service_start redis
 
 running 'tapping homebrew-cask'
@@ -208,26 +192,31 @@ brew tap homebrew/cask-versions;ok
 bot 'installing brew casks...'
 
 # casks
-require_cask brave-browser
-require_cask firefox-developer-edition
-require_cask visual-studio-code
-require_cask fork
-require_cask transmit
-require_cask tableplus
-require_cask hyper
-require_cask spotify
-require_cask 1password
-require_cask insomnia
-require_cask alfred
-require_cask spectacle
-require_cask bartender
-require_cask docker
-require_cask forklift
-require_cask fantastical
-require_cask google-drive
-require_cask dropbox
-require_cask slack
-require_cask the-unarchiver
+cask brave-browser
+cask firefox-developer-edition
+cask visual-studio-code
+cask fork
+cask transmit
+cask tableplus
+cask hyper
+cask spotify
+cask 1password
+cask insomnia
+cask alfred
+cask bartender
+cask forklift
+cask fantastical
+cask google-drive
+cask dropbox
+cask slack
+cask the-unarchiver
+cask herd
+cask rectangle
+cask helo
+
+running 'tapping shopify/shopify'
+brew tap shopify/shopify
+brew themekit;ok
 
 bot 'installing mac app store apps...'
 
@@ -246,9 +235,9 @@ if ask 'have you signed into the app store?' Y; then
     mas install 1091189122 > /dev/null 2>&1;ok
 fi
 
-if ask 'would you like to have spectacle start upon startup?' Y; then
-    osascript -e 'tell application "System Events" to make login item at end with properties {path:"/Applications/Spectacle.app", hidden:false}'
-fi
+# if ask 'would you like to have spectacle start upon startup?' Y; then
+#     osascript -e 'tell application "System Events" to make login item at end with properties {path:"/Applications/Spectacle.app", hidden:false}'
+# fi
 
 ###############################################################################
 # Node/NPM                                                                    #
@@ -271,14 +260,6 @@ npm install -g vsce;ok
 ###############################################################################
 
 bot 'installing global composer packages'
-
-running 'installing laravel/valet'
-composer_global laravel/valet;ok
-
-action 'configuring laravel/valet'
-valet install > /dev/null 2>&1
-valet tld test > /dev/null 2>&1
-valet park ~/Code > /dev/null 2>&1;ok
 
 action 'installing laravel/installer'
 composer global require laravel/installer > /dev/null 2>&1;ok
@@ -307,3 +288,10 @@ curl https://raw.githubusercontent.com/git/git/master/contrib/completion/git-com
 
 running 'installing zsh autocomplete git completion'
 git clone https://github.com/zsh-users/zsh-autosuggestions ~/.zsh/zsh-autosuggestions;ok
+
+###############################################################################
+# Rosetta                                                                     #
+###############################################################################
+
+running 'installing rosetta'
+softwareupdate --install-rosetta;ok

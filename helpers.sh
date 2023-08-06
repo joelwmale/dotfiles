@@ -78,7 +78,7 @@ say() {
     echo "$1"
 }
 
-function require_cask() {
+function cask() {
     brew cask list $1 > /dev/null 2>&1 | true
     if [[ ${PIPESTATUS[0]} != 0 ]]; then
         action "brew install --cask $1 $2"
@@ -91,7 +91,7 @@ function require_cask() {
     fi
 }
 
-function require_brew() {
+function brew() {
     brew list $1 > /dev/null 2>&1 | true
     if [[ ${PIPESTATUS[0]} != 0 ]]; then
         action "brew install $1 $2"
