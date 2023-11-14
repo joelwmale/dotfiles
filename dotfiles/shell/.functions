@@ -16,18 +16,10 @@ function mkd() {
 }
 
 function weather() {
-   city="$1"
-
-   if [ -z "$city" ]; then
-      city="Brisbane"
-   fi
-
-   eval "curl http://wttr.in/${city}"
+   ocal city="${1:-Brisbane}"
+   curl http://wttr.in/${city// /+}\?F
 }
 
-alias mysqladm='mysql -u root'
-
-# Commit everything
 function commit() {
   commitMessage="$*"
 
