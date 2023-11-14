@@ -10,53 +10,16 @@ function tc() {
    fi
 }
 
-# Run tests
-function p() {
-   if [ -f vendor/bin/pest ]; then
-      vendor/bin/pest "$@" -p
-   else
-      vendor/bin/phpunit "$@"
-   fi
-}
-
-function pf() {
-   if [ -f vendor/bin/pest ]; then
-      vendor/bin/pest --filter "$@"
-   else
-      vendor/bin/phpunit --filter "$@"
-   fi
-}
-
-# Docker
-function ssh-docker() {
-   docker exec -it "$@" bash
-}
-
 # Create a new directory and enter it
 function mkd() {
    mkdir -p "$@" && cd "$@"
-}
-
-# All the dig info
-function digga() {
-	dig +nocmd "$1" any +multiline +noall +answer
-}
-
-function tinker()
-{
-  if [ -z "$1" ]
-    then
-       php artisan tinker
-    else
-       php artisan tinker --execute="dd($1);"
-  fi
 }
 
 function weather() {
    city="$1"
 
    if [ -z "$city" ]; then
-      city="Antwerp"
+      city="Brisbane"
    fi
 
    eval "curl http://wttr.in/${city}"
@@ -64,17 +27,18 @@ function weather() {
 
 alias mysqladm='mysql -u root'
 
-#  Commit everything
+# Commit everything
 function commit() {
-  commitMessage="$1"
-
-  if [ "$commitMessage" = "" ]; then
-     commitMessage="wip"
-  fi
+  commitMessage="$*"
 
   git add .
+
+  if [ "$commitMessage" = "" ]; then
+     aicommits
+     return
+  fi
+    
   eval "git commit -a -m '${commitMessage}'"
-  eval "git push"
 }
 
 function db () {

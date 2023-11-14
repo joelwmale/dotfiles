@@ -14,9 +14,9 @@ alias cdump="composer dumpautoload"
 
 # laravel
 alias optimize="php artisan optimize"
-alias pa="php artisan"
+alias pa="valet php artisan"
+alias composer="valet composer"
 alias dbfresh="pa migrate:fresh --seed"
-
 alias op="php artisan optimize"
 alias mfs="pa migrate:fresh --seed"
 alias mr="php artisan migrate:rollback"
@@ -32,7 +32,7 @@ alias shrug="echo '¯\_(ツ)_/¯' | pbcopy"
 alias repush='git pull --rebase && git push'
 alias gitclean="git checkout master && git fetch -p && git branch -vv | grep 'origin/.*: gone]' | awk '{print $1}' | xargs git branch -D"
 alias publish='git push --set-upstream origin $(git branch | grep \* | cut -d " " -f2)'
-
+alias uncommit="git reset --soft HEAD~1"
 alias grc="gh repo clone"
 
 # one line log
@@ -40,7 +40,7 @@ alias gl='git log --pretty=format:"%C(yellow)%h %ad%Cred%d %Creset%s%Cblue [%cn]
 alias gr='git reset'
 
 # misc
-alias gaa='git add .'
+alias ga='git commit --amend'
 alias gp='git push'
 alias gfa='git fetch --all'
 alias grh='git add . && git reset --hard'
@@ -49,7 +49,7 @@ alias grh='git add . && git reset --hard'
 alias gmp='git merge -' # merge previous branch
 alias mpb='gcp && git pull && gcp && gmp && git push' # swap to previous branch, pull, swab back to current branch, merge, and push
 
- # diffs
+# diffs
 alias gd='git diff'
 alias gds='git diff --stat'
 
@@ -93,8 +93,12 @@ export PATH="./vendor/bin:$PATH"
 export PATH="/.npm-packages/bin:$PATH"
 export PATH="/usr/local/bin:$PATH"
 export PATH="/usr/local/opt/mysql@5.7/bin:$PATH"
+export PATH="/Users/joel/.gem/ruby/2.6.0/bin:$PATH"
 
-export GEM_HOME="$HOME/.gem"
-export PATH="$GEM_HOME/bin:$PATH"
+# export GEM_HOME="$HOME/.gem"
+# export PATH="$GEM_HOME/bin:$PATH"
 
 eval $(/opt/homebrew/bin/brew shellenv)
+
+# handle ssh keys
+ssh-add --apple-load-keychain >> /dev/null 2>&1

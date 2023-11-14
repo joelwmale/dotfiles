@@ -201,7 +201,7 @@ cask tableplus
 cask hyper
 cask spotify
 cask 1password
-cask insomnia
+cask httpie
 cask alfred
 cask bartender
 cask forklift
@@ -210,9 +210,9 @@ cask google-drive
 cask dropbox
 cask slack
 cask the-unarchiver
-cask herd
 cask rectangle
 cask helo
+cask tinkerwell
 
 running 'tapping shopify/shopify'
 brew tap shopify/shopify
@@ -246,14 +246,14 @@ fi
 bot 'configurating node & npm and installing packages'
 
 running 'configure global npm packages to ~/.npm-global'
-mkdir ~/.npm-packages
-npm config set prefix ~/.npm-packages;ok
+mkdir ~/.npm-global
+npm config set prefix ~/.npm-global;ok
 
 running 'installing gulp globally'
 npm install -g gulp > /dev/null 2>&1;ok
 
-running 'install vsce'
-npm install -g vsce;ok
+running 'installing aicommits'
+npm install -g aicommits > /dev/null 2>&1;ok
 
 ###############################################################################
 # Composer                                                                    #
@@ -262,7 +262,15 @@ npm install -g vsce;ok
 bot 'installing global composer packages'
 
 action 'installing laravel/installer'
-composer global require laravel/installer > /dev/null 2>&1;ok
+composer_global laravel/installer
+
+action 'installing laravel/valet'
+composer_global laravel/valet
+
+action 'configuring laravel/valet'
+valet install > /dev/null 2>&1
+valet tld test > /dev/null 2>&1
+valet park ~/Code > /dev/null 2>&1;ok
 
 ###############################################################################
 # Shell                                                                       #
