@@ -151,68 +151,68 @@ fi
 
 bot 'installing brew apps...'
 
-brew git
-brew gh
-brew node
-brew pkg-config
-brew wget
-brew httpie
-brew ncdu
-brew hub
-brew ack
-brew bat
-brew doctl
-brew yarn
-brew diff-so-fancy
-brew zsh-autosuggestions
-brew awscli
-brew tree
-brew mas
-brew dockutil
-brew htop
+brew_install git
+brew_install gh
+brew_install node
+brew_install pkg-config
+brew_install wget
+brew_install httpie
+brew_install ncdu
+brew_install hub
+brew_install ack
+brew_install bat
+brew_install doctl
+brew_install yarn
+brew_install diff-so-fancy
+brew_install zsh-autosuggestions
+brew_install awscli
+brew_install tree
+brew_install mas
+brew_install dockutil
+brew_install htop
+brew_install composer
+brew_install mariadb
 
-brew composer
-
-brew mariadb
 service_start mariadb
 brew_link mariadb
 
 running 'setting root mariadb password to root'
 sudo $(brew --prefix mariadb)/bin/mysqladmin -u root password root;
 
-brew redis
+brew_install redis
 service_start redis
 
 running 'tapping homebrew-cask'
-brew tap homebrew/cask;ok
+brew_install tap homebrew/cask;ok
 
 running 'tapping homebrew/cask-versions'
-brew tap homebrew/cask-versions;ok
+brew_install tap homebrew/cask-versions;ok
 
 bot 'installing brew casks...'
 
 # casks
-cask brave-browser
-cask firefox-developer-edition
-cask visual-studio-code
-cask fork
-cask transmit
-cask tableplus
-cask hyper
-cask spotify
-cask 1password
-cask httpie
-cask alfred
-cask bartender
-cask forklift
-cask fantastical
-cask google-drive
-cask dropbox
-cask slack
-cask the-unarchiver
-cask rectangle
-cask helo
-cask tinkerwell
+cask_install brave-browser
+cask_install firefox-developer-edition
+cask_install visual-studio-code
+cask_install fork
+cask_install transmit
+cask_install tableplus
+cask_install hyper
+cask_install spotify
+cask_install 1password
+cask_install httpie
+cask_install alfred
+cask_install bartender
+cask_install forklift
+cask_install fantastical
+cask_install google-drive
+cask_install dropbox
+cask_install slack
+cask_install the-unarchiver
+cask_install rectangle
+cask_install helo
+cask_install tinkerwell
+cask_install telegram
 
 running 'tapping shopify/shopify'
 brew tap shopify/shopify

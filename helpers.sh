@@ -78,29 +78,23 @@ say() {
     echo "$1"
 }
 
-function cask() {
-    brew cask list $1 > /dev/null 2>&1 | true
-    if [[ ${PIPESTATUS[0]} != 0 ]]; then
-        action "brew install --cask $1 $2"
-        brew install --cask $1 > /dev/null 2>&1
-        if [[ $? != 0 ]]; then
-            error "failed to install $1! skipping..."
-        else
-            ok
-        fi
+function cask_install() {
+    action "brew install --cask $1 $2"
+    brew install --cask $1 > /dev/null 2>&1
+    if [[ $? != 0 ]]; then
+        error "failed to install $1! skipping..."
+    else
+        ok
     fi
 }
 
-function brew() {
-    brew list $1 > /dev/null 2>&1 | true
-    if [[ ${PIPESTATUS[0]} != 0 ]]; then
-        action "brew install $1 $2"
-        brew install $1 $2 > /dev/null 2>&1
-        if [[ $? != 0 ]]; then
-            error "failed to install $1! skipping..."
-        else
-            ok
-        fi
+function brew_install() {
+    action "brew install $1 $2"
+    brew install $1 $2 > /dev/null 2>&1
+    if [[ $? != 0 ]]; then
+        error "failed to install $1! skipping..."
+    else
+        ok
     fi
 }
 
