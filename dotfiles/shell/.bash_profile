@@ -13,13 +13,12 @@ alias stan="vendor/bin/phpstan analyse --memory-limit=2G"
 alias cdump="composer dumpautoload"
 
 # laravel
-alias optimize="php artisan optimize"
-alias pa="valet php artisan"
-alias composer="valet composer"
+alias pa="php artisan"
+alias optimize="pa optimize"
 alias dbfresh="pa migrate:fresh --seed"
-alias op="php artisan optimize"
+alias op="pa optimize"
 alias mfs="pa migrate:fresh --seed"
-alias mr="php artisan migrate:rollback"
+alias mr="pa migrate:rollback"
 
 # frontend stuff
 alias twatch="TAILWIND_MODE=watch npx mix watch" 
@@ -102,3 +101,5 @@ eval $(/opt/homebrew/bin/brew shellenv)
 
 # handle ssh keys
 ssh-add --apple-load-keychain >> /dev/null 2>&1
+
+export SPACESHIP_CONFIG="$HOME/.config/spaceship.zsh"

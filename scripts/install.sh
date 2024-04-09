@@ -104,6 +104,12 @@ ln -s $ROOT/dotfiles/vendor/.hyper.js $HOME/.hyper.js;ok
 action 'creating code directory at ~/Code'
 mkdir -p $HOME/Code;ok
 
+action 'creating .config directory at ~/.config'
+mkdir -p $HOME/.config;ok
+
+action 'symlink spaceship.zsh'
+ln -s $ROOT/dotfiles/vendor/spaceship.zsh $HOME/.config/spaceship.zsh;ok
+
 ###############################################################################
 # Default cleanup                                                             #
 ###############################################################################
@@ -171,13 +177,13 @@ brew_install mas
 brew_install dockutil
 brew_install htop
 brew_install composer
-brew_install mariadb
 
-service_start mariadb
-brew_link mariadb
 
-running 'setting root mariadb password to root'
-sudo $(brew --prefix mariadb)/bin/mysqladmin -u root password root;
+brew_install mysql
+service_start mysql
+
+# configure mysql
+mysql -e "ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'root';"
 
 brew_install redis
 service_start redis
@@ -192,18 +198,17 @@ bot 'installing brew casks...'
 
 # casks
 cask_install brave-browser
-cask_install firefox-developer-edition
+# cask_install firefox-developer-edition
 cask_install visual-studio-code
 cask_install fork
 cask_install transmit
-cask_install tableplus
+# cask_install tableplus
 cask_install hyper
 cask_install spotify
 cask_install 1password
 cask_install httpie
 cask_install alfred
-cask_install bartender
-cask_install forklift
+# cask_install forklift
 cask_install fantastical
 cask_install google-drive
 cask_install dropbox
@@ -213,10 +218,12 @@ cask_install rectangle
 cask_install helo
 cask_install tinkerwell
 cask_install telegram
+cask_install discord
+cask_install setapp
 
 running 'tapping shopify/shopify'
 brew tap shopify/shopify
-brew themekit;ok
+brew_install themekit;ok
 
 bot 'installing mac app store apps...'
 
