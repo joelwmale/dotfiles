@@ -1,6 +1,39 @@
 # Use vs instead of code
 vs () { VSCODE_CWD="$PWD" open -n -b "com.microsoft.VSCode" --args $* ;}
 
+composer-link() {
+    # Check if the directory is provided and exists
+    if [[ -z "$1" || ! -d "$1" ]]; then
+        echo "Usage: composer-link <path-to-package-directory>"
+        return 1
+    fi
+
+    # Define the path to the package's composer.json file
+    PACKAGE_COMPOSER_JSON="$1/composer.json"
+
+    # Check if composer.json exists in the given directory
+    if [[ ! -f "$PACKAGE_COMPOSER_JSON" ]]; then
+        echo "Error: composer.json not found in the specified directory."
+        return 1
+    fi
+
+    # Extract the 'name' field from the package's composer.json
+    PACKAGE_NAME=$(jq -r '.name' "$PACKAGE_COMPOSER_JSON" 2>/dev/null)
+
+    # Verify the name was successfully extracted
+    if [[ -z "$PACKAGE_NAME" || "$PACKAGE_NAME" == "null" ]]; then
+        echo "Error: Unable to find a valid 'name' in $PACKAGE_COMPOSER_JSON."
+        return 1
+    fi
+
+    # Add the repository to the current project's composer.json
+    composer config repositories.local '{"type": "path", "url": "'"$1"'"}' --file composer.json
+
+    # Run composer require using the extracted package name
+    composer require "$PACKAGE_NAME":@dev
+
+    echo "Successfully linked and required package: $PACKAGE_NAME"
+}
 function tc() {
    if [ -f app/Console/Commands/TestCommand.php ]; then
       pa test:command

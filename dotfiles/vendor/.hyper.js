@@ -137,6 +137,7 @@ module.exports = {
     "hyperterm-paste",
     "hyper-search",
     "hyper-tabs-enhanced",
+    "hyperlinks",
   ],
 
   // in development, you can create a directory under
