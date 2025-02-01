@@ -29,7 +29,7 @@ alias shrug="echo '¯\_(ツ)_/¯' | pbcopy"
 
 # git/hub
 alias repush='git pull --rebase && git push'
-alias gitclean="git checkout master && git fetch -p && git branch -vv | grep 'origin/.*: gone]' | awk '{print $1}' | xargs git branch -D"
+# alias gitclean="git checkout master && git fetch -p && git branch -vv | grep 'origin/.*: gone]' | awk '{print $1}' | xargs git branch -D"
 alias publish='git push --set-upstream origin $(git branch | grep \* | cut -d " " -f2)'
 alias uncommit="git reset --soft HEAD~1"
 alias grc="gh repo clone"
