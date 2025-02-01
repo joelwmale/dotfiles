@@ -178,9 +178,8 @@ brew_install dockutil
 brew_install htop
 brew_install composer
 
-
-brew_install mysql
-service_start mysql
+brew_install mysql@8.0
+service_start mysql@8.0
 
 # configure mysql
 mysql -e "ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'root';"
