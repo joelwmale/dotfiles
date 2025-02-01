@@ -1,6 +1,41 @@
 # Use vs instead of code
 vs () { VSCODE_CWD="$PWD" open -n -b "com.microsoft.VSCode" --args $* ;}
 
+gho() {
+    # Check if the current directory is a Git repository
+    if [[ ! -d .git ]]; then
+        echo "Error: Not a Git repository."
+        return 1
+    fi
+
+    # Extract the 'origin' URL from the .git configuration
+    GIT_URL=$(git config --get remote.origin.url)
+
+    # Check if the URL is valid
+    if [[ -z "$GIT_URL" ]]; then
+        echo "Error: No remote 'origin' URL found."
+        return 1
+    fi
+
+    # Transform the URL into a browser-friendly format
+    # Handle both SSH and HTTPS URLs
+    if [[ "$GIT_URL" == git@* ]]; then
+        # Convert SSH URL (e.g., git@github.com:org/repo.git) to HTTPS
+        BROWSER_URL=$(echo "$GIT_URL" | sed -E 's/git@(.*):/https:\/\/\1\//' | sed 's/\.git$//')
+    elif [[ "$GIT_URL" == https://* ]]; then
+        # Remove .git if it's an HTTPS URL
+        BROWSER_URL=$(echo "$GIT_URL" | sed 's/\.git$//')
+    else
+        echo "Error: Unsupported remote URL format."
+        return 1
+    fi
+
+    # Open the URL in the default browser
+    echo "Opening $BROWSER_URL..."
+    open "$BROWSER_URL"
+}
+
+
 composer-link() {
     # Check if the directory is provided and exists
     if [[ -z "$1" || ! -d "$1" ]]; then
@@ -34,6 +69,8 @@ composer-link() {
 
     echo "Successfully linked and required package: $PACKAGE_NAME"
 }
+
+
 function tc() {
    if [ -f app/Console/Commands/TestCommand.php ]; then
       pa test:command
