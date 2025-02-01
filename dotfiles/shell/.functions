@@ -43,6 +43,25 @@ function tc() {
    fi
 }
 
+function gitclean()
+{
+   !f() { local targetBranch=${1:-master} && git checkout -q $targetBranch && git branch --merged | grep -v "\*" | xargs -n 1 git branch -d && git for-each-ref refs/heads/ "--format=%(refname:short)" | while read branch; do mergeBase=$(git merge-base $targetBranch $branch) && [[ $(git cherry $targetBranch $(git commit-tree $(git rev-parse $branch^{tree}) -p $mergeBase -m _)) == "-"* ]] && git branch -D $branch; done; }; f
+}
+
+function dc() {
+   # work out the docker compose container id using the docker-compose file
+   containerId=$(docker-compose ps -q $1)
+
+   # if the container id is empty, then the container is not running
+   if [ -z "$containerId" ]; then
+      echo "Container $1 is not running"
+      return
+   fi
+
+   # now start a shell in the container
+   docker exec -it $containerId /bin/bash
+}
+
 # Create a new directory and enter it
 function mkd() {
    mkdir -p "$@" && cd "$@"
