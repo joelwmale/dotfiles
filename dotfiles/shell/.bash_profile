@@ -20,6 +20,8 @@ alias op="pa optimize"
 alias mfs="pa migrate:fresh --seed"
 alias mr="pa migrate:rollback"
 
+alias po="herd php"
+alias co="herd composer"
 # frontend stuff
 alias twatch="TAILWIND_MODE=watch npx mix watch" 
 
@@ -103,3 +105,5 @@ eval $(/opt/homebrew/bin/brew shellenv)
 ssh-add --apple-load-keychain >> /dev/null 2>&1
 
 export SPACESHIP_CONFIG="$HOME/.config/spaceship.zsh"
+
+export PATH="$PATH:/Users/joel/.dotnet/tools"
