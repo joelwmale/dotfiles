@@ -177,6 +177,7 @@ brew_install mas
 brew_install dockutil
 brew_install htop
 brew_install composer
+brew_install jordanbaird-ice
 
 brew_install mysql@8.0
 service_start mysql@8.0
