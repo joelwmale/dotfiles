@@ -1,9 +1,14 @@
 # general
-alias code='cd ~/Code'
+alias code='clear && cd ~/Code'
 alias dotfiles='cd ~/Code/dotfiles'
 alias q="cd ~ && clear"
+alias c="composer run dev"
 
 alias top="sudo htop"
+
+# custom
+alias ghs="php ~/Code/cli/gh.php"
+alias gs="php ~/Code/cli/sync.php"
 
 # code
 alias p="./vendor/bin/pest"
@@ -13,7 +18,7 @@ alias stan="vendor/bin/phpstan analyse --memory-limit=2G"
 alias cdump="composer dumpautoload"
 
 # laravel
-alias pa="php artisan"
+alias pa="herd php artisan"
 alias optimize="pa optimize"
 alias dbfresh="pa migrate:fresh --seed"
 alias op="pa optimize"
@@ -95,6 +100,7 @@ export PATH="/.npm-packages/bin:$PATH"
 export PATH="/usr/local/bin:$PATH"
 export PATH="/usr/local/opt/mysql@5.7/bin:$PATH"
 export PATH="/Users/joel/.gem/ruby/2.6.0/bin:$PATH"
+export PATH="/Users/joel/Code/cli:$PATH"
 
 # export GEM_HOME="$HOME/.gem"
 # export PATH="$GEM_HOME/bin:$PATH"
