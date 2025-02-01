@@ -197,17 +197,14 @@ bot 'installing brew casks...'
 
 # casks
 cask_install brave-browser
-# cask_install firefox-developer-edition
 cask_install visual-studio-code
 cask_install fork
 cask_install transmit
-# cask_install tableplus
 cask_install hyper
 cask_install spotify
 cask_install 1password
 cask_install httpie
 cask_install alfred
-# cask_install forklift
 cask_install fantastical
 cask_install google-drive
 cask_install dropbox
@@ -215,10 +212,10 @@ cask_install slack
 cask_install the-unarchiver
 cask_install rectangle
 cask_install helo
-cask_install tinkerwell
 cask_install telegram
 cask_install discord
 cask_install setapp
+cask_install herd
 
 running 'tapping shopify/shopify'
 brew tap shopify/shopify
@@ -241,9 +238,17 @@ if ask 'have you signed into the app store?' Y; then
     mas install 1091189122 > /dev/null 2>&1;ok
 fi
 
-# if ask 'would you like to have spectacle start upon startup?' Y; then
-#     osascript -e 'tell application "System Events" to make login item at end with properties {path:"/Applications/Spectacle.app", hidden:false}'
-# fi
+if ask 'would you like to have rectangle start upon startup?' Y; then
+    osascript -e 'tell application "System Events" to make login item at end with properties {path:"/Applications/Rectangle.app", hidden:false}'
+fi
+
+###############################################################################
+# Preferences                                                #
+###############################################################################
+
+bot 'Setting up preferences...'
+
+cp $ROOT/dotfiles/preferences/* ~/Library/Preferences/;ok
 
 ###############################################################################
 # Node/NPM                                                                    #
@@ -270,13 +275,13 @@ bot 'installing global composer packages'
 action 'installing laravel/installer'
 composer_global laravel/installer
 
-action 'installing laravel/valet'
-composer_global laravel/valet
+# action 'installing laravel/valet'
+# composer_global laravel/valet
 
-action 'configuring laravel/valet'
-valet install > /dev/null 2>&1
-valet tld test > /dev/null 2>&1
-valet park ~/Code > /dev/null 2>&1;ok
+# action 'configuring laravel/valet'
+# valet install > /dev/null 2>&1
+# valet tld test > /dev/null 2>&1
+# valet park ~/Code > /dev/null 2>&1;ok
 
 ###############################################################################
 # Shell                                                                       #
@@ -302,6 +307,9 @@ curl https://raw.githubusercontent.com/git/git/master/contrib/completion/git-com
 
 running 'installing zsh autocomplete git completion'
 git clone https://github.com/zsh-users/zsh-autosuggestions ~/.zsh/zsh-autosuggestions;ok
+
+running 'installing nvm'
+wget -qO- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh | bash;ok
 
 ###############################################################################
 # Rosetta                                                                     #
