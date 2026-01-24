@@ -14,6 +14,9 @@ plugins=(
   brew
 )
 
+# disable git stash symbol
+SPACESHIP_GIT_STATUS_SHOW_STASH=false
+
 # Alias hub to git
 eval "$(hub alias -s)"
 
@@ -76,3 +79,8 @@ export HERD_PHP_84_INI_SCAN_DIR="/Users/joel/Library/Application Support/Herd/co
 
 export PATH="/opt/homebrew/opt/mysql@8.0/bin:$PATH"
 export PATH="$HOME/bin:$PATH"
+
+eval "$(starship init zsh)"
+
+# Herd injected PHP 8.5 configuration.
+export HERD_PHP_85_INI_SCAN_DIR="/Users/joel/Library/Application Support/Herd/config/php/85/"

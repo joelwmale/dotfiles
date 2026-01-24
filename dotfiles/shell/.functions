@@ -1,5 +1,24 @@
 # Use vs instead of code
-vs () { VSCODE_CWD="$PWD" open -n -b "com.microsoft.VSCode" --args $* ;}
+vs () { VSCODE_CWD="$PWD" open -n -b "com.todesktop.230313mzl4w4u92" --args $* ;}
+
+v() {
+    (cd ~/Code/cli-l && php artisan security:audit)
+}
+
+unalias p 2>/dev/null
+
+p() {
+    if [[ -f "composer.json" ]]; then
+        if composer run --list 2>/dev/null | grep -q "^\s*test\s"; then
+            composer run test
+        else
+            ./vendor/bin/pest
+        fi
+    else
+        echo "No composer.json found in current directory"
+        return 1
+    fi
+}
 
 gho() {
     # Check if the current directory is a Git repository
@@ -35,6 +54,20 @@ gho() {
     open "$BROWSER_URL"
 }
 
+unalias gss 2>/dev/null  # Remove alias if it exists
+
+gss() {
+    local targetDir
+    targetDir=$(php ~/Code/cli/swap.php)  # No spaces around '='
+
+    if [ -d "$targetDir" ]; then  # Check if the directory exists
+        cd "$targetDir" || return 1
+        echo "Switched to $targetDir"
+    else
+        echo -e "\033[31mError: Target directory does not exist.\033[0m"
+        echo "Directory: $targetDir"
+    fi
+}
 
 composer-link() {
     # Check if the directory is provided and exists

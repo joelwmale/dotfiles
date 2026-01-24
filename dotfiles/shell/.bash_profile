@@ -11,7 +11,6 @@ alias ghs="php ~/Code/cli/gh.php"
 alias gs="php ~/Code/cli/sync.php"
 
 # code
-alias p="./vendor/bin/pest"
 alias pc="p --type-coverage"
 alias stan="vendor/bin/phpstan analyse --memory-limit=2G"
 
@@ -113,3 +112,4 @@ ssh-add --apple-load-keychain >> /dev/null 2>&1
 export SPACESHIP_CONFIG="$HOME/.config/spaceship.zsh"
 
 export PATH="$PATH:/Users/joel/.dotnet/tools"
+export PATH="$HOME/.local/bin:$PATH"
