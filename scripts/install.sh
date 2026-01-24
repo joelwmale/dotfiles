@@ -243,6 +243,16 @@ if ask 'would you like to have rectangle start upon startup?' Y; then
     osascript -e 'tell application "System Events" to make login item at end with properties {path:"/Applications/Rectangle.app", hidden:false}'
 fi
 
+# Claude Code setup
+echo ""
+read -p "Install Claude Code? (y/n) " -n 1 -r
+echo ""
+if [[ $REPLY =~ ^[Yy]$ ]]; then
+    bash $ROOT/scripts/install-claude-code.sh || warn "Claude Code setup had issues"
+else
+    warn "Skipping Claude Code installation"
+fi
+
 ###############################################################################
 # Preferences                                                #
 ###############################################################################
