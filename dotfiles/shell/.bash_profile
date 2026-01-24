@@ -7,7 +7,6 @@ alias c="composer run dev"
 alias top="sudo htop"
 
 # custom
-alias ghs="php ~/Code/cli/gh.php"
 alias gs="php ~/Code/cli/sync.php"
 
 # code
@@ -108,8 +107,6 @@ eval $(/opt/homebrew/bin/brew shellenv)
 
 # handle ssh keys
 ssh-add --apple-load-keychain >> /dev/null 2>&1
-
-export SPACESHIP_CONFIG="$HOME/.config/spaceship.zsh"
 
 export PATH="$PATH:/Users/joel/.dotnet/tools"
 export PATH="$HOME/.local/bin:$PATH"

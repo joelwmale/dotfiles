@@ -7,15 +7,12 @@ export PATH=$HOME/.npm-global/bin:$PATH
 # Path to your oh-my-zsh installation.
 export ZSH=$HOME/.oh-my-zsh
 
-ZSH_THEME="spaceship"
+ZSH_THEME=""
 
 plugins=(
   git
   brew
 )
-
-# disable git stash symbol
-SPACESHIP_GIT_STATUS_SHOW_STASH=false
 
 # Alias hub to git
 eval "$(hub alias -s)"

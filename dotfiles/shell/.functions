@@ -1,4 +1,4 @@
-# Use vs instead of code
+# Use vs to open Cursor (VS Code fork with AI)
 vs () { VSCODE_CWD="$PWD" open -n -b "com.todesktop.230313mzl4w4u92" --args $* ;}
 
 v() {
