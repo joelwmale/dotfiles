@@ -65,50 +65,65 @@ fi
 bot 'Setting up symlinks...'
 
 action 'add global gitignore'
-rm $HOME/.gitignore
-ln -s $ROOT/dotfiles/vendor/.gitignore $HOME/.gitignore;ok
+rm -f $HOME/.gitignore
+ln -sf $ROOT/dotfiles/vendor/.gitignore $HOME/.gitignore;ok
 
 action 'add global gitattributes'
-rm $HOME/.gitattributes
-ln -s $ROOT/dotfiles/vendor/.gitattributes $HOME/.gitattributes;ok
+rm -f $HOME/.gitattributes
+ln -sf $ROOT/dotfiles/vendor/.gitattributes $HOME/.gitattributes;ok
 
 action 'symlink .bash_profile'
-rm $HOME/.bash_profile
-ln -s $ROOT/dotfiles/shell/.bash_profile $HOME/.bash_profile;ok
+rm -f $HOME/.bash_profile
+ln -sf $ROOT/dotfiles/shell/.bash_profile $HOME/.bash_profile;ok
 
 action 'symlink .functions'
-rm $HOME/.functions
-ln -s $ROOT/dotfiles/shell/.functions $HOME/.functions;ok
+rm -f $HOME/.functions
+ln -sf $ROOT/dotfiles/shell/.functions $HOME/.functions;ok
 
 action 'touch .aliases'
-rm $HOME/.aliases
+rm -f $HOME/.aliases
 touch $HOME/.aliases;ok
 
 action 'symlink .zshrc'
-rm $HOME/.zshrc
-ln -s $ROOT/dotfiles/vendor/.zshrc $HOME/.zshrc;ok
+rm -f $HOME/.zshrc
+ln -sf $ROOT/dotfiles/vendor/.zshrc $HOME/.zshrc;ok
 
 action 'creating ~/.zsh'
 rm -rf $HOME/.zsh
 mkdir $HOME/.zsh
 
 action 'symlink .gitconfig'
-rm $HOME/.gitconfig
-ln -s $ROOT/dotfiles/vendor/.gitconfig $HOME/.gitconfig;ok
+rm -f $HOME/.gitconfig
+ln -sf $ROOT/dotfiles/vendor/.gitconfig $HOME/.gitconfig;ok
 
 action 'symlink .hyper.js'
-rm $HOME/.hyper.js
-ln -s $ROOT/dotfiles/vendor/.hyper.js $HOME/.hyper.js;ok
+rm -f $HOME/.hyper.js
+ln -sf $ROOT/dotfiles/vendor/.hyper.js $HOME/.hyper.js;ok
+
+action 'symlink .tmux.conf'
+rm -f $HOME/.tmux.conf
+ln -sf $ROOT/dotfiles/vendor/.tmux.conf $HOME/.tmux.conf;ok
 
 # Create directories
 action 'creating code directory at ~/Code'
 mkdir -p $HOME/Code;ok
 
+action 'creating cli directory at ~/Code/cli'
+mkdir -p $HOME/Code/cli;ok
+
+action 'symlinking CLI scripts'
+for script in $ROOT/cli/*; do
+    if [ -f "$script" ]; then
+        ln -sf "$script" "$HOME/Code/cli/$(basename $script)"
+        chmod +x "$HOME/Code/cli/$(basename $script)"
+    fi
+done;ok
+
 action 'creating .config directory at ~/.config'
 mkdir -p $HOME/.config;ok
 
 action 'symlink spaceship.zsh'
-ln -s $ROOT/dotfiles/vendor/spaceship.zsh $HOME/.config/spaceship.zsh;ok
+ln -sf $ROOT/dotfiles/vendor/spaceship.zsh $HOME/.config/spaceship.zsh;ok
 
 ###############################################################################
 # Default cleanup                                                             #
@@ -178,6 +193,27 @@ brew_install dockutil
 brew_install htop
 brew_install composer
 brew_install jordanbaird-ice
+brew_install go
+brew_install git-filter-repo
+brew_install tesseract
+
+# Productivity tools
+brew_install fzf
+brew_install zoxide
+brew_install tmux
+brew_install eza
+brew_install git-delta
+brew_install lazygit
+brew_install fd
+brew_install ripgrep
+brew_install yazi
+brew_install jq
+brew_install stripe
+brew_install stripe-mock
+brew_install node@22
+brew_install python@3.13
+brew_install python@3.14
+brew_install clickhouse
 
 brew_install mysql@8.0
 service_start mysql@8.0
@@ -217,6 +253,12 @@ cask_install telegram
 cask_install discord
 cask_install setapp
 cask_install herd
+cask_install ghostty
+cask_install warp
+cask_install cursor
+cask_install alt-tab
+cask_install bettertouchtool
+cask_install daisydisk
 
 running 'tapping shopify/shopify'
 brew tap shopify/shopify
@@ -321,6 +363,9 @@ git clone https://github.com/zsh-users/zsh-autosuggestions ~/.zsh/zsh-autosugges
 
 running 'installing nvm'
 wget -qO- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh | bash;ok
+
+running 'setting up fzf key bindings'
+$(brew --prefix)/opt/fzf/install --key-bindings --completion --no-update-rc --no-bash --no-fish;ok
 
 ###############################################################################
 # Rosetta                                                                     #

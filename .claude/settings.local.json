@@ -10,7 +10,8 @@
       "Bash(go version:*)",
       "Bash(pyenv versions:*)",
       "Bash(nvm list)",
-      "Bash(ls:*)"
+      "Bash(ls:*)",
+      "Bash(test:*)"
     ]
   }
 }
