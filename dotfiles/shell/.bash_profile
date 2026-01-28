@@ -32,6 +32,14 @@ alias twatch="TAILWIND_MODE=watch npx mix watch"
 alias cat='bat'
 alias shrug="echo '¯\_(ツ)_/¯' | pbcopy"
 
+# productivity tools
+alias ls='eza'
+alias ll='eza -la --git'
+alias lt='eza --tree --level=2'
+alias llt='eza -la --tree --level=2 --git'
+alias lg='lazygit'
+alias ff='fd'
+
 # git/hub
 alias repush='git pull --rebase && git push'
 # alias gitclean="git checkout master && git fetch -p && git branch -vv | grep 'origin/.*: gone]' | awk '{print $1}' | xargs git branch -D"
@@ -107,6 +115,8 @@ eval $(/opt/homebrew/bin/brew shellenv)
 
 # handle ssh keys
 ssh-add --apple-load-keychain >> /dev/null 2>&1
+
+export SPACESHIP_CONFIG="$HOME/.config/spaceship.zsh"
 
 export PATH="$PATH:/Users/joel/.dotnet/tools"
 export PATH="$HOME/.local/bin:$PATH"

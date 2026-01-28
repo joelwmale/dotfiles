@@ -7,12 +7,15 @@ export PATH=$HOME/.npm-global/bin:$PATH
 # Path to your oh-my-zsh installation.
 export ZSH=$HOME/.oh-my-zsh
 
-ZSH_THEME=""
+ZSH_THEME="spaceship"
 
 plugins=(
   git
   brew
 )
+
+# disable git stash symbol
+SPACESHIP_GIT_STATUS_SHOW_STASH=false
 
 # Alias hub to git
 eval "$(hub alias -s)"
@@ -23,8 +26,17 @@ source ~/.bash_profile
 source ~/.functions
 source ~/.aliases
 
-# load plugins
+# load plugins and completions
 fpath=(~/.zsh $fpath)
+
+# Initialize completion system (if not already done by oh-my-zsh)
+autoload -Uz compinit
+if [[ -n ${ZDOTDIR}/.zcompdump(#qN.mh+24) ]]; then
+  compinit
+else
+  compinit -C
+fi
+
 source ~/.zsh/zsh-autosuggestions/zsh-autosuggestions.zsh 2> /dev/null
 
 # randomize suggest color
@@ -77,7 +89,24 @@ export HERD_PHP_84_INI_SCAN_DIR="/Users/joel/Library/Application Support/Herd/co
 export PATH="/opt/homebrew/opt/mysql@8.0/bin:$PATH"
 export PATH="$HOME/bin:$PATH"
 
-eval "$(starship init zsh)"
-
 # Herd injected PHP 8.5 configuration.
 export HERD_PHP_85_INI_SCAN_DIR="/Users/joel/Library/Application Support/Herd/config/php/85/"
+
+# fzf - Fuzzy finder
+[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+export FZF_DEFAULT_COMMAND='fd --type f --hidden --follow --exclude .git'
+export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
+export FZF_DEFAULT_OPTS='--height 40% --layout=reverse --border --preview "bat --color=always --style=numbers --line-range=:500 {}"'
+
+# Custom fzf keybindings (more ergonomic)
+# Note: Command key isn't available in terminal, using Option/Ctrl alternatives
+# Ctrl+R - Search history (standard, keep as is)
+# Ctrl+P - Search files (instead of Ctrl+T which conflicts with some terminals)
+# Ctrl+G - Change directory (instead of Alt+C)
+
+bindkey -r '^T'  # Remove default Ctrl+T binding
+bindkey '^P' fzf-file-widget  # Ctrl+P for files (like VSCode)
+bindkey '^G' fzf-cd-widget    # Ctrl+G for directories
+
+# zoxide - Smarter cd
+eval "$(zoxide init zsh)"

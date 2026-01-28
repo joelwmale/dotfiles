@@ -5,6 +5,22 @@
 	excludesfile = ~/.gitignore
 	attributesfile = ~/.gitattributes
 	pager = diff-so-fancy | less --tabs=4 -RFX
+
+[interactive]
+	diffFilter = delta --color-only
+
+[delta]
+	navigate = true
+	light = false
+	side-by-side = true
+	line-numbers = true
+	syntax-theme = Dracula
+
+[merge]
+	conflictstyle = diff3
+
+[diff]
+	colorMoved = default
 [alias]
 	permission-reset = !git diff -p -R --no-color | grep -E \"^(diff|(old|new) mode)\" --color=never | git apply
 [hub]
@@ -12,6 +28,7 @@
 [user]
 	email = joel@joelmale.com
 	name = Joel Male
+	signingkey = 8C43FD2C9426C3AC
 [pull]
 	rebase = false
 [init]
@@ -20,3 +37,9 @@
 	protocol = ssh
 [push]
 	autoSetupRemote = true
+[commit]
+	gpgsign = true
+[tag]
+	gpgsign = true
+[gpg]
+	format = openpgp

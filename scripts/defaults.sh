@@ -53,33 +53,21 @@ defaults write NSGlobalDomain NSDisableAutomaticTermination -bool true;ok
 running 'Disable crash reporter'
 defaults write com.apple.CrashReporter DialogType -string "none";ok
 
-running 'Disable notification center and remove the menu bar icon'
-launchctl unload -w /System/Library/LaunchAgents/com.apple.notificationcenterui.plist 2> /dev/null;ok
-
-running 'Disable smart quotes'
-defaults write NSGlobalDomain NSAutomaticQuoteSubstitutionEnabled -bool false;ok
-
-running 'Disable smart dashes'
-defaults write NSGlobalDomain NSAutomaticDashSubstitutionEnabled -bool false;ok
-
-running 'Show battery percent'
-defaults write com.apple.menuextra.battery ShowPercent -string "YES";ok
+# NOTE: Notification Center cannot be disabled via launchctl in modern macOS (SIP protected)
 
 running 'Restart computer automatically if it freezes'
 sudo systemsetup -setrestartfreeze on;ok
 
 ###############################################################################
-# SSD-specific tweaks                                                         #
+# Modern macOS Performance                                                    #
 ###############################################################################
 
-bot 'SSD tweaks'
+bot 'Performance tweaks'
 
-running 'Disable hibernation'
+running 'Disable hibernation (handled by APFS on M-series Macs)'
 sudo pmset -a hibernatemode 0;ok
 
-# Disable the sudden motion sensor as it’s not useful for SSDs
-running 'Disable sudden motion sensor'
-sudo pmset -a sms 0;ok
+# NOTE: Sudden motion sensor doesn't exist on M-series Macs
 
 ###############################################################################
 # Trackpad, mouse, keyboard, Bluetooth accessories, and input                 #
@@ -121,11 +109,14 @@ defaults write NSGlobalDomain NSAutomaticSpellingCorrectionEnabled -bool false;o
 running 'Disable natural scrolling'
 defaults write NSGlobalDomain com.apple.swipescrolldirection -bool false;ok
 
-running 'Stop itunes from launching on media key press'
-launchctl unload -w /System/Library/LaunchAgents/com.apple.rcd.plist 2> /dev/null;ok
+running 'Enable press-and-hold for accented characters'
+defaults write NSGlobalDomain ApplePressAndHoldEnabled -bool false;ok
 
-running 'Stop itunes from opening when a device is plugged in'
-defaults write com.apple.iTunesHelper ignore-devices 1;ok
+running 'Set fast keyboard repeat rate'
+defaults write NSGlobalDomain KeyRepeat -int 2
+defaults write NSGlobalDomain InitialKeyRepeat -int 15;ok
+
+# NOTE: iTunes removed in macOS Catalina, replaced by Music/TV/Podcasts
 
 running 'Turn off keyboard illumination when computer is not used for 5 minutes'
 defaults write com.apple.BezelServices kDimTime -int 300;ok
@@ -139,8 +130,10 @@ defaults write com.apple.AppleMultitouchTrackpad TrackpadRightClick -int 1;ok
 
 bot 'Configuring spotlight'
 
-running 'Stop spotlight from indexing'
-launchctl unload -w /System/Library/LaunchDaemons/com.apple.metadata.mds.plist;ok
+# NOTE: Cannot disable Spotlight indexing in modern macOS (SIP protected)
+
+running 'Disable Spotlight web search results'
+defaults write com.apple.lookup.shared LookupSuggestionsDisabled -bool true;ok
 
 ###############################################################################
 # Screen                                                                      #
@@ -152,8 +145,14 @@ running 'Require password immediately after sleep or screen saver'
 defaults write com.apple.screensaver askForPassword -int 1
 defaults write com.apple.screensaver askForPasswordDelay -int 0;ok
 
-running 'Save screenshots to the desktop'
-defaults write com.apple.screencapture location -string "${HOME}/Desktop";ok
+running 'Create Screenshots folder'
+mkdir -p "${HOME}/Screenshots";ok
+
+running 'Save screenshots to ~/Screenshots'
+defaults write com.apple.screencapture location -string "${HOME}/Screenshots";ok
+
+running 'Include date in screenshot filenames'
+defaults write com.apple.screencapture include-date -bool true;ok
 
 running 'Save screenshots as png'
 defaults write com.apple.screencapture type -string "png";ok
@@ -182,6 +181,15 @@ defaults write NSGlobalDomain AppleShowAllExtensions -bool true;ok
 
 running 'Show hidden files'
 defaults write com.apple.finder AppleShowAllFiles -bool true;ok
+
+running 'Show path bar'
+defaults write com.apple.finder ShowPathbar -bool true;ok
+
+running 'Show status bar'
+defaults write com.apple.finder ShowStatusBar -bool true;ok
+
+running 'Keep folders on top when sorting by name'
+defaults write com.apple.finder _FXSortFoldersFirst -bool true;ok
 
 running 'Allow text selection in Quick Look'
 defaults write com.apple.finder QLEnableTextSelection -bool true;ok
@@ -238,8 +246,15 @@ bot 'Setting up dock, dashboard and hot corners'
 running 'Stop bouncing in dock'
 defaults write com.apple.dock no-bouncing -bool true;ok
 
-running 'Show recents in dock'
-defaults write com.apple.dock show-recents -bool true;ok
+running 'Hide recents in dock'
+defaults write com.apple.dock show-recents -bool false;ok
+
+running 'Speed up dock show/hide animation'
+defaults write com.apple.dock autohide-delay -float 0
+defaults write com.apple.dock autohide-time-modifier -float 0.5;ok
+
+running 'Minimize windows into application icon'
+defaults write com.apple.dock minimize-to-application -bool true;ok
 
 running 'Automatically hide and show the dock'
 defaults write com.apple.dock autohide -bool true;ok
@@ -247,14 +262,16 @@ defaults write com.apple.dock autohide -bool true;ok
 running 'Remove delay for showing the dock when in full screen'
 defaults write com.apple.dock autohide-fullscreen-delayed -bool false;ok
 
-running 'Setting dock tilezie to 60 pixels'
+running 'Setting dock tilesize to 60 pixels'
 defaults write com.apple.dock tilesize -int 60;ok
 
-running 'Disable dashboard'
-defaults write com.apple.dashboard mcx-disabled -bool true;ok
+# NOTE: Dashboard was removed in macOS Catalina
 
-running "Don't show dashboard as a space"
-defaults write com.apple.dock dashboard-in-overlay -bool true;ok
+running 'Disable Stage Manager by default'
+defaults write com.apple.WindowManager GloballyEnabled -bool false;ok
+
+running 'Speed up Mission Control animations'
+defaults write com.apple.dock expose-animation-duration -float 0.1;ok
 
 running 'Disable automatically arranging applications based on recent use'
 defaults write com.apple.dock mru-spaces -bool false;ok
@@ -288,8 +305,7 @@ defaults write com.apple.Safari com.apple.Safari.ContentPageGroupIdentifier.WebK
 
 bot 'Configuring time machine'
 
-running 'Disable local Time Machine snapshots'
-sudo tmutil disablelocal;ok
+# NOTE: 'tmutil disablelocal' is deprecated in modern macOS
 
 running 'Prevent time machine from prompting to use new hard drives as backup volumes'
 defaults write com.apple.TimeMachine DoNotOfferNewDisksForBackup -bool true;ok
@@ -366,3 +382,62 @@ sudo pmset -a lidwake 1;ok
 
 running 'Disable machine sleep while charging'
 sudo pmset -c sleep 0;ok
+
+###############################################################################
+# Menu Bar & Control Center                                                   #
+###############################################################################
+
+bot 'Configuring menu bar'
+
+running 'Show Bluetooth in menu bar'
+defaults write com.apple.controlcenter "NSStatusItem Visible Bluetooth" -bool true;ok
+
+running 'Show date and time in menu bar clock'
+defaults write com.apple.menuextra.clock DateFormat -string "EEE d MMM HH:mm";ok
+
+running 'Show battery percentage in menu bar'
+defaults write com.apple.controlcenter BatteryShowPercentage -bool true;ok
+
+###############################################################################
+# Developer Settings                                                          #
+###############################################################################
+
+bot 'Configuring developer settings'
+
+running 'Show full POSIX path as Finder window title'
+defaults write com.apple.finder _FXShowPosixPathInTitle -bool true;ok
+
+running 'Disable press-and-hold for keys (enable key repeat for coding)'
+defaults write NSGlobalDomain ApplePressAndHoldEnabled -bool false;ok
+
+running 'Avoid creating .DS_Store files on network or USB volumes'
+defaults write com.apple.desktopservices DSDontWriteNetworkStores -bool true
+defaults write com.apple.desktopservices DSDontWriteUSBStores -bool true;ok
+
+###############################################################################
+# Privacy & Security                                                          #
+###############################################################################
+
+bot 'Configuring privacy settings'
+
+running 'Disable Siri'
+defaults write com.apple.assistant.support "Assistant Enabled" -bool false;ok
+
+running 'Disable Siri voice feedback'
+defaults write com.apple.assistant.backedup "Use device speaker for TTS" -int 3;ok
+
+###############################################################################
+# Continuity & Handoff                                                        #
+###############################################################################
+
+bot 'Configuring continuity'
+
+running 'Disable Handoff'
+defaults write com.apple.coreservices.useractivityd ActivityAdvertisingAllowed -bool false
+defaults write com.apple.coreservices.useractivityd ActivityReceivingAllowed -bool false;ok
+
+###############################################################################
+# Finish                                                                      #
+###############################################################################
+
+bot 'All defaults applied! Some changes require logout/restart to take effect.'
