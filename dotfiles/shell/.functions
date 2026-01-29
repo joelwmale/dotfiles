@@ -186,6 +186,209 @@ function commit() {
   eval "git commit -a -m '${commitMessage}'"
 }
 
+function release() {
+  # Check if we're in a git repo
+  if [[ ! -d .git ]]; then
+    echo "Error: Not a Git repository."
+    return 1
+  fi
+
+  # Check for unpushed commits
+  git fetch --quiet
+  LOCAL=$(git rev-parse @)
+  REMOTE=$(git rev-parse @{u} 2>/dev/null)
+
+  if [ $? -ne 0 ]; then
+    echo "Error: Current branch has no upstream. Please push your branch first."
+    return 1
+  fi
+
+  if [ "$LOCAL" != "$REMOTE" ]; then
+    UNPUSHED=$(git log @{u}..HEAD --oneline 2>/dev/null | wc -l | tr -d ' ')
+    if [ "$UNPUSHED" -gt 0 ]; then
+      echo "Warning: You have $UNPUSHED unpushed commit(s)."
+      printf "Push commits before creating release? (Y/n): "
+      read pushConfirm
+      pushConfirm=${pushConfirm:-y}
+
+      if [[ "$pushConfirm" =~ ^[Yy]$ ]]; then
+        echo "Pushing commits..."
+        git push
+        if [ $? -ne 0 ]; then
+          echo "Error: Failed to push commits."
+          return 1
+        fi
+      else
+        echo "Error: Please push your commits before creating a release."
+        return 1
+      fi
+    fi
+  fi
+
+  # Get the last release from GitHub
+  lastRelease=$(gh release list --limit 1 --json tagName --jq '.[0].tagName' 2>/dev/null)
+
+  if [ -z "$lastRelease" ]; then
+    echo "No previous releases found. Starting from 0.0.0"
+    lastVersion="0.0.0"
+  else
+    lastVersion="${lastRelease#v}"  # Remove 'v' prefix if present
+    echo "Last release: $lastVersion"
+  fi
+
+  # Parse current version
+  IFS='.' read -r major minor patch <<< "$lastVersion"
+
+  # Ask for release type
+  echo ""
+  echo "Release type:"
+  echo "  1) Major (breaking changes)"
+  echo "  2) Minor (new features)"
+  echo "  3) Patch (bug fixes)"
+  echo ""
+  printf "Select release type (1-3): "
+  read releaseType
+
+  case $releaseType in
+    1)
+      major=$((major + 1))
+      minor=0
+      patch=0
+      releaseTypeLabel="Major"
+      ;;
+    2)
+      minor=$((minor + 1))
+      patch=0
+      releaseTypeLabel="Minor"
+      ;;
+    3)
+      patch=$((patch + 1))
+      releaseTypeLabel="Patch"
+      ;;
+    *)
+      echo "Invalid selection"
+      return 1
+      ;;
+  esac
+
+  newVersion="$major.$minor.$patch"
+
+  # Confirm version
+  echo ""
+  echo "Current version: $lastVersion"
+  echo "New version: $newVersion ($releaseTypeLabel)"
+  echo ""
+  printf "Confirm release v$newVersion? (Y/n): "
+  read confirm
+  confirm=${confirm:-y}  # Default to 'y' if empty
+
+  if [[ ! "$confirm" =~ ^[Yy]$ ]]; then
+    echo "Release cancelled"
+    return 1
+  fi
+
+  # Generate release notes
+  echo ""
+  echo "Generating release notes..."
+
+  # Start spinner
+  {
+    spinner="⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏"
+    while true; do
+      for (( i=0; i<${#spinner}; i++ )); do
+        printf "\r${spinner:$i:1} Analyzing changes since $lastVersion..."
+        sleep 0.1
+      done
+    done
+  } &!
+  spinner_pid=$!
+
+  # Cleanup function
+  cleanup() {
+    { kill $spinner_pid; wait $spinner_pid; } 2>/dev/null
+    printf "\r\033[K"
+    trap - INT
+    return 1
+  }
+  trap cleanup INT
+
+  # Get diff from last release
+  if [ -z "$lastRelease" ]; then
+    diffRange="HEAD"
+    logRange="HEAD"
+  else
+    diffRange="$lastRelease...HEAD"
+    logRange="$lastRelease..HEAD"
+  fi
+
+  # Gather information for release notes
+  releaseInfo=$(cat <<EOF
+=== Release Information ===
+Version: $newVersion
+Type: $releaseTypeLabel
+Previous Version: $lastVersion
+
+=== Commit History ===
+$(git log $logRange --oneline --no-decorate)
+
+=== File Changes ===
+$(git diff $diffRange --stat)
+
+=== Detailed Changes (truncated if large) ===
+$(git diff $diffRange | head -c 100000)
+EOF
+)
+
+  # Generate release notes using Claude
+  releaseNotes=$(echo "$releaseInfo" | claude -p "Generate professional release notes for version $newVersion. Include:
+- A brief summary at the top
+- Sections for: Added, Changed, Fixed (only include sections with actual changes)
+- Use bullet points
+- Be concise but informative
+- Output in markdown format
+- Do not include the version number in the title (I'll add it)
+
+Output ONLY the release notes content, no extra commentary.")
+
+  # Stop spinner
+  trap - INT
+  { kill $spinner_pid; wait $spinner_pid; } 2>/dev/null
+  printf "\r\033[K"
+
+  # Show release notes
+  echo ""
+  echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+  echo "Release Notes Preview"
+  echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+  echo ""
+  echo "$releaseNotes"
+  echo ""
+  echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+  echo ""
+  printf "Create release v$newVersion? (Y/n): "
+  read createRelease
+  createRelease=${createRelease:-y}  # Default to 'y' if empty
+
+  if [[ ! "$createRelease" =~ ^[Yy]$ ]]; then
+    echo "Release cancelled"
+    return 1
+  fi
+
+  # Create the release using gh
+  echo "Creating release v$newVersion..."
+  echo "$releaseNotes" | gh release create "v$newVersion" \
+    --title "v$newVersion" \
+    --notes-file -
+
+  if [ $? -eq 0 ]; then
+    echo "✓ Release v$newVersion created successfully!"
+    echo "  View at: $(gh repo view --json url --jq '.url')/releases/tag/v$newVersion"
+  else
+    echo "✗ Failed to create release"
+    return 1
+  fi
+}
+
 function db () {
    [ ! -f .env ] && { echo "No .env file found."; exit 1; }
 
