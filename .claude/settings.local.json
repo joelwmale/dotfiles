@@ -11,7 +11,19 @@
       "Bash(pyenv versions:*)",
       "Bash(nvm list)",
       "Bash(ls:*)",
-      "Bash(test:*)"
+      "Bash(test:*)",
+      "Bash(bash:*)",
+      "Bash(command -v:*)",
+      "Bash(starship:*)",
+      "Bash(done)",
+      "Bash(ln:*)",
+      "Bash(xargs -I {} git show {}:dotfiles/vendor/spaceship.zsh)",
+      "Bash(source:*)",
+      "Bash(sw_vers:*)",
+      "Bash(zsh:*)",
+      "Bash(defaults read:*)",
+      "Bash(mdfind:*)",
+      "Bash(ghostty:*)"
     ]
   }
 }

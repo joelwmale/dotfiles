@@ -56,3 +56,9 @@ When working on Laravel/PHP code that touches user input, authentication, author
 ## Using GitHub
 
 For questions about GitHub, use the `gh` tool.
+
+## Committing
+
+When you have finished working on a request, commit the changes and NEVER pus them to the remote repository.
+
+You can use the `commit` bash function to commit the changes automatically which calls AI to help write the commit message.
