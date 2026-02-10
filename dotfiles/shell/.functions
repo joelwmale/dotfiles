@@ -374,6 +374,31 @@ Output ONLY the release notes content, no extra commentary.")
     return 1
   fi
 
+  # Update composer.json if it exists
+  if [ -f "composer.json" ]; then
+    echo "Updating composer.json version..."
+
+    # Check if jq is available
+    if ! command -v jq &> /dev/null; then
+      echo "Warning: jq not found. Skipping composer.json update."
+    else
+      # Update the version field in composer.json
+      jq --arg version "$newVersion" '.version = $version' composer.json > composer.json.tmp && mv composer.json.tmp composer.json
+
+      # Stage and commit the change
+      git add composer.json
+      git commit -m "chore: bump version to $newVersion"
+      git push
+
+      if [ $? -eq 0 ]; then
+        echo "✓ composer.json updated to version $newVersion"
+      else
+        echo "✗ Failed to push composer.json update"
+        return 1
+      fi
+    fi
+  fi
+
   # Create the release using gh
   echo "Creating release v$newVersion..."
   echo "$releaseNotes" | gh release create "v$newVersion" \
