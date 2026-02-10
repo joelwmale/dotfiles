@@ -1,0 +1,156 @@
+# Ghostty Configuration
+# Optimized for AI/Claude & Laravel PHP Development
+
+# Font Configuration
+# Use a Nerd Font for icon support (install via: brew install --cask font-jetbrains-mono-nerd-font)
+font-family = "JetBrains Mono"
+font-size = 13
+font-thicken = true
+font-feature = -calt  # Disable ligatures for better code readability with AI
+
+# Theme - Horizon
+# Warm, dark theme with excellent contrast
+background = 1c1e26
+foreground = e3e6ee
+cursor-color = e95678
+selection-background = 6c6f93
+selection-foreground = e3e6ee
+
+# Horizon color palette
+palette = 0=#16161c
+palette = 1=#e95678
+palette = 2=#29d398
+palette = 3=#fab795
+palette = 4=#26bbd9
+palette = 5=#ee64ac
+palette = 6=#59e1e3
+palette = 7=#e3e6ee
+palette = 8=#6c6f93
+palette = 9=#ec6a88
+palette = 10=#3fdaa4
+palette = 11=#fbc3a7
+palette = 12=#3fc6de
+palette = 13=#f075b5
+palette = 14=#6be4e6
+palette = 15=#d5d8da
+
+# Window Settings
+window-padding-x = 8
+window-padding-y = 8
+window-padding-balance = true
+window-theme = dark
+window-decoration = true
+window-save-state = always
+window-inherit-working-directory = true
+window-inherit-font-size = true
+
+# Shell Integration
+shell-integration = zsh
+shell-integration-features = cursor,sudo,title
+
+# Performance
+macos-titlebar-style = tabs
+macos-option-as-alt = true
+clipboard-read = allow
+clipboard-write = allow
+# Allow Claude to work smoothly - disable paste protection
+clipboard-paste-protection = false
+
+# Scrollback
+scrollback-limit = 10000
+
+# Split Panes (for Laravel dev - artisan serve in one pane, tests in another)
+# Keybindings use Cmd key (macOS style)
+keybind = cmd+d=new_split:right
+keybind = cmd+shift+d=new_split:down
+keybind = cmd+w=close_surface
+
+# Navigate between splits (cycling)
+keybind = cmd+g=goto_split:previous
+keybind = cmd+h=goto_split:next
+
+# Resize splits
+keybind = cmd+ctrl+left=resize_split:left,10
+keybind = cmd+ctrl+right=resize_split:right,10
+keybind = cmd+ctrl+up=resize_split:up,10
+keybind = cmd+ctrl+down=resize_split:down,10
+
+# Tab Management
+keybind = cmd+t=new_tab
+keybind = cmd+shift+w=close_tab
+keybind = cmd+1=goto_tab:1
+keybind = cmd+2=goto_tab:2
+keybind = cmd+3=goto_tab:3
+keybind = cmd+4=goto_tab:4
+keybind = cmd+5=goto_tab:5
+keybind = cmd+6=goto_tab:6
+keybind = cmd+7=goto_tab:7
+keybind = cmd+8=goto_tab:8
+keybind = cmd+9=goto_tab:9
+
+# Shell support
+shell-integration-features = ssh-env
+
+# Quick Access Commands for Laravel Development
+# Cmd+Shift+P for running Pest tests (your 'p' function)
+# Cmd+Shift+A for artisan commands
+# These won't directly trigger commands but provide quick access patterns
+
+# Font Size Adjustments (useful during AI pair programming sessions)
+keybind = cmd+plus=increase_font_size:1
+keybind = cmd+minus=decrease_font_size:1
+keybind = cmd+0=reset_font_size
+
+# Copy/Paste (standard macOS)
+keybind = cmd+c=copy_to_clipboard
+keybind = cmd+v=paste_from_clipboard
+
+# Search (useful for finding Claude's suggestions in scrollback)
+# Note: Ghostty uses Cmd+F for native search by default
+
+# Clear Screen (Cmd+K like Terminal.app)
+keybind = cmd+k=clear_screen
+
+# Cursor
+cursor-style = block
+cursor-style-blink = false
+
+# Mouse
+mouse-hide-while-typing = true
+mouse-scroll-multiplier = 1.0
+
+# Links (for clicking GitHub links, Laravel docs, etc.)
+link-url = true
+
+# Confirmation
+confirm-close-surface = false
+quit-after-last-window-closed = true
+
+# Advanced Features for Power Users
+
+# Copy on select (like tmux) - instantly copy selected text
+copy-on-select = true
+
+# Window opacity (0.0-1.0) - see code underneath terminal
+# Uncomment to enable transparency
+# background-opacity = 0.95
+
+# Global hotkey to show/hide Ghostty from anywhere
+# Uncomment and customize if needed
+# keybind = global:cmd+shift+space=toggle_window_visibility
+
+# Image support (view images in terminal with imgcat, etc.)
+image-storage-limit = 320000000
+
+# Window title shows current directory
+window-title-font-family = "JetBrains Mono"
+
+# Jump to previous command output
+keybind = cmd+shift+up=jump_to_prompt:-1
+keybind = cmd+shift+down=jump_to_prompt:1
+
+# Quick terminal toggle for different tasks
+keybind = cmd+shift+n=new_window
+
+# OSC 133 support for better prompt integration
+# Works with your zsh setup for semantic prompt markers
