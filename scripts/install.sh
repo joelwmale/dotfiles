@@ -96,14 +96,6 @@ action 'symlink .gitconfig'
 rm -f $HOME/.gitconfig
 ln -sf $ROOT/dotfiles/vendor/.gitconfig $HOME/.gitconfig;ok
 
-action 'symlink .hyper.js'
-rm -f $HOME/.hyper.js
-ln -sf $ROOT/dotfiles/vendor/.hyper.js $HOME/.hyper.js;ok
-
-action 'symlink .tmux.conf'
-rm -f $HOME/.tmux.conf
-ln -sf $ROOT/dotfiles/vendor/.tmux.conf $HOME/.tmux.conf;ok
-
 # Create directories
 action 'creating code directory at ~/Code'
 mkdir -p $HOME/Code;ok
@@ -124,6 +116,12 @@ mkdir -p $HOME/.config;ok
 
 action 'symlink spaceship.zsh'
 ln -sf $ROOT/dotfiles/vendor/spaceship.zsh $HOME/.config/spaceship.zsh;ok
+
+action 'creating ghostty config directory at ~/.config/ghostty'
+mkdir -p $HOME/.config/ghostty;ok
+
+action 'symlink ghostty config'
+ln -sf $ROOT/config/ghostty/config $HOME/.config/ghostty/config;ok
 
 ###############################################################################
 # Default cleanup                                                             #
@@ -237,7 +235,6 @@ cask_install brave-browser
 cask_install visual-studio-code
 cask_install fork
 cask_install transmit
-cask_install hyper
 cask_install spotify
 cask_install 1password
 cask_install httpie
@@ -254,6 +251,7 @@ cask_install discord
 cask_install setapp
 cask_install herd
 cask_install ghostty
+cask_install font-jetbrains-mono-nerd-font
 cask_install warp
 cask_install cursor
 cask_install alt-tab
