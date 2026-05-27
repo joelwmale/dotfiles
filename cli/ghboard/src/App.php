@@ -139,7 +139,7 @@ final class App
 
         $footer = match ($this->mode) {
             'group-pick' => $this->dashboard->buildModeFooter($this->buildGroupPickerText()),
-            'new-group'  => $this->dashboard->buildModeFooter('new group name: ' . $this->newGroupBuffer . '▌'),
+            'new-group'  => $this->dashboard->buildModeFooter('new group name: ' . $this->newGroupBuffer . '_  [Enter] confirm  [Esc] back'),
             default      => $this->dashboard->buildFooter(
                 selectedIndex: $this->selectedIndex + 1,
                 total: count($this->repos),
@@ -334,12 +334,40 @@ final class App
             return;
         }
 
-        $this->selectedIndex = min($this->selectedIndex + 1, count($this->repos) - 1);
+        $found = false;
+        foreach ($this->buildDisplayList() as $item) {
+            if ($item['type'] !== 'repo') {
+                continue;
+            }
+            if ($found) {
+                $this->selectedIndex = $item['repoIndex'];
+                return;
+            }
+            if (($item['repoIndex'] ?? -1) === $this->selectedIndex) {
+                $found = true;
+            }
+        }
     }
 
     private function moveUp(): void
     {
-        $this->selectedIndex = max($this->selectedIndex - 1, 0);
+        if (count($this->repos) === 0) {
+            return;
+        }
+
+        $prev = null;
+        foreach ($this->buildDisplayList() as $item) {
+            if ($item['type'] !== 'repo') {
+                continue;
+            }
+            if (($item['repoIndex'] ?? -1) === $this->selectedIndex) {
+                if ($prev !== null) {
+                    $this->selectedIndex = $prev;
+                }
+                return;
+            }
+            $prev = $item['repoIndex'];
+        }
     }
 
     private function ignoreSelected(): void
@@ -441,13 +469,15 @@ final class App
             $suffix = $group === $currentGroup ? '*' : '';
             $parts[] = '[' . ($i + 1) . '] ' . $group . $suffix;
         }
-        $parts[] = '[n] new';
+        $parts[] = '[n] new group';
         if ($currentGroup !== null) {
-            $parts[] = '[r] remove';
+            $parts[] = '[r] remove from group';
         }
         $parts[] = '[Esc] cancel';
 
-        return 'group  ' . implode('  ', $parts);
+        return count($this->config->groups) === 0
+            ? 'group  no groups yet  [n] new group  [Esc] cancel'
+            : 'group  ' . implode('  ', $parts);
     }
 
     private function openInBrowser(): void
