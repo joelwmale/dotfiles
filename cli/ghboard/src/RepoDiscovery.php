@@ -27,6 +27,10 @@ final class RepoDiscovery
         $scanDir = $this->baseDir ?: $this->cwd;
         $repos = [];
 
+        if (!is_dir($scanDir)) {
+            return [];
+        }
+
         foreach (scandir($scanDir) as $entry) {
             if ($entry === '.' || $entry === '..') {
                 continue;
@@ -61,7 +65,10 @@ final class RepoDiscovery
             return null;
         }
 
-        $content = (string) file_get_contents($configFile);
+        $content = file_get_contents($configFile);
+        if ($content === false) {
+            return null;
+        }
         $url = $this->extractRemoteUrl($content);
 
         if ($url === null) {
