@@ -47,7 +47,7 @@ final class App
         $this->dashboard = new Dashboard();
 
         $home = $_SERVER['HOME'] ?? getenv('HOME') ?: '';
-        $baseDir = str_replace('~', $home, $config->baseDir);
+        $baseDir = preg_replace('/^~/', $home, $config->baseDir);
 
         $this->discovery = $discovery ?? new RepoDiscovery(
             cwd: getcwd() ?: $home,

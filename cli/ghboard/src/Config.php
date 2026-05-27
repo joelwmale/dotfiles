@@ -29,6 +29,7 @@ final class Config
         }
 
         $data = json_decode((string) file_get_contents($path), associative: true);
+        $data = is_array($data) ? $data : [];
 
         return new self(
             ignored: $data['ignored'] ?? [],
