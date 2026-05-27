@@ -20,8 +20,9 @@ final class GithubClient
     /** @return WorkflowRun[] */
     public function getWorkflowRuns(string $owner, string $repo): array
     {
+        $slug = escapeshellarg("{$owner}/{$repo}");
         $output = ($this->executor)(
-            "gh run list --repo {$owner}/{$repo} --limit 30 --json name,status,conclusion 2>/dev/null"
+            "gh run list --repo {$slug} --limit 30 --json name,status,conclusion 2>/dev/null"
         );
 
         $data = json_decode($output, associative: true);
@@ -51,8 +52,9 @@ final class GithubClient
 
     public function getDependabotSummary(string $owner, string $repo): DependabotSummary
     {
+        $slug = escapeshellarg("{$owner}/{$repo}");
         $output = ($this->executor)(
-            "gh api repos/{$owner}/{$repo}/dependabot/alerts?state=open&per_page=100 2>/dev/null"
+            "gh api repos/{$slug}/dependabot/alerts?state=open&per_page=100 2>/dev/null"
         );
 
         $data = json_decode($output, associative: true);
@@ -77,8 +79,9 @@ final class GithubClient
 
     public function getOpenPrCount(string $owner, string $repo): int
     {
+        $slug = escapeshellarg("{$owner}/{$repo}");
         $output = ($this->executor)(
-            "gh pr list --repo {$owner}/{$repo} --state open --json number 2>/dev/null"
+            "gh pr list --repo {$slug} --state open --json number 2>/dev/null"
         );
 
         $data = json_decode($output, associative: true);
@@ -87,8 +90,9 @@ final class GithubClient
 
     public function getOpenIssueCount(string $owner, string $repo): int
     {
+        $slug = escapeshellarg("{$owner}/{$repo}");
         $output = ($this->executor)(
-            "gh issue list --repo {$owner}/{$repo} --state open --json number 2>/dev/null"
+            "gh issue list --repo {$slug} --state open --json number 2>/dev/null"
         );
 
         $data = json_decode($output, associative: true);

@@ -3,7 +3,6 @@
 declare(strict_types=1);
 
 use Ghboard\GithubClient;
-use Ghboard\WorkflowRun;
 
 function makeClient(array $responses): GithubClient
 {
