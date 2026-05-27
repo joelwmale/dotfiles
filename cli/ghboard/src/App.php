@@ -14,6 +14,7 @@ use PhpTui\Tui\DisplayBuilder;
 use PhpTui\Tui\Extension\Core\Widget\GridWidget;
 use PhpTui\Tui\Extension\Core\Widget\Table\TableState;
 use PhpTui\Tui\Model\Direction;
+use PhpTui\Tui\Model\Display\Display;
 use PhpTui\Tui\Model\Layout\Constraint;
 
 final class App
@@ -29,7 +30,7 @@ final class App
 
     private bool $quit = false;
 
-    private mixed $display = null;
+    private ?Display $display = null;
 
     private readonly Dashboard $dashboard;
 
@@ -95,7 +96,7 @@ final class App
         $terminal->disableRawMode();
     }
 
-    private function render(mixed $display): void
+    private function render(?Display $display): void
     {
         $secondsSinceRefresh = time() - $this->lastRefreshedAt;
         $secondsUntilRefresh = max(0, $this->config->refreshInterval - $secondsSinceRefresh);
@@ -228,7 +229,7 @@ final class App
         $merged = [];
         foreach ($freshRepos as $repo) {
             $key = $repo->owner . '/' . $repo->name;
-            $merged[] = isset($existing[$key]) ? $existing[$key] : $repo;
+            $merged[] = $existing[$key] ?? $repo;
         }
 
         $this->repos = $merged;
@@ -237,7 +238,6 @@ final class App
 
     private function fetchAll(): void
     {
-        $this->refreshing = true;
         $fetched = [];
 
         foreach ($this->repos as $repo) {
