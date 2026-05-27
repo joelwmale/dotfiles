@@ -70,7 +70,7 @@ final class Dashboard
             ->header($headerRow)
             ->rows(...$rows)
             ->state($state)
-            ->highlightStyle(Style::default()->bg(AnsiColor::DarkGray));
+            ->highlightStyle(Style::default()->bg(AnsiColor::DarkGray)->fg(AnsiColor::White));
     }
 
     public function buildFooter(int $selectedIndex, int $total, int $secondsUntilRefresh): ParagraphWidget

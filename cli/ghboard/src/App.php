@@ -83,16 +83,17 @@ final class App
         }
 
         while (!$this->quit) {
-            if (!$this->refreshing && time() - $this->lastRefreshedAt >= $this->config->refreshInterval) {
-                $this->startRefresh();
-            }
-
+            // Process events first so keypresses are always responsive
             while (null !== $event = $terminal->events()->next()) {
                 if ($event instanceof CharKeyEvent) {
                     $this->handleChar($event);
                 } elseif ($event instanceof CodedKeyEvent) {
                     $this->handleCodedKey($event);
                 }
+            }
+
+            if (!$this->refreshing && time() - $this->lastRefreshedAt >= $this->config->refreshInterval) {
+                $this->startRefresh();
             }
 
             $this->render($this->display);
@@ -209,6 +210,10 @@ final class App
         } else {
             $this->selectedIndex = 0;
         }
+
+        // Reset the auto-refresh timer so ignoring multiple repos quickly
+        // doesn't trigger a blocking API refresh between keypresses.
+        $this->lastRefreshedAt = time();
     }
 
     private function openInBrowser(): void
