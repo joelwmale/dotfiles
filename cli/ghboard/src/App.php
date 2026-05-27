@@ -29,6 +29,8 @@ final class App
 
     private bool $quit = false;
 
+    private mixed $display = null;
+
     private readonly Dashboard $dashboard;
 
     private readonly GithubClient $client;
@@ -56,7 +58,7 @@ final class App
     {
         $terminal = Terminal::new();
         $backend = PhpTermBackend::new($terminal);
-        $display = DisplayBuilder::default($backend)->build();
+        $this->display = DisplayBuilder::default($backend)->build();
 
         $terminal->enableRawMode();
 
@@ -84,7 +86,7 @@ final class App
             }
 
             // Render
-            $this->render($display);
+            $this->render($this->display);
 
             // Tick at ~100ms
             usleep(100_000);
@@ -214,6 +216,7 @@ final class App
     private function startRefresh(): void
     {
         $this->refreshing = true;
+        $this->render($this->display);
         $freshRepos = $this->discovery->discover($this->config->ignored);
 
         // Retain existing data for repos already loaded, mark new ones as loading
