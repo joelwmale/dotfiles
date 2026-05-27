@@ -10,7 +10,7 @@ final class Config
         public array $ignored,
         public int $refreshInterval,
         public string $baseDir,
-        public readonly array $groups,
+        public array $groups,
         private readonly string $path,
     ) {}
 
@@ -40,6 +40,12 @@ final class Config
             groups: is_array($data['groups'] ?? null) ? $data['groups'] : [],
             path: $path,
         );
+    }
+
+    public function updateGroups(array $groups): void
+    {
+        $this->groups = $groups;
+        $this->persist();
     }
 
     public function ignore(string $repoName): void

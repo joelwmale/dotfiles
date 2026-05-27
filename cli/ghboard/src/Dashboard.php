@@ -35,7 +35,7 @@ final class Dashboard
         }
 
         $keymapSpan = Span::styled(
-            '  ·  [r] refresh  [i] ignore  [enter] open  [q] quit',
+            '  ·  [r] refresh  [i] ignore  [g] group  [enter] open  [q] quit',
             Style::default()->fg(AnsiColor::DarkGray),
         );
 
@@ -89,6 +89,12 @@ final class Dashboard
             TableCell::fromString(''),
             TableCell::fromString(''),
         );
+    }
+
+    public function buildModeFooter(string $text): ParagraphWidget
+    {
+        $line = Line::fromSpan(Span::styled($text, Style::default()->fg(AnsiColor::Yellow)));
+        return ParagraphWidget::fromText(Text::fromLine($line));
     }
 
     public function buildFooter(int $selectedIndex, int $total, int $secondsUntilRefresh): ParagraphWidget

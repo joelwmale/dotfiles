@@ -33,6 +33,11 @@ final class App
 
     private ?Display $display = null;
 
+    /** @var 'normal'|'group-pick'|'new-group' */
+    private string $mode = 'normal';
+
+    private string $newGroupBuffer = '';
+
     private readonly Dashboard $dashboard;
 
     private readonly GithubClient $client;
@@ -132,11 +137,15 @@ final class App
 
         $table = $this->dashboard->buildTable($displayList, $tableState);
 
-        $footer = $this->dashboard->buildFooter(
-            selectedIndex: $this->selectedIndex + 1,
-            total: count($this->repos),
-            secondsUntilRefresh: $secondsUntilRefresh,
-        );
+        $footer = match ($this->mode) {
+            'group-pick' => $this->dashboard->buildModeFooter($this->buildGroupPickerText()),
+            'new-group'  => $this->dashboard->buildModeFooter('new group name: ' . $this->newGroupBuffer . '▌'),
+            default      => $this->dashboard->buildFooter(
+                selectedIndex: $this->selectedIndex + 1,
+                total: count($this->repos),
+                secondsUntilRefresh: $secondsUntilRefresh,
+            ),
+        };
 
         $grid = GridWidget::default()
             ->direction(Direction::Vertical)
@@ -213,21 +222,70 @@ final class App
 
     private function handleChar(CharKeyEvent $event): void
     {
-        // Ctrl-C
+        // Ctrl-C always quits
         if ($event->char === 'c' && ($event->modifiers & KeyModifiers::CONTROL) !== 0) {
             $this->quit = true;
             return;
         }
 
+        if ($this->mode === 'new-group') {
+            $this->handleNewGroupChar($event->char);
+            return;
+        }
+
+        if ($this->mode === 'group-pick') {
+            $this->handleGroupPickChar($event->char);
+            return;
+        }
+
         match ($event->char) {
-            'q'  => $this->quit = true,
-            'j'  => $this->moveDown(),
-            'k'  => $this->moveUp(),
-            'r'  => $this->startRefresh(),
-            'i'  => $this->ignoreSelected(),
+            'q'        => $this->quit = true,
+            'j'        => $this->moveDown(),
+            'k'        => $this->moveUp(),
+            'r'        => $this->startRefresh(),
+            'i'        => $this->ignoreSelected(),
+            'g'        => $this->enterGroupPickMode(),
             "\r", "\n" => $this->openInBrowser(),
+            default    => null,
+        };
+    }
+
+    private function handleGroupPickChar(string $char): void
+    {
+        $groups = array_keys($this->config->groups);
+
+        if (is_numeric($char)) {
+            $idx = (int) $char - 1;
+            if (isset($groups[$idx])) {
+                $this->assignToGroup($groups[$idx]);
+            }
+            return;
+        }
+
+        match ($char) {
+            'n'    => $this->mode = 'new-group',
+            'r'    => $this->removeFromGroup(),
+            "\x1b" => $this->mode = 'normal',
             default => null,
         };
+    }
+
+    private function handleNewGroupChar(string $char): void
+    {
+        // Backspace (DEL or BS sent as char by some terminals)
+        if ($char === "\x7f" || $char === "\x08") {
+            $this->newGroupBuffer = mb_substr($this->newGroupBuffer, 0, -1);
+            return;
+        }
+
+        if ($char === "\r" || $char === "\n") {
+            $this->confirmNewGroup();
+            return;
+        }
+
+        if (mb_strlen($char) === 1 && ord($char) >= 32) {
+            $this->newGroupBuffer .= $char;
+        }
     }
 
     private function handleCodedKey(CodedKeyEvent $event): void
@@ -239,6 +297,23 @@ final class App
         // Ctrl-C via CodedKeyEvent (some terminals send this way)
         if ($event->code === KeyCode::Char && ($event->modifiers & KeyModifiers::CONTROL) !== 0) {
             $this->quit = true;
+            return;
+        }
+
+        if ($this->mode === 'new-group') {
+            match ($event->code) {
+                KeyCode::Esc       => (function (): void { $this->mode = 'group-pick'; $this->newGroupBuffer = ''; })(),
+                KeyCode::Backspace => $this->newGroupBuffer = mb_substr($this->newGroupBuffer, 0, -1),
+                KeyCode::Enter     => $this->confirmNewGroup(),
+                default            => null,
+            };
+            return;
+        }
+
+        if ($this->mode === 'group-pick') {
+            if ($event->code === KeyCode::Esc) {
+                $this->mode = 'normal';
+            }
             return;
         }
 
@@ -284,6 +359,92 @@ final class App
         // Reset the auto-refresh timer so ignoring multiple repos quickly
         // doesn't trigger a blocking API refresh between keypresses.
         $this->lastRefreshedAt = time();
+    }
+
+    private function enterGroupPickMode(): void
+    {
+        if (count($this->repos) > 0) {
+            $this->mode = 'group-pick';
+        }
+    }
+
+    private function confirmNewGroup(): void
+    {
+        $name = trim($this->newGroupBuffer);
+        if ($name !== '') {
+            $this->assignToGroup($name);
+        }
+        $this->newGroupBuffer = '';
+        $this->mode = 'normal';
+    }
+
+    private function assignToGroup(string $groupName): void
+    {
+        if (count($this->repos) === 0) {
+            return;
+        }
+
+        $repo  = $this->repos[$this->selectedIndex];
+        $groups = $this->config->groups;
+
+        // Remove from any existing group
+        foreach ($groups as &$names) {
+            $names = array_values(array_filter($names, fn (string $n) => $n !== $repo->name));
+        }
+        unset($names);
+
+        // Add to target group (create if new)
+        $groups[$groupName] ??= [];
+        if (!in_array($repo->name, $groups[$groupName], strict: true)) {
+            $groups[$groupName][] = $repo->name;
+        }
+
+        $this->config->updateGroups(array_filter($groups, fn (array $g) => $g !== []));
+        $this->mode = 'normal';
+    }
+
+    private function removeFromGroup(): void
+    {
+        if (count($this->repos) === 0) {
+            return;
+        }
+
+        $repo  = $this->repos[$this->selectedIndex];
+        $groups = $this->config->groups;
+
+        foreach ($groups as &$names) {
+            $names = array_values(array_filter($names, fn (string $n) => $n !== $repo->name));
+        }
+        unset($names);
+
+        $this->config->updateGroups(array_filter($groups, fn (array $g) => $g !== []));
+        $this->mode = 'normal';
+    }
+
+    private function buildGroupPickerText(): string
+    {
+        $repo = $this->repos[$this->selectedIndex];
+
+        $currentGroup = null;
+        foreach ($this->config->groups as $name => $names) {
+            if (in_array($repo->name, $names, strict: true)) {
+                $currentGroup = $name;
+                break;
+            }
+        }
+
+        $parts = [];
+        foreach (array_keys($this->config->groups) as $i => $group) {
+            $suffix = $group === $currentGroup ? '*' : '';
+            $parts[] = '[' . ($i + 1) . '] ' . $group . $suffix;
+        }
+        $parts[] = '[n] new';
+        if ($currentGroup !== null) {
+            $parts[] = '[r] remove';
+        }
+        $parts[] = '[Esc] cancel';
+
+        return 'group  ' . implode('  ', $parts);
     }
 
     private function openInBrowser(): void
