@@ -1,0 +1,20 @@
+#!/usr/bin/env php
+<?php
+
+declare(strict_types=1);
+
+$autoload = dirname(__DIR__) . '/vendor/autoload.php';
+
+if (!file_exists($autoload)) {
+    fwrite(STDERR, "Run `composer install` in " . dirname(__DIR__) . " first.\n");
+    exit(1);
+}
+
+require_once $autoload;
+
+use Ghboard\App;
+use Ghboard\Config;
+
+$config = Config::load();
+$app = new App($config);
+$app->run();

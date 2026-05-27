@@ -1,0 +1,30 @@
+{
+  "name": "joelwmale/ghboard",
+  "description": "GitHub repository health dashboard for the terminal",
+  "type": "project",
+  "require": {
+    "php": "^8.2",
+    "php-tui/php-tui": "^0.1"
+  },
+  "require-dev": {
+    "pestphp/pest": "^2.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "Ghboard\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Ghboard\\Tests\\": "tests/"
+    }
+  },
+  "scripts": {
+    "test": "pest"
+  },
+  "config": {
+    "allow-plugins": {
+      "pestphp/pest-plugin": true
+    }
+  }
+}
