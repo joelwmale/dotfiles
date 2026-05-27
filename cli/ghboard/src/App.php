@@ -246,23 +246,28 @@ final class App
 
     private function fetchAll(): void
     {
-        $fetches = [];
-        foreach ($this->repos as $i => $repo) {
-            $fetches[$i] = $this->client->startFetch($repo->owner, $repo->name);
-        }
-
+        // Batch to stay well under the macOS default FD limit (256).
+        // Each repo opens 4 stdout pipes; 15 repos × 4 = 60 concurrent FDs.
         $fetched = [];
-        foreach ($this->repos as $i => $repo) {
-            try {
-                [$workflows, $dependabot, $openPrs, $openIssues] = $this->client->collectFetch($fetches[$i]);
-                $fetched[] = $repo->withData(
-                    workflows: $workflows,
-                    dependabot: $dependabot,
-                    openPrs: $openPrs,
-                    openIssues: $openIssues,
-                );
-            } catch (\Throwable $e) {
-                $fetched[] = $repo->withError($e->getMessage());
+
+        foreach (array_chunk($this->repos, 15) as $batch) {
+            $fetches = [];
+            foreach ($batch as $repo) {
+                $fetches[] = $this->client->startFetch($repo->owner, $repo->name);
+            }
+
+            foreach ($batch as $j => $repo) {
+                try {
+                    [$workflows, $dependabot, $openPrs, $openIssues] = $this->client->collectFetch($fetches[$j]);
+                    $fetched[] = $repo->withData(
+                        workflows: $workflows,
+                        dependabot: $dependabot,
+                        openPrs: $openPrs,
+                        openIssues: $openIssues,
+                    );
+                } catch (\Throwable $e) {
+                    $fetched[] = $repo->withError($e->getMessage());
+                }
             }
         }
 
