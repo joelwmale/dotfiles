@@ -133,9 +133,12 @@ final class Dashboard
             return Line::fromSpan(Span::styled('—', Style::default()->fg(AnsiColor::DarkGray)));
         }
 
-        $spans = [];
+        $maxShown = 3;
+        $shown    = array_slice($workflows, 0, $maxShown);
+        $hidden   = count($workflows) - count($shown);
+        $spans    = [];
 
-        foreach ($workflows as $index => $workflow) {
+        foreach ($shown as $index => $workflow) {
             if ($index > 0) {
                 $spans[] = Span::fromString('  ');
             }
@@ -146,8 +149,16 @@ final class Dashboard
                 default                => AnsiColor::Green,
             };
 
-            $label = $workflow->icon() . ' ' . $workflow->name;
-            $spans[] = Span::styled($label, Style::default()->fg($color));
+            $name = mb_strlen($workflow->name) > 20
+                ? mb_substr($workflow->name, 0, 19) . '…'
+                : $workflow->name;
+
+            $spans[] = Span::styled($workflow->icon() . ' ' . $name, Style::default()->fg($color));
+        }
+
+        if ($hidden > 0) {
+            $spans[] = Span::fromString('  ');
+            $spans[] = Span::styled("+{$hidden}", Style::default()->fg(AnsiColor::DarkGray));
         }
 
         return Line::fromSpans($spans);

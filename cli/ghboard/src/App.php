@@ -247,10 +247,10 @@ final class App
     private function fetchAll(): void
     {
         // Batch to stay well under the macOS default FD limit (256).
-        // Each repo opens 4 stdout pipes; 15 repos × 4 = 60 concurrent FDs.
+        // Each repo opens 4 stdout pipes; 30 repos × 4 = 120 concurrent FDs.
         $fetched = [];
 
-        foreach (array_chunk($this->repos, 15) as $batch) {
+        foreach (array_chunk($this->repos, 30) as $batch) {
             $fetches = [];
             foreach ($batch as $repo) {
                 $fetches[] = $this->client->startFetch($repo->owner, $repo->name);
