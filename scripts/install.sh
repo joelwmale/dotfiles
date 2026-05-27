@@ -211,6 +211,7 @@ brew_install stripe-mock
 brew_install node@22
 brew_install python@3.13
 brew_install python@3.14
+brew_install betterdisplaycli
 brew_install clickhouse
 
 brew_install mysql@8.0
@@ -256,6 +257,7 @@ cask_install warp
 cask_install cursor
 cask_install alt-tab
 cask_install bettertouchtool
+cask_install betterdisplay
 cask_install daisydisk
 
 running 'tapping shopify/shopify'
@@ -325,6 +327,12 @@ bot 'installing global composer packages'
 
 action 'installing laravel/installer'
 composer_global laravel/installer
+
+action 'Installing ghboard dependencies'
+(cd "$HOME/Code/dotfiles/cli/ghboard" && composer install --no-dev --quiet);ok
+
+action 'Symlinking ghboard'
+ln -sf "$HOME/Code/dotfiles/cli/ghboard/bin/ghboard" /usr/local/bin/ghboard;ok
 
 # action 'installing laravel/valet'
 # composer_global laravel/valet
