@@ -12,6 +12,8 @@ if (!file_exists($autoload)) {
 
 require_once $autoload;
 
+error_reporting(E_ALL & ~E_DEPRECATED & ~E_USER_DEPRECATED);
+
 use Ghboard\App;
 use Ghboard\Config;
 

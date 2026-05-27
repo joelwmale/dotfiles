@@ -52,10 +52,8 @@ final class GithubClient
 
     public function getDependabotSummary(string $owner, string $repo): DependabotSummary
     {
-        $slug = escapeshellarg("{$owner}/{$repo}");
-        $output = ($this->executor)(
-            "gh api repos/{$slug}/dependabot/alerts?state=open&per_page=100 2>/dev/null"
-        );
+        $urlPath = escapeshellarg("repos/{$owner}/{$repo}/dependabot/alerts?state=open&per_page=100");
+        $output = ($this->executor)("gh api {$urlPath} 2>/dev/null");
 
         $data = json_decode($output, associative: true);
 
