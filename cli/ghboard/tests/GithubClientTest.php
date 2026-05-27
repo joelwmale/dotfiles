@@ -13,10 +13,10 @@ function makeClient(array $responses): GithubClient
 
 it('parses workflow runs and keeps only the latest run per workflow name', function (): void {
     $json = json_encode([
-        ['name' => 'CI', 'status' => 'completed', 'conclusion' => 'success'],
-        ['name' => 'CI', 'status' => 'completed', 'conclusion' => 'failure'],  // older, must be ignored
-        ['name' => 'Tests', 'status' => 'in_progress', 'conclusion' => null],
-        ['name' => 'Deploy', 'status' => 'completed', 'conclusion' => 'failure'],
+        ['name' => 'CI',     'status' => 'completed',  'conclusion' => 'success', 'headBranch' => 'main'],
+        ['name' => 'CI',     'status' => 'completed',  'conclusion' => 'failure', 'headBranch' => 'main'],  // older, must be ignored
+        ['name' => 'Tests',  'status' => 'in_progress', 'conclusion' => null,    'headBranch' => 'main'],
+        ['name' => 'Deploy', 'status' => 'completed',  'conclusion' => 'failure', 'headBranch' => 'main'],
     ]);
 
     $runs = makeClient([$json])->getWorkflowRuns('owner', 'repo');
@@ -29,6 +29,21 @@ it('parses workflow runs and keeps only the latest run per workflow name', funct
     expect($byName['CI']->isPassed())->toBeTrue();
     expect($byName['Tests']->isRunning())->toBeTrue();
     expect($byName['Deploy']->isFailed())->toBeTrue();
+});
+
+it('filters out workflow runs not on main or master branch', function (): void {
+    $json = json_encode([
+        ['name' => 'CI',    'status' => 'completed', 'conclusion' => 'success', 'headBranch' => 'main'],
+        ['name' => 'Tests', 'status' => 'completed', 'conclusion' => 'success', 'headBranch' => 'dependabot/npm_and_yarn/lodash-4.17.21'],
+        ['name' => 'Lint',  'status' => 'completed', 'conclusion' => 'success', 'headBranch' => 'feature/my-branch'],
+        ['name' => 'Build', 'status' => 'completed', 'conclusion' => 'success', 'headBranch' => 'master'],
+    ]);
+
+    $runs = makeClient([$json])->getWorkflowRuns('owner', 'repo');
+
+    expect($runs)->toHaveCount(2);
+    $names = array_map(fn ($r) => $r->name, $runs);
+    expect($names)->toContain('CI')->toContain('Build');
 });
 
 it('returns empty array when no workflow runs exist', function (): void {

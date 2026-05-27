@@ -33,7 +33,7 @@ final class GithubClient
         $urlPath = escapeshellarg("repos/{$owner}/{$repo}/dependabot/alerts?state=open&per_page=100");
 
         $commands = [
-            "gh run list --repo {$slug} --limit 30 --json name,status,conclusion 2>/dev/null",
+            "gh run list --repo {$slug} --limit 30 --json name,status,conclusion,headBranch 2>/dev/null",
             "gh api {$urlPath} 2>/dev/null",
             "gh pr list --repo {$slug} --state open --json number 2>/dev/null",
             "gh issue list --repo {$slug} --state open --json number 2>/dev/null",
@@ -125,7 +125,7 @@ final class GithubClient
     {
         $slug   = escapeshellarg("{$owner}/{$repo}");
         $output = ($this->executor)(
-            "gh run list --repo {$slug} --limit 30 --json name,status,conclusion 2>/dev/null"
+            "gh run list --repo {$slug} --limit 30 --json name,status,conclusion,headBranch 2>/dev/null"
         );
 
         return $this->parseWorkflowRuns($output);
@@ -176,6 +176,11 @@ final class GithubClient
         $runs = [];
 
         foreach ($data as $row) {
+            $branch = $row['headBranch'] ?? '';
+            if (!in_array($branch, ['main', 'master'], strict: true)) {
+                continue;
+            }
+
             $name = $row['name'] ?? '';
             if (isset($seen[$name])) {
                 continue;
