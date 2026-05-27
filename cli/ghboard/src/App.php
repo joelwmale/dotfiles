@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Ghboard;
 
+use PhpTui\Term\Actions;
 use PhpTui\Term\Event\CharKeyEvent;
 use PhpTui\Term\Event\CodedKeyEvent;
 use PhpTui\Term\KeyCode;
@@ -62,8 +63,10 @@ final class App
         $this->display = DisplayBuilder::default($backend)->build();
 
         $terminal->enableRawMode();
+        $terminal->execute(Actions::alternateScreenEnable(), Actions::cursorHide());
 
         register_shutdown_function(static function () use ($terminal): void {
+            $terminal->execute(Actions::alternateScreenDisable(), Actions::cursorShow());
             $terminal->disableRawMode();
         });
 
@@ -97,6 +100,7 @@ final class App
             usleep(100_000);
         }
 
+        $terminal->execute(Actions::alternateScreenDisable(), Actions::cursorShow());
         $terminal->disableRawMode();
     }
 
@@ -242,15 +246,20 @@ final class App
 
     private function fetchAll(): void
     {
-        $fetched = [];
+        $fetches = [];
+        foreach ($this->repos as $i => $repo) {
+            $fetches[$i] = $this->client->startFetch($repo->owner, $repo->name);
+        }
 
-        foreach ($this->repos as $repo) {
+        $fetched = [];
+        foreach ($this->repos as $i => $repo) {
             try {
+                [$workflows, $dependabot, $openPrs, $openIssues] = $this->client->collectFetch($fetches[$i]);
                 $fetched[] = $repo->withData(
-                    workflows: $this->client->getWorkflowRuns($repo->owner, $repo->name),
-                    dependabot: $this->client->getDependabotSummary($repo->owner, $repo->name),
-                    openPrs: $this->client->getOpenPrCount($repo->owner, $repo->name),
-                    openIssues: $this->client->getOpenIssueCount($repo->owner, $repo->name),
+                    workflows: $workflows,
+                    dependabot: $dependabot,
+                    openPrs: $openPrs,
+                    openIssues: $openIssues,
                 );
             } catch (\Throwable $e) {
                 $fetched[] = $repo->withError($e->getMessage());
