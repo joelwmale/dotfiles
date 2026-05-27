@@ -110,10 +110,19 @@ final class App
         $secondsSinceRefresh = time() - $this->lastRefreshedAt;
         $secondsUntilRefresh = max(0, $this->config->refreshInterval - $secondsSinceRefresh);
 
-        $tableState = new TableState(
-            offset: 0,
-            selected: count($this->repos) > 0 ? $this->selectedIndex : null,
-        );
+        $displayList = $this->buildDisplayList();
+
+        $displaySelectedIndex = null;
+        if (count($this->repos) > 0) {
+            foreach ($displayList as $displayIdx => $item) {
+                if ($item['type'] === 'repo' && ($item['repoIndex'] ?? -1) === $this->selectedIndex) {
+                    $displaySelectedIndex = $displayIdx;
+                    break;
+                }
+            }
+        }
+
+        $tableState = new TableState(offset: 0, selected: $displaySelectedIndex);
 
         $header = $this->dashboard->buildHeader(
             repoCount: count($this->repos),
@@ -121,7 +130,7 @@ final class App
             refreshing: $this->refreshing,
         );
 
-        $table = $this->dashboard->buildTable($this->repos, $tableState);
+        $table = $this->dashboard->buildTable($displayList, $tableState);
 
         $footer = $this->dashboard->buildFooter(
             selectedIndex: $this->selectedIndex + 1,
@@ -139,6 +148,67 @@ final class App
             ->widgets($header, $table, $footer);
 
         $display->draw($grid);
+    }
+
+    /**
+     * Build the flat display list that Dashboard renders.
+     * When groups are configured, group header items are interleaved before
+     * each group's repos. Repos not in any group appear last under "Other".
+     * When no groups are configured, returns a simple indexed repo list.
+     *
+     * @return array<int, array{type: string, label?: string, repo?: RepoData, repoIndex?: int}>
+     */
+    private function buildDisplayList(): array
+    {
+        $groups = $this->config->groups;
+
+        if (empty($groups)) {
+            $list = [];
+            foreach ($this->repos as $i => $repo) {
+                $list[] = ['type' => 'repo', 'repo' => $repo, 'repoIndex' => $i];
+            }
+            return $list;
+        }
+
+        $byName = [];
+        foreach ($this->repos as $i => $repo) {
+            $byName[$repo->name] = ['repoIndex' => $i, 'repo' => $repo];
+        }
+
+        $list = [];
+        $usedIndices = [];
+
+        foreach ($groups as $groupName => $repoNames) {
+            $groupItems = [];
+            foreach ((array) $repoNames as $name) {
+                if (isset($byName[$name])) {
+                    $groupItems[] = $byName[$name];
+                }
+            }
+            if (empty($groupItems)) {
+                continue;
+            }
+            $list[] = ['type' => 'header', 'label' => $groupName];
+            foreach ($groupItems as $item) {
+                $list[] = ['type' => 'repo', 'repo' => $item['repo'], 'repoIndex' => $item['repoIndex']];
+                $usedIndices[] = $item['repoIndex'];
+            }
+        }
+
+        $ungrouped = [];
+        foreach ($this->repos as $i => $repo) {
+            if (!in_array($i, $usedIndices, strict: true)) {
+                $ungrouped[] = ['type' => 'repo', 'repo' => $repo, 'repoIndex' => $i];
+            }
+        }
+        if (!empty($ungrouped)) {
+            $list[] = ['type' => 'header', 'label' => 'Other'];
+            foreach ($ungrouped as $item) {
+                $list[] = $item;
+            }
+        }
+
+        return $list;
     }
 
     private function handleChar(CharKeyEvent $event): void

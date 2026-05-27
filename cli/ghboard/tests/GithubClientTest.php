@@ -13,10 +13,10 @@ function makeClient(array $responses): GithubClient
 
 it('parses workflow runs and keeps only the latest run per workflow name', function (): void {
     $json = json_encode([
-        ['name' => 'CI',     'status' => 'completed',  'conclusion' => 'success', 'headBranch' => 'main'],
-        ['name' => 'CI',     'status' => 'completed',  'conclusion' => 'failure', 'headBranch' => 'main'],  // older, must be ignored
-        ['name' => 'Tests',  'status' => 'in_progress', 'conclusion' => null,    'headBranch' => 'main'],
-        ['name' => 'Deploy', 'status' => 'completed',  'conclusion' => 'failure', 'headBranch' => 'main'],
+        ['workflowName' => 'CI',     'name' => 'CI',     'status' => 'completed',   'conclusion' => 'success', 'headBranch' => 'main'],
+        ['workflowName' => 'CI',     'name' => 'CI',     'status' => 'completed',   'conclusion' => 'failure', 'headBranch' => 'main'],
+        ['workflowName' => 'Tests',  'name' => 'Tests',  'status' => 'in_progress', 'conclusion' => null,      'headBranch' => 'main'],
+        ['workflowName' => 'Deploy', 'name' => 'Deploy', 'status' => 'completed',   'conclusion' => 'failure', 'headBranch' => 'main'],
     ]);
 
     $runs = makeClient([$json])->getWorkflowRuns('owner', 'repo');
@@ -31,12 +31,38 @@ it('parses workflow runs and keeps only the latest run per workflow name', funct
     expect($byName['Deploy']->isFailed())->toBeTrue();
 });
 
+it('uses workflowName over run name to strip Dependabot PR title noise', function (): void {
+    $json = json_encode([
+        [
+            'workflowName' => 'CI',
+            'name'         => 'npm_and_yarn in /. - Update #1385939015',
+            'status'       => 'completed',
+            'conclusion'   => 'success',
+            'headBranch'   => 'main',
+        ],
+        [
+            'workflowName' => 'Tests',
+            'name'         => 'github_actions in /. - Update #1385939029',
+            'status'       => 'completed',
+            'conclusion'   => 'failure',
+            'headBranch'   => 'main',
+        ],
+    ]);
+
+    $runs = makeClient([$json])->getWorkflowRuns('owner', 'repo');
+
+    expect($runs)->toHaveCount(2);
+    $names = array_map(fn ($r) => $r->name, $runs);
+    expect($names)->toContain('CI')->toContain('Tests');
+    expect($names)->not->toContain('npm_and_yarn in /. - Update #1385939015');
+});
+
 it('filters out workflow runs not on main or master branch', function (): void {
     $json = json_encode([
-        ['name' => 'CI',    'status' => 'completed', 'conclusion' => 'success', 'headBranch' => 'main'],
-        ['name' => 'Tests', 'status' => 'completed', 'conclusion' => 'success', 'headBranch' => 'dependabot/npm_and_yarn/lodash-4.17.21'],
-        ['name' => 'Lint',  'status' => 'completed', 'conclusion' => 'success', 'headBranch' => 'feature/my-branch'],
-        ['name' => 'Build', 'status' => 'completed', 'conclusion' => 'success', 'headBranch' => 'master'],
+        ['workflowName' => 'CI',    'name' => 'CI',    'status' => 'completed', 'conclusion' => 'success', 'headBranch' => 'main'],
+        ['workflowName' => 'Tests', 'name' => 'Tests', 'status' => 'completed', 'conclusion' => 'success', 'headBranch' => 'dependabot/npm_and_yarn/lodash-4.17.21'],
+        ['workflowName' => 'Lint',  'name' => 'Lint',  'status' => 'completed', 'conclusion' => 'success', 'headBranch' => 'feature/my-branch'],
+        ['workflowName' => 'Build', 'name' => 'Build', 'status' => 'completed', 'conclusion' => 'success', 'headBranch' => 'master'],
     ]);
 
     $runs = makeClient([$json])->getWorkflowRuns('owner', 'repo');

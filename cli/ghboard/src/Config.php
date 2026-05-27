@@ -10,6 +10,7 @@ final class Config
         public array $ignored,
         public int $refreshInterval,
         public string $baseDir,
+        public readonly array $groups,
         private readonly string $path,
     ) {}
 
@@ -22,6 +23,7 @@ final class Config
                 ignored: [],
                 refreshInterval: 60,
                 baseDir: (getenv('HOME') ?: '') . '/Code',
+                groups: [],
                 path: $path,
             );
             $config->persist();
@@ -35,6 +37,7 @@ final class Config
             ignored: $data['ignored'] ?? [],
             refreshInterval: $data['refresh_interval'] ?? 60,
             baseDir: $data['base_dir'] ?? (getenv('HOME') ?: '') . '/Code',
+            groups: is_array($data['groups'] ?? null) ? $data['groups'] : [],
             path: $path,
         );
     }
@@ -56,6 +59,7 @@ final class Config
             'ignored' => $this->ignored,
             'refresh_interval' => $this->refreshInterval,
             'base_dir' => $this->baseDir,
+            'groups' => $this->groups,
         ], JSON_PRETTY_PRINT));
         rename($tmp, $this->path);
     }

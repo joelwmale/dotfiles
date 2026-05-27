@@ -33,7 +33,7 @@ final class GithubClient
         $urlPath = escapeshellarg("repos/{$owner}/{$repo}/dependabot/alerts?state=open&per_page=100");
 
         $commands = [
-            "gh run list --repo {$slug} --limit 30 --json name,status,conclusion,headBranch 2>/dev/null",
+            "gh run list --repo {$slug} --limit 30 --json name,status,conclusion,headBranch,workflowName 2>/dev/null",
             "gh api {$urlPath} 2>/dev/null",
             "gh pr list --repo {$slug} --state open --json number 2>/dev/null",
             "gh issue list --repo {$slug} --state open --json number 2>/dev/null",
@@ -125,7 +125,7 @@ final class GithubClient
     {
         $slug   = escapeshellarg("{$owner}/{$repo}");
         $output = ($this->executor)(
-            "gh run list --repo {$slug} --limit 30 --json name,status,conclusion,headBranch 2>/dev/null"
+            "gh run list --repo {$slug} --limit 30 --json name,status,conclusion,headBranch,workflowName 2>/dev/null"
         );
 
         return $this->parseWorkflowRuns($output);
@@ -181,8 +181,12 @@ final class GithubClient
                 continue;
             }
 
-            $name = $row['name'] ?? '';
-            if (isset($seen[$name])) {
+            // workflowName is the name from the .yml file (e.g. "CI", "Tests").
+            // name is the per-run display title which Dependabot overrides with
+            // the PR description ("npm_and_yarn in /. - Update #123"), so we
+            // prefer workflowName to avoid that noise.
+            $name = $row['workflowName'] ?? $row['name'] ?? '';
+            if ($name === '' || isset($seen[$name])) {
                 continue;
             }
             $seen[$name] = true;

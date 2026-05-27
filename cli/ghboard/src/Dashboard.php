@@ -45,9 +45,9 @@ final class Dashboard
     }
 
     /**
-     * @param RepoData[] $repos
+     * @param array<array{type: string, label?: string, repo?: RepoData}> $displayList
      */
-    public function buildTable(array $repos, TableState $state): TableWidget
+    public function buildTable(array $displayList, TableState $state): TableWidget
     {
         $headerRow = TableRow::fromCells(
             TableCell::fromLine(Line::fromSpan(Span::styled('REPO', Style::default()->fg(AnsiColor::DarkGray)))),
@@ -57,7 +57,12 @@ final class Dashboard
             TableCell::fromLine(Line::fromSpan(Span::styled('ISSUES', Style::default()->fg(AnsiColor::DarkGray)))),
         );
 
-        $rows = array_map(fn (RepoData $repo): TableRow => $this->buildRow($repo), $repos);
+        $rows = array_map(function (array $item): TableRow {
+            if ($item['type'] === 'header') {
+                return $this->buildGroupHeaderRow($item['label'] ?? '');
+            }
+            return $this->buildRow($item['repo']);
+        }, $displayList);
 
         return TableWidget::default()
             ->widths(
@@ -71,6 +76,19 @@ final class Dashboard
             ->rows(...$rows)
             ->state($state)
             ->highlightStyle(Style::default()->bg(AnsiColor::DarkGray)->fg(AnsiColor::White));
+    }
+
+    private function buildGroupHeaderRow(string $label): TableRow
+    {
+        return TableRow::fromCells(
+            TableCell::fromLine(Line::fromSpan(
+                Span::styled('  ' . strtoupper($label), Style::default()->fg(AnsiColor::Cyan)),
+            )),
+            TableCell::fromString(''),
+            TableCell::fromString(''),
+            TableCell::fromString(''),
+            TableCell::fromString(''),
+        );
     }
 
     public function buildFooter(int $selectedIndex, int $total, int $secondsUntilRefresh): ParagraphWidget
