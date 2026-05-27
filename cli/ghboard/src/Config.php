@@ -40,9 +40,11 @@ final class Config
 
     public function ignore(string $repoName): void
     {
-        if (!in_array($repoName, $this->ignored, strict: true)) {
-            $this->ignored[] = $repoName;
+        if (in_array($repoName, $this->ignored, strict: true)) {
+            return;
         }
+
+        $this->ignored[] = $repoName;
         $this->persist();
     }
 
