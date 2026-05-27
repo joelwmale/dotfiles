@@ -97,7 +97,7 @@ final class App
                 }
             }
 
-            if (!$this->refreshing && time() - $this->lastRefreshedAt >= $this->config->refreshInterval) {
+            if ($this->mode === 'normal' && !$this->refreshing && time() - $this->lastRefreshedAt >= $this->config->refreshInterval) {
                 $this->startRefresh();
             }
 
@@ -262,12 +262,13 @@ final class App
             return;
         }
 
-        match ($char) {
-            'n'    => $this->mode = 'new-group',
-            'r'    => $this->removeFromGroup(),
-            "\x1b" => $this->mode = 'normal',
-            default => null,
-        };
+        if ($char === 'n') {
+            $this->mode = 'new-group';
+        } elseif ($char === 'r') {
+            $this->removeFromGroup();
+        } elseif ($char === 'g' || $char === "\x1b") {
+            $this->mode = 'normal';
+        }
     }
 
     private function handleNewGroupChar(string $char): void
@@ -301,12 +302,14 @@ final class App
         }
 
         if ($this->mode === 'new-group') {
-            match ($event->code) {
-                KeyCode::Esc       => (function (): void { $this->mode = 'group-pick'; $this->newGroupBuffer = ''; })(),
-                KeyCode::Backspace => $this->newGroupBuffer = mb_substr($this->newGroupBuffer, 0, -1),
-                KeyCode::Enter     => $this->confirmNewGroup(),
-                default            => null,
-            };
+            if ($event->code === KeyCode::Esc) {
+                $this->mode = 'group-pick';
+                $this->newGroupBuffer = '';
+            } elseif ($event->code === KeyCode::Backspace) {
+                $this->newGroupBuffer = mb_substr($this->newGroupBuffer, 0, -1);
+            } elseif ($event->code === KeyCode::Enter) {
+                $this->confirmNewGroup();
+            }
             return;
         }
 
