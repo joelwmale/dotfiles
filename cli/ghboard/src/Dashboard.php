@@ -80,14 +80,18 @@ final class Dashboard
 
     private function buildGroupHeaderRow(string $label): TableRow
     {
+        $sep = str_repeat('─', 60);
+        $line = Style::default()->fg(AnsiColor::DarkGray);
+
         return TableRow::fromCells(
-            TableCell::fromLine(Line::fromSpan(
-                Span::styled('  ' . strtoupper($label), Style::default()->fg(AnsiColor::Cyan)),
-            )),
-            TableCell::fromString(''),
-            TableCell::fromString(''),
-            TableCell::fromString(''),
-            TableCell::fromString(''),
+            TableCell::fromLine(Line::fromSpans([
+                Span::styled(strtoupper($label) . ' ', Style::default()->fg(AnsiColor::Cyan)),
+                Span::styled($sep, $line),
+            ])),
+            TableCell::fromLine(Line::fromSpan(Span::styled($sep, $line))),
+            TableCell::fromLine(Line::fromSpan(Span::styled($sep, $line))),
+            TableCell::fromLine(Line::fromSpan(Span::styled($sep, $line))),
+            TableCell::fromLine(Line::fromSpan(Span::styled($sep, $line))),
         );
     }
 
