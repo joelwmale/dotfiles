@@ -67,17 +67,23 @@ final class App
             $terminal->disableRawMode();
         });
 
-        // Initial data fetch before first render
         $this->repos = $this->discovery->discover($this->config->ignored);
+
+        // Render loading state before the blocking initial fetch
+        $this->refreshing = true;
+        $this->render($this->display);
         $this->fetchAll();
 
+        // Drain any events queued during the loading fetch so stray keypresses
+        // don't immediately quit the app before the user sees the TUI
+        while (null !== $terminal->events()->next()) {
+        }
+
         while (!$this->quit) {
-            // Auto-refresh check
             if (!$this->refreshing && time() - $this->lastRefreshedAt >= $this->config->refreshInterval) {
                 $this->startRefresh();
             }
 
-            // Handle input events (non-blocking)
             while (null !== $event = $terminal->events()->next()) {
                 if ($event instanceof CharKeyEvent) {
                     $this->handleChar($event);
@@ -86,10 +92,8 @@ final class App
                 }
             }
 
-            // Render
             $this->render($this->display);
 
-            // Tick at ~100ms
             usleep(100_000);
         }
 
