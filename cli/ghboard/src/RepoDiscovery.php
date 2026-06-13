@@ -81,7 +81,7 @@ final class RepoDiscovery
             return null;
         }
 
-        return new RepoData(name: $name, owner: $owner, path: $path);
+        return new RepoData(name: basename($path), owner: $owner, path: $path);
     }
 
     private function extractRemoteUrl(string $gitConfig): ?string
