@@ -6,6 +6,8 @@ Do not excessively use emojis.
 
 Prefer using browser agent skill over using playwright directly.
 
+Use hyphens (-) instead of em dashes (—) in all copy and content. Em dashes read as AI-generated.
+
 ---
 
 ## How to use Rules & Skills
@@ -14,6 +16,7 @@ Prefer using browser agent skill over using playwright directly.
 Always follow the rules in:
 - `config/claude/rules/php_coding_rules.md`
 - `config/claude/rules/git_workflow.md`
+- `config/claude/rules/review_policy.md`
 
 If there is any conflict:
 1. Project requirements in the prompt win
@@ -59,6 +62,18 @@ For questions about GitHub, use the `gh` tool.
 
 ## Committing
 
-When you have finished working on a request, commit the changes and NEVER pus them to the remote repository.
+When you have finished working on a request, commit the changes and push them to the remote repository.
 
-You can use the `commit` bash function to commit the changes automatically which calls AI to help write the commit message.
+Write a commit message that makes sense for the changes you have made. Always prefix the commit message with the type of change you have made, for example:
+
+- feat: add new feature
+- fix: fix bug
+- refactor: refactor code
+- docs: update documentation
+- test: add tests
+- chore: miscellaneous changes
+- perf: performance improvements
+- ci: continuous integration changes
+- style: formatting changes
+- build: build system changes
+- revert: revert previous commit
