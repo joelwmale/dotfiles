@@ -45,9 +45,15 @@ turns out to touch a Tier 1 concern, stop and re-tier it.
   task is not understood; the third attempt gets a real gate.
 - **A test proving a guard exists must prove the guarded action did not happen.**
   Asserting a status, a returned string, or that something threw is not enough —
-  an unmatched HTTP fake returns a benign 200 and a guard can be deleted with the
-  test still green. When a fix is security-relevant, verify it by removing the
-  guard, watching the test fail, and restoring the file.
+  a guard can be deleted with the test still green. When a fix is
+  security-relevant, verify it by removing the guard, watching the test fail, and
+  restoring the file.
+- **In Laravel, a URL not matched by `Http::fake([...])` is not stubbed — it is
+  attempted for real.** Verified: it raises a `ConnectionException` from cURL, or
+  worse, succeeds against the live service. So an incomplete fake array does not
+  fail loudly and locally; it either errors for the wrong reason or reaches out
+  over the network. Prefer asserting `Http::assertNotSent(...)` on the specific
+  request a guard should prevent, and stub every URL a code path can reach.
 - **Report tier choices and their cost.** If a Tier 3 call turns out to have been
   wrong, say so plainly rather than quietly upgrading later.
 
