@@ -1,0 +1,169 @@
+#!/usr/bin/env bash
+#
+# displays - Save and restore display arrangements via BetterDisplay CLI
+#
+# Usage:
+#   displays save [profile]   Save current display layout
+#   displays load [profile]   Restore a saved display layout
+#   displays list              List saved profiles
+#
+# Profiles are stored in ~/.config/betterdisplay/
+# Default profile name: "default"
+
+set -euo pipefail
+
+# Ensure Homebrew is in PATH (needed when run from AppleScript/Stream Deck)
+export PATH="/opt/homebrew/bin:${PATH}"
+
+CONFIG_DIR="${HOME}/.config/betterdisplay"
+CLI="betterdisplaycli"
+DEFAULT_PROFILE="default"
+
+die() { echo "error: $*" >&2; exit 1; }
+
+require_cli() {
+  command -v "$CLI" &>/dev/null || die "betterdisplaycli not found. Install via: brew install betterdisplaycli"
+}
+
+profile_path() {
+  echo "${CONFIG_DIR}/${1:-$DEFAULT_PROFILE}.json"
+}
+
+cmd_save() {
+  require_cli
+  local profile="${1:-$DEFAULT_PROFILE}"
+  local path
+  path="$(profile_path "$profile")"
+  mkdir -p "$CONFIG_DIR"
+
+  echo "Querying connected displays..."
+
+  local identifiers
+  identifiers=$("$CLI" get --identifiers 2>/dev/null) || die "Failed to get display identifiers. Is BetterDisplay running?"
+
+  # Extract display names from identifiers JSON
+  # Output is comma-separated objects without wrapping [], so we wrap it
+  local names
+  names=$(echo "[$identifiers]" | /usr/bin/python3 -c "
+import sys, json
+data = json.load(sys.stdin)
+for d in data:
+    name = d.get('name', '')
+    dtype = d.get('deviceType', '')
+    if dtype == 'Display' and name:
+        print(name)
+")
+
+  if [[ -z "$names" ]]; then
+    die "No displays found"
+  fi
+
+  local displays="[]"
+
+  while IFS= read -r name; do
+    echo "  Reading: ${name}"
+
+    local placement rotation resolution refresh_rate
+    placement=$("$CLI" get --name="$name" --placement 2>/dev/null || echo "")
+    rotation=$("$CLI" get --name="$name" --rotation 2>/dev/null || echo "")
+    resolution=$("$CLI" get --name="$name" --resolution 2>/dev/null || echo "")
+    refresh_rate=$("$CLI" get --name="$name" --refreshRate 2>/dev/null || echo "")
+
+    displays=$(/usr/bin/python3 -c "
+import sys, json
+displays = json.loads(sys.argv[1])
+displays.append({
+    'name': sys.argv[2],
+    'placement': sys.argv[3],
+    'rotation': sys.argv[4],
+    'resolution': sys.argv[5],
+    'refreshRate': sys.argv[6]
+})
+print(json.dumps(displays, indent=2))
+" "$displays" "$name" "$placement" "$rotation" "$resolution" "$refresh_rate")
+
+  done <<< "$names"
+
+  echo "$displays" > "$path"
+  echo "Saved profile '${profile}' to ${path}"
+  echo "$displays" | /usr/bin/python3 -c "
+import sys, json
+for d in json.load(sys.stdin):
+    print(f\"  {d['name']}: {d['resolution']} @ {d['placement']} rot={d['rotation']}\")
+"
+}
+
+cmd_load() {
+  require_cli
+  local profile="${1:-$DEFAULT_PROFILE}"
+  local path
+  path="$(profile_path "$profile")"
+
+  [[ -f "$path" ]] || die "Profile '${profile}' not found at ${path}. Run 'displays save ${profile}' first."
+
+  echo "Restoring profile '${profile}'..."
+
+  /usr/bin/python3 -c "
+import sys, json
+with open(sys.argv[1]) as f:
+    displays = json.load(f)
+for d in displays:
+    print(d['name'])
+    print(d.get('placement', ''))
+    print(d.get('rotation', ''))
+    print(d.get('resolution', ''))
+    print(d.get('refreshRate', ''))
+" "$path" | while IFS= read -r name; do
+    IFS= read -r placement
+    IFS= read -r rotation
+    IFS= read -r resolution
+    IFS= read -r refresh_rate
+
+    echo "  Restoring: ${name}"
+
+    local args=()
+    [[ -n "$placement" ]]    && args+=(--placement="$placement")
+    [[ -n "$rotation" ]]     && args+=(--rotation="$rotation")
+    [[ -n "$resolution" ]]   && args+=(--resolution="$resolution")
+    [[ -n "$refresh_rate" ]] && args+=(--refreshRate="$refresh_rate")
+
+    if [[ ${#args[@]} -gt 0 ]]; then
+      "$CLI" set --name="$name" "${args[@]}" 2>/dev/null || echo "    Warning: failed to apply settings for ${name}"
+    fi
+  done
+
+  echo "Done."
+}
+
+cmd_list() {
+  mkdir -p "$CONFIG_DIR"
+  echo "Saved profiles:"
+  for f in "$CONFIG_DIR"/*.json; do
+    [[ -f "$f" ]] || { echo "  (none)"; break; }
+    local pname
+    pname=$(basename "$f" .json)
+    local count
+    count=$(/usr/bin/python3 -c "import json; print(len(json.load(open('$f'))))" 2>/dev/null || echo "?")
+    echo "  ${pname} (${count} displays)"
+  done
+}
+
+case "${1:-}" in
+  save) cmd_save "${2:-}" ;;
+  load) cmd_load "${2:-}" ;;
+  list) cmd_list ;;
+  *)
+    echo "Usage: displays <save|load|list> [profile]"
+    echo ""
+    echo "  save [profile]   Save current display layout (default: 'default')"
+    echo "  load [profile]   Restore a saved layout"
+    echo "  list             List saved profiles"
+    echo ""
+    echo "Examples:"
+    echo "  displays save office     # Save current layout as 'office'"
+    echo "  displays load office     # Restore 'office' layout (Stream Deck)"
+    echo "  displays save            # Save as 'default'"
+    echo "  displays load            # Restore 'default'"
+    exit 1
+    ;;
+esac
