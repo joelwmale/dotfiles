@@ -52,12 +52,8 @@
       "WebSearch",
       "WebFetch"
     ],
-    "defaultMode": "acceptEdits"
+    "defaultMode": "auto"
   },
-  "enabledPlugins": {
-    "laravel-simplifier@laravel": true
-  },
-  "alwaysThinkingEnabled": true,
   "hooks": {
     "PreCompact": [
       {
@@ -82,5 +78,26 @@
         ]
       }
     ]
-  }
+  },
+  "enabledPlugins": {
+    "figma@claude-plugins-official": true,
+    "frontend-design@claude-plugins-official": true,
+    "laravel-simplifier@laravel": true,
+    "superpowers@claude-plugins-official": true,
+    "stripe@claude-plugins-official": true
+  },
+  "extraKnownMarketplaces": {
+    "cloudflare": {
+      "source": {
+        "source": "github",
+        "repo": "cloudflare/skills"
+      }
+    }
+  },
+  "alwaysThinkingEnabled": true,
+  "tui": "fullscreen",
+  "skipDangerousModePermissionPrompt": true,
+  "remoteControlAtStartup": false,
+  "agentPushNotifEnabled": true,
+  "voiceEnabled": true
 }
