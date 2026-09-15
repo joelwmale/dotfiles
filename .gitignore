@@ -1,3 +1,6 @@
 .claude
 .superpowers
 config/claude/personas/*
+
+# ignore paid skills that cannot be published for free
+config/claude/skills/design/*
