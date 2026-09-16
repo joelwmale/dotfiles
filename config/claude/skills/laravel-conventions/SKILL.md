@@ -180,6 +180,10 @@ class User extends Model
 
 ## Testing
 
+**Whether to test at all is governed by `rules/testing_policy.md`** - test what
+can break silently, not copy changes, markup, config or one-off commands. The
+guidance below is how to write a test once that rule says one is warranted.
+
 - Pest, feature tests first
 - Factories for all model setup - no hand-built arrays
 - Do not test private methods; test the behaviour that exercises them

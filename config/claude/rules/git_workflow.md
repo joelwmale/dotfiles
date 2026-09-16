@@ -28,12 +28,13 @@ When creating PRs:
    - Identify dependencies and risks
    - Break down into phases
 
-2. **TDD Approach**
-   - Use **tdd-guide** agent
-   - Write tests first (RED)
-   - Implement to pass tests (GREEN)
-   - Refactor (IMPROVE)
-   - Verify 80%+ coverage
+2. **Testing**
+   - Tier the change per `testing_policy.md` and say which tier
+   - Tier 1 (auth, money, irreversible effects, security and bug fixes):
+     test first - RED, GREEN, refactor
+   - Tier 2: test in the same commit, after implementing
+   - Tier 3 (copy, markup, one-off commands, config): no test
+   - No coverage target
 
 3. **Code Review**
    - Use **code-reviewer** agent immediately after writing code

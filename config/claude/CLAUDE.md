@@ -17,6 +17,7 @@ Always follow the rules in:
 - `config/claude/rules/php_coding_rules.md`
 - `config/claude/rules/git_workflow.md`
 - `config/claude/rules/review_policy.md`
+- `config/claude/rules/testing_policy.md`
 
 If there is any conflict:
 1. Project requirements in the prompt win
@@ -44,7 +45,8 @@ the strict rules above. Rules win on any conflict.
 
 - For Laravel/PHP work: follow `php_coding_rules.md` (rule) and apply `laravel-conventions` (skill).
 - Write idiomatic Laravel code (FormRequests, Policies, Resources, transactions, etc.).
-- Add Pest tests for new features unless explicitly out of scope.
+- Test proportionately per `testing_policy.md`. Test what can break silently;
+  do not test copy changes, markup, config or one-off commands.
 
 ---
 
