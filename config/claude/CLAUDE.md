@@ -18,6 +18,7 @@ Always follow the rules in:
 - `config/claude/rules/git_workflow.md`
 - `config/claude/rules/review_policy.md`
 - `config/claude/rules/testing_policy.md`
+- `config/claude/rules/code_comments.md`
 
 If there is any conflict:
 1. Project requirements in the prompt win
