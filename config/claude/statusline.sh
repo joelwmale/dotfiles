@@ -1,13 +1,10 @@
 #!/bin/bash
 # Claude Code status line. Receives session JSON on stdin.
-# Renders: model | dir branch | context% | +add/-del | 5h limit | 7d limit | cost
+# Renders: model | dir branch | context% | 5h limit | 7d limit
 #
 # Limit segments read "5h 48% 1h32m·11:57am" - percentage of the window used,
 # time remaining, and the wall-clock time it resets. Percentages are colour
 # coded green under 50, yellow 50-79, red 80 and above.
-#
-# Note: cost and line counts are cumulative for the LIFETIME of the session,
-# across every resume and compaction - not just the current context window.
 
 input=$(cat)
 
@@ -90,21 +87,10 @@ fi
 ctx=$(get '.context_window.used_percentage')
 [ -n "$ctx" ] && add "$(pct_color "$ctx")${ctx}%${reset}${dim} ctx${reset}"
 
-added=$(get '.cost.total_lines_added'); removed=$(get '.cost.total_lines_removed')
-if [ "${added:-0}" -gt 0 ] 2>/dev/null || [ "${removed:-0}" -gt 0 ] 2>/dev/null; then
-    add "${green}+${added:-0}${reset}${dim}/${reset}${red}-${removed:-0}${reset}"
-fi
-
 five=$(get '.rate_limits.five_hour.used_percentage')
 [ -n "$five" ] && add "$(limit_segment 5h "$five" "$(get '.rate_limits.five_hour.resets_at')")"
 
 week=$(get '.rate_limits.seven_day.used_percentage')
 [ -n "$week" ] && add "$(limit_segment 7d "$week" "$(get '.rate_limits.seven_day.resets_at')")"
-
-cost=$(get '.cost.total_cost_usd')
-if [ -n "$cost" ]; then
-    formatted=$(printf '%.2f' "$cost" 2>/dev/null)
-    [ -n "$formatted" ] && [ "$formatted" != "0.00" ] && add "${yellow}\$${formatted}${reset}"
-fi
 
 printf '%s' "$out"
