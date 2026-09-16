@@ -1,18 +1,30 @@
 # Testing Policy (Proportionate)
 
-Applies to every change. Governs whether a test gets written at all.
+Applies to every change.
 
-**This rule overrides `superpowers:test-driven-development`**, the `tdd-guide`
-agent, and any project instruction to hit a coverage number. Those treat a test
-as mandatory for any feature or bugfix, which is correct for code that can break
-silently and waste for code that cannot. Rules beat skills; apply the tiers
-below instead.
+## This file is the only authority on whether to test
+
+There is no second opinion to weigh against it.
+
+| Question | Answer lives in |
+|---|---|
+| **Whether** a test gets written | **This file. Nowhere else.** |
+| **How** to write it, once this file says to | the `writing-tests` skill |
+
+`superpowers:test-driven-development` is **disabled** in settings.json via
+`skillOverrides`, precisely so there is nothing to arbitrate between. There is
+no coverage target anywhere.
+
+If any other source - a plugin skill, an agent, a project `CLAUDE.md`, a
+generic TDD instinct - implies a test for something this file places in Tier 3,
+**this file wins, and you do not need to ask.**
 
 **Skipping a test under Tier 3 is the correct call, not a rationalisation.**
-The TDD skill pre-empts the thought "skip it just this once" because it assumes
-every change carries risk. In this codebase that assumption is wrong often
-enough to matter, and the cost is real: unnecessary tests slow the work, bloat
-the diff for review, and make the suite noisier without making it safer.
+Generic TDD guidance assumes every change carries silent risk. Across these
+projects that assumption has been wrong often enough to produce suites of
+thousands of tests running for tens of minutes, where most never catch anything
+and all of them slow the work down. A test that cannot fail is not neutral - it
+costs runtime, review attention, and trust in the suite.
 
 ---
 
@@ -30,8 +42,8 @@ Not "is this code?" Not "is this a feature?" Only: can it break quietly.
 
 ## Tier 1 - test first, TDD
 
-Write the failing test, watch it fail, then implement. A change is Tier 1 if it
-touches any of:
+Write the failing test, watch it fail, then implement. Mechanics are in the
+`writing-tests` skill. A change is Tier 1 if it touches any of:
 
 - authentication, authorisation, or a permission gate
 - money, billing, pricing, discounts, credit or refunds

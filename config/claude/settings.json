@@ -127,5 +127,8 @@
   "remoteControlAtStartup": false,
   "agentPushNotifEnabled": true,
   "voiceEnabled": true,
-  "switchModelsOnFlag": true
+  "switchModelsOnFlag": true,
+  "skillOverrides": {
+    "test-driven-development": "off"
+  }
 }
