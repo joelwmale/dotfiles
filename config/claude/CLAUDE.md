@@ -24,21 +24,25 @@ If there is any conflict:
 3. Skills are guidance
 
 ### Skills (apply when relevant)
-Apply the most relevant skills from:
-- `config/claude/skills/laravel_style_guide.md` (Laravel/PHP conventions & style)
-- `config/claude/skills/frontend_design.md` (frontend/UI/UX output)
-- `config/claude/skills/seo_audit.md` (SEO reviews, audits, recommendations)
-- `config/claude/skills/web_design_guidelines.md` (web design standards/guidelines)
+Skills in `config/claude/skills/` are auto-discovered by name and description -
+they do not need listing here. The house conventions are:
 
-When working on Laravel/PHP tasks, apply:
-- `laravel_style_guide.md`
-…in addition to the strict PHP/Laravel rules.
+- `laravel-conventions` (Laravel/PHP naming, structure, Eloquent, testing)
+- `livewire-conventions` (Livewire 3 components)
+- `inertia-react-conventions` (React as the Laravel view layer, via Inertia)
+- `react-native-conventions` (mobile)
+- `tailwind-conventions` (Tailwind v4)
+- `web-design-guidelines` (UI review against Web Interface Guidelines)
+- `seo-audit` (SEO reviews and audits)
+
+Apply the conventions skill for whatever stack the work touches, in addition to
+the strict rules above. Rules win on any conflict.
 
 ---
 
 ## Coding Standards
 
-- For Laravel/PHP work: follow `php_coding_rules.md` (rule) and apply `laravel_style_guide.md` (skill).
+- For Laravel/PHP work: follow `php_coding_rules.md` (rule) and apply `laravel-conventions` (skill).
 - Write idiomatic Laravel code (FormRequests, Policies, Resources, transactions, etc.).
 - Add Pest tests for new features unless explicitly out of scope.
 
