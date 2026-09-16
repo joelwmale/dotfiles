@@ -52,7 +52,6 @@
       "WebSearch",
       "WebFetch"
     ],
-    "defaultMode": "auto",
     "deny": [
       "Read(**/.env)",
       "Read(**/.env.local)",
@@ -67,8 +66,13 @@
       "Bash(sudo:*)",
       "Bash(rm -rf /:*)",
       "Bash(rm -rf ~:*)"
-    ]
+    ],
+    "defaultMode": "auto"
   },
+  "fallbackModel": [
+    "opus",
+    "sonnet"
+  ],
   "hooks": {
     "PreCompact": [
       {
@@ -94,6 +98,10 @@
       }
     ]
   },
+  "statusLine": {
+    "type": "command",
+    "command": "~/.claude/statusline.sh"
+  },
   "enabledPlugins": {
     "figma@claude-plugins-official": true,
     "frontend-design@claude-plugins-official": true,
@@ -110,21 +118,14 @@
     }
   },
   "alwaysThinkingEnabled": true,
+  "effortLevel": "xhigh",
   "tui": "fullscreen",
   "skipDangerousModePermissionPrompt": true,
+  "precomputeCompactionEnabled": true,
+  "autoContinueAtUsageLimit": true,
+  "teammateMode": "tmux",
   "remoteControlAtStartup": false,
   "agentPushNotifEnabled": true,
   "voiceEnabled": true,
-  "effortLevel": "xhigh",
-  "fallbackModel": [
-    "opus",
-    "sonnet"
-  ],
-  "teammateMode": "tmux",
-  "precomputeCompactionEnabled": true,
-  "autoContinueAtUsageLimit": true,
-  "statusLine": {
-    "type": "command",
-    "command": "~/.claude/statusline.sh"
-  }
+  "switchModelsOnFlag": true
 }
