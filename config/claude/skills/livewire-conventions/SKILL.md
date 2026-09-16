@@ -281,29 +281,49 @@ Eloquent *model* properties are checksum-protected. **Scalars and arrays are
 not.** An `int`, `string`, `bool` or `array` property is client input.
 
 ```php
-// DANGEROUS - $brandIds is client input on every request after the first
-public array $brandIds = [];
-
-public function mount(): void
+// DANGEROUS
+class ProductIndex extends Component
 {
-    $this->brandIds = auth()->user()->supplier->brands->pluck('id')->toArray();
-}
+    // A public array is client input on every request after the first one.
+    public array $brandIds = [];
 
-public function render(): View
-{
-    // runs on EVERY request, reading the hydrated (tampered) value
-    $products = Product::whereHas('brand', fn ($q) => $q->whereIn('id', $this->brandIds));
+    public function mount(): void
+    {
+        // Runs ONCE, on the initial render.
+        $this->brandIds = auth()->user()->supplier->brands->pluck('id')->toArray();
+    }
+
+    public function render(): View
+    {
+        // Runs on EVERY request, against whatever the client last sent.
+        return view('livewire.products.index', [
+            'products' => Product::whereHas(
+                'brand',
+                fn ($q) => $q->whereIn('id', $this->brandIds)
+            )->get(),
+        ]);
+    }
 }
 ```
 
 **Best fix: do not hold the value at all.** Resolve it from the authenticated
-user inside each query, so there is nothing to tamper with:
+user inside the query. Note what disappears - the property and `mount()` are
+both gone, so there is nothing left for the client to tamper with:
 
 ```php
-$products = Product::whereHas(
-    'brand',
-    fn ($q) => $q->whereIn('id', auth()->user()->supplier->brands->pluck('id'))
-);
+// SAFE
+class ProductIndex extends Component
+{
+    public function render(): View
+    {
+        return view('livewire.products.index', [
+            'products' => Product::whereHas(
+                'brand',
+                fn ($q) => $q->whereIn('id', auth()->user()->supplier->brands->pluck('id'))
+            )->get(),
+        ]);
+    }
+}
 ```
 
 **Second best: `#[Locked]`.** Apply it to every property the client must not
