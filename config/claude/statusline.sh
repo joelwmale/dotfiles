@@ -1,6 +1,7 @@
 #!/bin/bash
 # Claude Code status line. Receives session JSON on stdin.
-# Renders: model | directory branch | +added/-removed | cost
+# Renders: model | dir branch | context% | +add/-del | 5h limit | 7d limit | cost
+# Limit percentages are colour-coded: green <50, yellow 50-79, red 80+.
 
 input=$(cat)
 
@@ -15,39 +16,71 @@ sep="${dim} | ${reset}"
 
 get() { printf '%s' "$input" | jq -r "$1 // empty" 2>/dev/null; }
 
-model=$(get '.model.display_name')
-cwd=$(get '.workspace.current_dir')
-[ -z "$cwd" ] && cwd=$(get '.cwd')
-added=$(get '.cost.total_lines_added')
-removed=$(get '.cost.total_lines_removed')
-cost=$(get '.cost.total_cost_usd')
+# Colour for a 0-100 usage percentage: the higher the worse.
+pct_color() {
+    if   [ "$1" -ge 80 ] 2>/dev/null; then printf '%s' "$red"
+    elif [ "$1" -ge 50 ] 2>/dev/null; then printf '%s' "$yellow"
+    else printf '%s' "$green"
+    fi
+}
+
+# Compact time until a unix timestamp: 4d3h / 2h14m / 9m.
+until_ts() {
+    local diff d h m
+    diff=$(( $1 - $(date +%s) ))
+    [ "$diff" -le 0 ] && { printf 'now'; return; }
+    d=$(( diff / 86400 )); h=$(( (diff % 86400) / 3600 )); m=$(( (diff % 3600) / 60 ))
+    if   [ "$d" -gt 0 ]; then printf '%dd%dh' "$d" "$h"
+    elif [ "$h" -gt 0 ]; then printf '%dh%02dm' "$h" "$m"
+    else printf '%dm' "$m"
+    fi
+}
+
+# "5h 48% 2h14m", coloured by severity. $1=label $2=pct $3=reset timestamp
+limit_segment() {
+    local label=$1 pct=$2 ts=$3 c
+    [ -z "$pct" ] && return
+    c=$(pct_color "$pct")
+    printf '%s%s %s%s%%%s' "$dim" "$label" "$c" "$pct" "$reset"
+    [ -n "$ts" ] && printf ' %s%s%s' "$dim" "$(until_ts "$ts")" "$reset"
+}
 
 out=""
+add() { [ -n "$out" ] && out="${out}${sep}"; out="${out}$1"; }
+
+model=$(get '.model.display_name')
 [ -n "$model" ] && out="${cyan}${model}${reset}"
 
+cwd=$(get '.workspace.current_dir'); [ -z "$cwd" ] && cwd=$(get '.cwd')
 if [ -n "$cwd" ]; then
-    [ -n "$out" ] && out="${out}${sep}"
-    out="${out}${dim}$(basename "$cwd")${reset}"
-
+    seg="${dim}$(basename "$cwd")${reset}"
     branch=$(git -C "$cwd" rev-parse --abbrev-ref HEAD 2>/dev/null)
     if [ -n "$branch" ]; then
         dirty=""
         [ -n "$(git -C "$cwd" status --porcelain 2>/dev/null)" ] && dirty="${yellow}*${reset}"
-        out="${out} ${magenta}${branch}${reset}${dirty}"
+        seg="${seg} ${magenta}${branch}${reset}${dirty}"
     fi
+    add "$seg"
 fi
 
-if [ -n "$added" ] || [ -n "$removed" ]; then
-    if [ "${added:-0}" -gt 0 ] 2>/dev/null || [ "${removed:-0}" -gt 0 ] 2>/dev/null; then
-        out="${out}${sep}${green}+${added:-0}${reset}${dim}/${reset}${red}-${removed:-0}${reset}"
-    fi
+ctx=$(get '.context_window.used_percentage')
+[ -n "$ctx" ] && add "$(pct_color "$ctx")${ctx}%${reset}${dim} ctx${reset}"
+
+added=$(get '.cost.total_lines_added'); removed=$(get '.cost.total_lines_removed')
+if [ "${added:-0}" -gt 0 ] 2>/dev/null || [ "${removed:-0}" -gt 0 ] 2>/dev/null; then
+    add "${green}+${added:-0}${reset}${dim}/${reset}${red}-${removed:-0}${reset}"
 fi
 
+five=$(get '.rate_limits.five_hour.used_percentage')
+[ -n "$five" ] && add "$(limit_segment 5h "$five" "$(get '.rate_limits.five_hour.resets_at')")"
+
+week=$(get '.rate_limits.seven_day.used_percentage')
+[ -n "$week" ] && add "$(limit_segment 7d "$week" "$(get '.rate_limits.seven_day.resets_at')")"
+
+cost=$(get '.cost.total_cost_usd')
 if [ -n "$cost" ]; then
     formatted=$(printf '%.2f' "$cost" 2>/dev/null)
-    if [ -n "$formatted" ] && [ "$formatted" != "0.00" ]; then
-        out="${out}${sep}${yellow}\$${formatted}${reset}"
-    fi
+    [ -n "$formatted" ] && [ "$formatted" != "0.00" ] && add "${yellow}\$${formatted}${reset}"
 fi
 
 printf '%s' "$out"
