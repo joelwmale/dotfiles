@@ -1,6 +1,6 @@
 ---
 name: livewire-conventions
-description: Livewire conventions targeting v4, with v3 differences flagged - components, properties, actions, validation, computed properties, islands, events, wire:model modifiers, Alpine integration and testing. Use when writing or reviewing Livewire components or Blade views containing wire: directives.
+description: Livewire conventions targeting v4, with v3 differences flagged - components, properties, actions, computed properties, islands, wire:model modifiers, Alpine integration, and a security section on client-writable public properties, #[Locked], middleware not re-applying to livewire/update, and how to test tampering. Use when writing or reviewing Livewire components or Blade views containing wire: directives.
 ---
 
 # Livewire Conventions
@@ -264,6 +264,197 @@ it('cancels an order', function () {
 - On the authorisation path, assert the action **did not happen** - a status
   assertion alone passes even if the guard is deleted
 - Test `#[Locked]` properties by attempting to set them
+
+## Security
+
+Livewire's request model is the single largest source of critical findings in
+our pentest reports. Read this section before writing a component.
+
+### Every public property is attacker-controlled
+
+The client posts an `updates` payload to `/livewire/update`. The only check
+Livewire applies is that the property is **public and declared on the
+component**. There is no allowlist, and **no `wire:model` binding is required** -
+a property the template never binds is still writable.
+
+Eloquent *model* properties are checksum-protected. **Scalars and arrays are
+not.** An `int`, `string`, `bool` or `array` property is client input.
+
+```php
+// DANGEROUS - $brandIds is client input on every request after the first
+public array $brandIds = [];
+
+public function mount(): void
+{
+    $this->brandIds = auth()->user()->supplier->brands->pluck('id')->toArray();
+}
+
+public function render(): View
+{
+    // runs on EVERY request, reading the hydrated (tampered) value
+    $products = Product::whereHas('brand', fn ($q) => $q->whereIn('id', $this->brandIds));
+}
+```
+
+**Best fix: do not hold the value at all.** Resolve it from the authenticated
+user inside each query, so there is nothing to tamper with:
+
+```php
+$products = Product::whereHas(
+    'brand',
+    fn ($q) => $q->whereIn('id', auth()->user()->supplier->brands->pluck('id'))
+);
+```
+
+**Second best: `#[Locked]`.** Apply it to every property the client must not
+change - tenancy scopes, IDs, prices, totals, quantities, statuses, roles,
+permission flags, polymorphic type strings.
+
+```php
+#[Locked]
+public int $orderId;
+
+#[Locked]
+public string $modelType;
+```
+
+Findings we have actually shipped from getting this wrong: cross-tenant
+catalogue deletion, platform-wide order book disclosure, account takeover,
+2FA bypass, arbitrary gift card values, client-declared payment success, and
+stock allocated from reserved and quarantined pools.
+
+### `mount()` runs once and then stops protecting anything
+
+`mount()` fires on the initial render only. `render()` and every action run
+again on each subsequent request, against state the client can rewrite.
+
+**Authorisation inside `mount()` is not authorisation.** Authorise inside each
+action and re-derive scope inside each query.
+
+### Route middleware does not re-apply to Livewire actions
+
+Livewire re-applies only a fixed allow-list of middleware to
+`POST /livewire/update` (see
+`vendor/livewire/livewire/src/Mechanisms/PersistentMiddleware/PersistentMiddleware.php`).
+Roughly: session authentication, basic auth and route-model binding.
+
+**Your custom middleware does not re-run.** Permission gates, 2FA enforcement,
+subscription checks and `throttle` protect the initial GET that renders the
+page - and nothing after it. All the real work happens in actions, which POST
+to a route those middleware never see.
+
+Two consequences, both of which have produced High findings:
+
+1. **Authorisation must be re-asserted inside the component**, in every action.
+   Do not rely on the route's middleware stack.
+2. **Rate limiting must be applied inside the action.** A `throttle` on the
+   route does not limit a password reset, a verification-code check or a 2FA
+   attempt that runs as a Livewire action.
+
+```php
+public function verify(): void
+{
+    $key = 'verify:'.auth()->id();
+
+    if (RateLimiter::tooManyAttempts($key, 5)) {
+        throw new TooManyRequestsHttpException(RateLimiter::availableIn($key));
+    }
+
+    RateLimiter::hit($key, 300);
+
+    $this->authorize('verify', $this->order);
+}
+```
+
+Where middleware genuinely must persist, register it explicitly with
+`Livewire::addPersistentMiddleware([...])` - and still authorise in the action.
+
+### Every public method is a public endpoint
+
+Any `public function` on a component can be invoked by name, whether or not the
+template renders a control for it. Hiding a button hides nothing.
+
+- Authorise inside the method
+- Methods that are not actions should be `protected` or `private`
+- A public method that sets a session flag, confirms a step, or marks state is
+  an unauthenticated state transition unless it checks something
+
+### Never put secrets in public properties
+
+Public properties serialise into the page and back. A `public string $password`
+puts the plaintext in the DOM, in the snapshot, and in anything that captures
+either.
+
+- Passwords, tokens, TOTP secrets and recovery codes must never be public
+  properties
+- Bind them to a `protected`/`private` property, or read them from the request
+  in the action and clear immediately after use
+
+### Scope every lookup through the relationship
+
+`Model::find($id)` with a client-supplied `$id` is unscoped by definition.
+
+```php
+// DANGEROUS - reaches any row
+$comment = Comment::find($id);
+
+// Correct - constrained to what this principal owns
+$comment = $this->order->comments()->findOrFail($id);
+```
+
+### Guards must fail closed on null
+
+A comparison between two nulls passes.
+
+```php
+// DANGEROUS - when both sides are null, the guard passes
+if ($comment->user_id !== auth('admin')->id()) {
+    return false;
+}
+
+// Correct - reject an absent identity outright
+$adminId = auth('admin')->id();
+
+abort_if($adminId === null, 403);
+abort_if($comment->user_id !== $adminId, 403);
+```
+
+Rows written by jobs, console commands, webhooks and services have no auth
+context, so their ownership columns are null. Those are exactly the rows a
+null-comparing guard hands over.
+
+### Testing security fixes
+
+**A single-request Livewire test passes against a two-request tampering
+exploit.** The real attack is: post a tampered property, let the server
+re-render and hand back a signed snapshot containing the victim's data, then
+replay that snapshot and call the destructive action.
+
+So a test must:
+
+1. `->set()` the tampered property explicitly, simulating the client write -
+   do not assume the property is unreachable because the template does not
+   bind it
+2. Assert the guarded action **did not happen**, not merely that a status came
+   back or an exception was thrown
+
+```php
+it('cannot delete another tenant\'s products', function () {
+    $mine = Supplier::factory()->create();
+    $theirs = Product::factory()->create();
+
+    Livewire::actingAs($mine->user)
+        ->test(ProductIndex::class)
+        ->set('brandIds', [$theirs->brand_id])   // the tamper
+        ->call('removeProduct', [$theirs->id])
+        ->assertForbidden();
+
+    expect(Product::find($theirs->id))->not->toBeNull();  // the real assertion
+});
+```
+
+Verify a security fix by deleting the guard, watching the test fail, and
+restoring it. A test that stays green without the guard is not a test.
 
 ## Config Renames (v3 to v4)
 
