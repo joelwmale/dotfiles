@@ -1,5 +1,8 @@
 # Use vs to open Cursor (VS Code fork with AI)
-vs () { VSCODE_CWD="$PWD" open -n -b "com.todesktop.230313mzl4w4u92" --args $* ;}
+vs () { VSCODE_CWD="$PWD" open -n -b "com.microsoft.VSCode" --args $* ;}
+
+# Use fl to open ForkLift at a path (defaults to current directory)
+fl() { open -a ForkLift "${1:-.}"; }
 
 v() {
     (cd ~/Code/cli-l && php artisan security:audit)
@@ -18,6 +21,10 @@ p() {
         echo "No composer.json found in current directory"
         return 1
     fi
+}
+
+s() {
+   vendor/bin/phpstan analyse --memory-limit=512M
 }
 
 gho() {
@@ -52,6 +59,21 @@ gho() {
     # Open the URL in the default browser
     echo "Opening $BROWSER_URL..."
     open "$BROWSER_URL"
+}
+
+# Open the PR for the current branch in the browser, or offer to create one
+pr() {
+    if gh pr view --web; then
+        return 0
+    fi
+
+    printf "No PR found for this branch. Create one now? (Y/n): "
+    read createPr
+    createPr=${createPr:-y}
+
+    if [[ "$createPr" =~ ^[Yy]$ ]]; then
+        gh pr create --web
+    fi
 }
 
 unalias gss 2>/dev/null  # Remove alias if it exists
@@ -187,9 +209,20 @@ function commit() {
 }
 
 function release() {
+  local BOLD="\033[1m"
+  local DIM="\033[2m"
+  local GREEN="\033[32m"
+  local RED="\033[31m"
+  local CYAN="\033[36m"
+  local YELLOW="\033[33m"
+  local RESET="\033[0m"
+
+  _rel_ok()  { printf "  ${GREEN}✓${RESET} ${1}\n"; }
+  _rel_err() { printf "  ${RED}✗${RESET} ${1}\n"; }
+
   # Check if we're in a git repo
   if [[ ! -d .git ]]; then
-    echo "Error: Not a Git repository."
+    _rel_err "Not a Git repository."
     return 1
   fi
 
@@ -199,111 +232,92 @@ function release() {
   REMOTE=$(git rev-parse @{u} 2>/dev/null)
 
   if [ $? -ne 0 ]; then
-    echo "Error: Current branch has no upstream. Please push your branch first."
+    _rel_err "Current branch has no upstream. Please push your branch first."
     return 1
   fi
 
   if [ "$LOCAL" != "$REMOTE" ]; then
     UNPUSHED=$(git log @{u}..HEAD --oneline 2>/dev/null | wc -l | tr -d ' ')
     if [ "$UNPUSHED" -gt 0 ]; then
-      echo "Warning: You have $UNPUSHED unpushed commit(s)."
-      printf "Push commits before creating release? (Y/n): "
+      printf "  ${YELLOW}!${RESET} You have ${BOLD}$UNPUSHED${RESET} unpushed commit(s).\n"
+      printf "  Push before releasing? (Y/n): "
       read pushConfirm
       pushConfirm=${pushConfirm:-y}
 
       if [[ "$pushConfirm" =~ ^[Yy]$ ]]; then
-        echo "Pushing commits..."
-        git push
+        git push --quiet
         if [ $? -ne 0 ]; then
-          echo "Error: Failed to push commits."
+          _rel_err "Failed to push commits."
           return 1
         fi
+        _rel_ok "Commits pushed"
       else
-        echo "Error: Please push your commits before creating a release."
+        _rel_err "Please push your commits before releasing."
         return 1
       fi
     fi
   fi
 
+  echo ""
+
   # Get the last release from GitHub
   lastRelease=$(gh release list --limit 1 --json tagName --jq '.[0].tagName' 2>/dev/null)
 
   if [ -z "$lastRelease" ]; then
-    echo "No previous releases found. Starting from 0.0.0"
     lastVersion="0.0.0"
+    printf "  ${DIM}No previous releases found - starting from 0.0.0${RESET}\n"
   else
-    lastVersion="${lastRelease#v}"  # Remove 'v' prefix if present
-    echo "Last release: $lastVersion"
+    lastVersion="${lastRelease#v}"
   fi
 
-  # Parse current version
   IFS='.' read -r major minor patch <<< "$lastVersion"
 
-  # Ask for release type
+  # Show current state and release type menu
+  printf "${BOLD}Current version:${RESET} v$lastVersion\n"
   echo ""
-  echo "Release type:"
-  echo "  1) Major (breaking changes)"
-  echo "  2) Minor (new features)"
-  echo "  3) Patch (bug fixes)"
+  printf "${CYAN}Release type:${RESET}\n"
+  printf "  1) Major  ${DIM}(breaking changes)${RESET}\n"
+  printf "  2) Minor  ${DIM}(new features)${RESET}\n"
+  printf "  3) Patch  ${DIM}(bug fixes)${RESET}\n"
   echo ""
-  printf "Select release type (1-3): "
+  printf "Select (1-3): "
   read releaseType
 
   case $releaseType in
-    1)
-      major=$((major + 1))
-      minor=0
-      patch=0
-      releaseTypeLabel="Major"
-      ;;
-    2)
-      minor=$((minor + 1))
-      patch=0
-      releaseTypeLabel="Minor"
-      ;;
-    3)
-      patch=$((patch + 1))
-      releaseTypeLabel="Patch"
-      ;;
-    *)
-      echo "Invalid selection"
-      return 1
-      ;;
+    1) major=$((major + 1)); minor=0; patch=0; releaseTypeLabel="Major" ;;
+    2) minor=$((minor + 1)); patch=0; releaseTypeLabel="Minor" ;;
+    3) patch=$((patch + 1)); releaseTypeLabel="Patch" ;;
+    *) _rel_err "Invalid selection"; return 1 ;;
   esac
 
   newVersion="$major.$minor.$patch"
 
-  # Confirm version
   echo ""
-  echo "Current version: $lastVersion"
-  echo "New version: $newVersion ($releaseTypeLabel)"
+  printf "${BOLD}New version:${RESET} v$newVersion ${DIM}($releaseTypeLabel)${RESET}\n"
   echo ""
-  printf "Confirm release v$newVersion? (Y/n): "
+  printf "Confirm? (Y/n): "
   read confirm
-  confirm=${confirm:-y}  # Default to 'y' if empty
+  confirm=${confirm:-y}
 
   if [[ ! "$confirm" =~ ^[Yy]$ ]]; then
-    echo "Release cancelled"
+    echo "Cancelled."
     return 1
   fi
 
   # Generate release notes
   echo ""
-  echo "Generating release notes..."
 
-  # Start spinner
   {
     spinner="⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏"
     while true; do
       for (( i=0; i<${#spinner}; i++ )); do
-        printf "\r${spinner:$i:1} Analyzing changes since $lastVersion..."
+        printf "\r  ${CYAN}${spinner:$i:1}${RESET} Generating release notes..."
         sleep 0.1
       done
     done
   } &!
   spinner_pid=$!
 
-  # Cleanup function
   cleanup() {
     { kill $spinner_pid; wait $spinner_pid; } 2>/dev/null
     printf "\r\033[K"
@@ -312,16 +326,22 @@ function release() {
   }
   trap cleanup INT
 
-  # Get diff from last release
   if [ -z "$lastRelease" ]; then
-    diffRange="HEAD"
-    logRange="HEAD"
+    diffRange="HEAD"; logRange="HEAD"; sinceDate=""
   else
-    diffRange="$lastRelease...HEAD"
-    logRange="$lastRelease..HEAD"
+    diffRange="$lastRelease...HEAD"; logRange="$lastRelease..HEAD"
+    sinceDate=$(git log -1 --format=%aI "$lastRelease" 2>/dev/null || echo "")
   fi
 
-  # Gather information for release notes
+  repoName=$(gh repo view --json nameWithOwner --jq '.nameWithOwner' 2>/dev/null || echo "")
+
+  contributors=""
+  if [ -n "$repoName" ] && [ -n "$sinceDate" ]; then
+    contributors=$(gh pr list --repo "$repoName" --state merged --search "merged:>=$sinceDate" \
+      --json number,title,author \
+      --jq '.[] | "- @\(.author.login) (PR #\(.number)): \(.title)"' 2>/dev/null | sort -u || echo "")
+  fi
+
   releaseInfo=$(cat <<EOF
 === Release Information ===
 Version: $newVersion
@@ -329,89 +349,113 @@ Type: $releaseTypeLabel
 Previous Version: $lastVersion
 
 === Commit History ===
-$(git log $logRange --oneline --no-decorate)
+$(git log $logRange --format="%h %an: %s" --no-decorate)
 
 === File Changes ===
 $(git diff $diffRange --stat)
 
 === Detailed Changes (truncated if large) ===
 $(git diff $diffRange | head -c 100000)
+
+=== Contributors ===
+${contributors:-None found}
 EOF
 )
 
-  # Generate release notes using Claude
   releaseNotes=$(echo "$releaseInfo" | claude -p "Generate professional release notes for version $newVersion. Include:
-- A brief summary at the top
 - Sections for: Added, Changed, Fixed (only include sections with actual changes)
+- Do NOT include a summary or intro paragraph - start directly with the first section heading
 - Use bullet points
 - Be concise but informative
 - Output in markdown format
 - Do not include the version number in the title (I'll add it)
+- Use the Contributors section to credit PR authors. For each bullet in Added/Changed/Fixed, append the relevant contributor handle(s) at the end in the format \" - @username\" (multiple contributors separated by spaces).
+- If you cannot confidently map a change to a specific contributor, still add a final \"Contributors\" subsection listing each handle on its own line as \"- @username\".
 
 Output ONLY the release notes content, no extra commentary.")
 
-  # Stop spinner
   trap - INT
   { kill $spinner_pid; wait $spinner_pid; } 2>/dev/null
   printf "\r\033[K"
 
-  # Show release notes
+  # Show release notes preview
   echo ""
-  echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-  echo "Release Notes Preview"
-  echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+  printf "${BOLD}${CYAN}Release Notes Preview${RESET}\n"
+  printf "${DIM}────────────────────────────────────────────────────${RESET}\n"
   echo ""
   echo "$releaseNotes"
   echo ""
-  echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+  printf "${DIM}────────────────────────────────────────────────────${RESET}\n"
   echo ""
-  printf "Create release v$newVersion? (Y/n): "
+  printf "Publish release v$newVersion? (Y/n): "
   read createRelease
-  createRelease=${createRelease:-y}  # Default to 'y' if empty
+  createRelease=${createRelease:-y}
 
   if [[ ! "$createRelease" =~ ^[Yy]$ ]]; then
-    echo "Release cancelled"
+    echo "Cancelled."
     return 1
   fi
 
-  # Update composer.json if it exists
-  if [ -f "composer.json" ]; then
-    echo "Updating composer.json version..."
+  echo ""
 
-    # Check if jq is available
-    if ! command -v jq &> /dev/null; then
-      echo "Warning: jq not found. Skipping composer.json update."
-    else
-      # Update the version field in composer.json
-      jq --arg version "$newVersion" '.version = $version' composer.json > composer.json.tmp && mv composer.json.tmp composer.json
+  {
+    spinner="⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏"
+    while true; do
+      for (( i=0; i<${#spinner}; i++ )); do
+        printf "\r  ${CYAN}${spinner:$i:1}${RESET} Publishing v$newVersion..."
+        sleep 0.1
+      done
+    done
+  } &!
+  pub_spinner_pid=$!
 
-      # Stage and commit the change
-      git add composer.json
-      git commit -m "chore: bump version to $newVersion"
-      git push
-
-      if [ $? -eq 0 ]; then
-        echo "✓ composer.json updated to version $newVersion"
-      else
-        echo "✗ Failed to push composer.json update"
-        return 1
-      fi
+  versionBumped=false
+  if command -v jq &> /dev/null; then
+    if [ -f "package.json" ]; then
+      jq --arg version "$newVersion" '.version = $version' package.json > package.json.tmp && mv package.json.tmp package.json
+      git add package.json
     fi
   fi
 
-  # Create the release using gh
-  echo "Creating release v$newVersion..."
+  if ! git diff --cached --quiet; then
+    git commit --quiet -m "chore: bump version to $newVersion"
+    git push --quiet 2>/dev/null
+    if [ $? -ne 0 ]; then
+      { kill $pub_spinner_pid; wait $pub_spinner_pid; } 2>/dev/null
+      printf "\r\033[K"
+      _rel_err "Failed to push version bump"
+      return 1
+    fi
+    versionBumped=true
+  fi
+
   echo "$releaseNotes" | gh release create "v$newVersion" \
     --title "v$newVersion" \
-    --notes-file -
+    --notes-file - > /dev/null 2>&1
+  releaseSuccess=$?
 
-  if [ $? -eq 0 ]; then
-    echo "✓ Release v$newVersion created successfully!"
-    echo "  View at: $(gh repo view --json url --jq '.url')/releases/tag/v$newVersion"
+  if [ ! -f "composer.json" ]; then
+    floatingTag="v$major"
+    git tag -a "$floatingTag" -m "$floatingTag" -f 2>/dev/null
+    git push origin "$floatingTag" --force --quiet 2>/dev/null
+  fi
+
+  { kill $pub_spinner_pid; wait $pub_spinner_pid; } 2>/dev/null
+  printf "\r\033[K"
+
+  echo ""
+
+  if [ $releaseSuccess -eq 0 ]; then
+    releaseUrl="$(gh repo view --json url --jq '.url')/releases/tag/v$newVersion"
+    _rel_ok "Released ${BOLD}v$newVersion${RESET}"
+    [ "$versionBumped" = true ] && _rel_ok "Version bumped"
+    printf "  \033[97m${releaseUrl}\033[0m\n"
   else
-    echo "✗ Failed to create release"
+    _rel_err "Failed to create release"
     return 1
   fi
+
+  echo ""
 }
 
 function db () {

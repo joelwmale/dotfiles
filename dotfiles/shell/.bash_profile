@@ -3,6 +3,7 @@ alias code='clear && cd ~/Code'
 alias dotfiles='cd ~/Code/dotfiles'
 alias q="cd ~ && clear"
 alias c="composer run dev"
+alias l="lazygit"
 
 alias top="sudo htop"
 
@@ -120,3 +121,4 @@ export SPACESHIP_CONFIG="$HOME/.config/spaceship.zsh"
 
 export PATH="$PATH:/Users/joel/.dotnet/tools"
 export PATH="$HOME/.local/bin:$PATH"
+. "$HOME/.cargo/env"
