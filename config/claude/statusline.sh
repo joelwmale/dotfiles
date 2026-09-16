@@ -19,6 +19,15 @@ sep="${dim} | ${reset}"
 
 get() { printf '%s' "$input" | jq -r "$1 // empty" 2>/dev/null; }
 
+# Percentages arrive as floats (56.99999999999999). Round to a whole number so
+# they display sanely and survive integer comparison in pct_color.
+round_pct() {
+    case "$1" in
+        ''|*[!0-9.]*) return ;;
+    esac
+    printf '%.0f' "$1" 2>/dev/null
+}
+
 # Colour for a 0-100 usage percentage: the higher the worse.
 pct_color() {
     if   [ "$1" -ge 80 ] 2>/dev/null; then printf '%s' "$red"
@@ -84,13 +93,13 @@ if [ -n "$cwd" ]; then
     add "$seg"
 fi
 
-ctx=$(get '.context_window.used_percentage')
+ctx=$(round_pct "$(get '.context_window.used_percentage')")
 [ -n "$ctx" ] && add "$(pct_color "$ctx")${ctx}%${reset}${dim} ctx${reset}"
 
-five=$(get '.rate_limits.five_hour.used_percentage')
+five=$(round_pct "$(get '.rate_limits.five_hour.used_percentage')")
 [ -n "$five" ] && add "$(limit_segment 5h "$five" "$(get '.rate_limits.five_hour.resets_at')")"
 
-week=$(get '.rate_limits.seven_day.used_percentage')
+week=$(round_pct "$(get '.rate_limits.seven_day.used_percentage')")
 [ -n "$week" ] && add "$(limit_segment 7d "$week" "$(get '.rate_limits.seven_day.resets_at')")"
 
 printf '%s' "$out"
