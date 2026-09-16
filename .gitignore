@@ -11,3 +11,6 @@ config/claude/skills/make-responsive/*
 
 # ignore public maintained skills that get updated outside of the repo
 config/claude/skills/deploying-laravel-cloud/*
+
+# macOS
+.DS_Store
