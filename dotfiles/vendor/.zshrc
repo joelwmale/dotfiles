@@ -67,10 +67,9 @@ nvm_auto_use() {
     elif [ "$nvmrc_node_version" != "$node_version" ]; then
       nvm use
     fi
-    # if node_version != $(nvm version default) and it is not system
-  elif [ "$node_version" != "$(nvm version 20.12.1)" ] && [ "$node_version" != "system" ]; then
-    echo "Updating nvm to 20.12.1"
-    nvm use 20.12.1
+  elif [ "$node_version" != "$(nvm version default)" ] && [ "$node_version" != "system" ]; then
+    echo "Reverting to nvm default version"
+    nvm use default
   fi
 }
 
@@ -110,3 +109,13 @@ bindkey '^G' fzf-cd-widget    # Ctrl+G for directories
 
 # zoxide - Smarter cd
 eval "$(zoxide init zsh)"
+
+# Trust Herd/Valet CA for Node.js (required for local HTTPS MCP servers)
+export NODE_EXTRA_CA_CERTS="/Users/joel/Library/Application Support/Herd/config/valet/CA/LaravelValetCASelfSigned.pem"
+
+# bun completions
+[ -s "/Users/joel/.bun/_bun" ] && source "/Users/joel/.bun/_bun"
+
+# bun
+export BUN_INSTALL="$HOME/.bun"
+export PATH="$BUN_INSTALL/bin:$PATH"
