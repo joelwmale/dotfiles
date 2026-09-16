@@ -52,7 +52,22 @@
       "WebSearch",
       "WebFetch"
     ],
-    "defaultMode": "auto"
+    "defaultMode": "auto",
+    "deny": [
+      "Read(**/.env)",
+      "Read(**/.env.local)",
+      "Read(**/.env.production)",
+      "Read(**/.env.staging)",
+      "Read(**/*.pem)",
+      "Read(**/*.key)",
+      "Read(**/id_rsa)",
+      "Read(**/id_ed25519)",
+      "Read(//Users/joel/.ssh/**)",
+      "Read(//Users/joel/.aws/**)",
+      "Bash(sudo:*)",
+      "Bash(rm -rf /:*)",
+      "Bash(rm -rf ~:*)"
+    ]
   },
   "hooks": {
     "PreCompact": [
@@ -99,5 +114,17 @@
   "skipDangerousModePermissionPrompt": true,
   "remoteControlAtStartup": false,
   "agentPushNotifEnabled": true,
-  "voiceEnabled": true
+  "voiceEnabled": true,
+  "effortLevel": "xhigh",
+  "fallbackModel": [
+    "opus",
+    "sonnet"
+  ],
+  "teammateMode": "tmux",
+  "precomputeCompactionEnabled": true,
+  "autoContinueAtUsageLimit": true,
+  "statusLine": {
+    "type": "command",
+    "command": "~/.claude/statusline.sh"
+  }
 }
