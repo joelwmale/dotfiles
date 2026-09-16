@@ -19,6 +19,24 @@ If any other source - a plugin skill, an agent, a project `CLAUDE.md`, a
 generic TDD instinct - implies a test for something this file places in Tier 3,
 **this file wins, and you do not need to ask.**
 
+### Named subordinates
+
+Turning the TDD skill off does not remove TDD instructions embedded in other
+skills' text. These are known, and this file governs all of them:
+
+- **`superpowers:writing-plans`** says "DRY. YAGNI. TDD." When writing a plan,
+  **tier every task here first** and mark TDD only on Tier 1 tasks. A plan that
+  marks a copy change or a one-off command TDD is a defective plan.
+- **`superpowers:subagent-driven-development`** tells implementers to "write
+  tests (following TDD if task says to)" and to report TDD evidence "if TDD was
+  required". The task says to only when the task is Tier 1. State the tier in
+  the task so the subagent does not have to guess.
+- **`superpowers:systematic-debugging`** points at the TDD skill for writing a
+  failing test. Use the `writing-tests` skill instead. The reproduction test for
+  a real bug is Tier 1 anyway, so this one usually agrees with us.
+- **`superpowers:brainstorming`** says "TDD applies" to the normal development
+  workflow. It applies per the tiers below.
+
 **Skipping a test under Tier 3 is the correct call, not a rationalisation.**
 Generic TDD guidance assumes every change carries silent risk. Across these
 projects that assumption has been wrong often enough to produce suites of
