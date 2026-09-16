@@ -1,7 +1,13 @@
 #!/bin/bash
 # Claude Code status line. Receives session JSON on stdin.
 # Renders: model | dir branch | context% | +add/-del | 5h limit | 7d limit | cost
-# Limit percentages are colour-coded: green <50, yellow 50-79, red 80+.
+#
+# Limit segments read "5h 48% 1h32m·11:57am" - percentage of the window used,
+# time remaining, and the wall-clock time it resets. Percentages are colour
+# coded green under 50, yellow 50-79, red 80 and above.
+#
+# Note: cost and line counts are cumulative for the LIFETIME of the session,
+# across every resume and compaction - not just the current context window.
 
 input=$(cat)
 
@@ -36,13 +42,31 @@ until_ts() {
     fi
 }
 
-# "5h 48% 2h14m", coloured by severity. $1=label $2=pct $3=reset timestamp
+# Wall-clock time a timestamp falls on: "11:57am", or "Sat 10am" if not today.
+# Minutes are omitted on the hour. For 24-hour clock, swap the %-I:%M/%-I
+# formats below for %H:%M and drop $ampm.
+at_ts() {
+    local ts=$1 hhmm min ampm day=""
+    min=$(date -r "$ts" "+%M" 2>/dev/null) || return
+    if [ "$min" = "00" ]; then
+        hhmm=$(date -r "$ts" "+%-I" 2>/dev/null)
+    else
+        hhmm=$(date -r "$ts" "+%-I:%M" 2>/dev/null)
+    fi
+    ampm=$(date -r "$ts" "+%p" 2>/dev/null | tr '[:upper:]' '[:lower:]')
+    [ "$(date -r "$ts" "+%Y%m%d" 2>/dev/null)" != "$(date "+%Y%m%d")" ] \
+        && day="$(date -r "$ts" "+%a") "
+    printf '%s%s%s' "$day" "$hhmm" "$ampm"
+}
+
+# "5h 48% 1h32m·11:57am", coloured by severity. $1=label $2=pct $3=reset ts
 limit_segment() {
     local label=$1 pct=$2 ts=$3 c
     [ -z "$pct" ] && return
     c=$(pct_color "$pct")
     printf '%s%s %s%s%%%s' "$dim" "$label" "$c" "$pct" "$reset"
-    [ -n "$ts" ] && printf ' %s%s%s' "$dim" "$(until_ts "$ts")" "$reset"
+    [ -n "$ts" ] && printf ' %s%s%s%s%s' \
+        "$dim" "$(until_ts "$ts")" "·" "$(at_ts "$ts")" "$reset"
 }
 
 out=""
