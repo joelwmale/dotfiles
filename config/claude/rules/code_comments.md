@@ -71,6 +71,23 @@ $errors = collect($object->requirements->errors)->keyBy('field');
   state change." Assume the reader knows the tools.
 - **Commented-out code.** Delete it. Git has it.
 - **`TODO` for work you just did**, or placeholders left from scaffolding.
+- **Justifying a decision you just made.** If you weighed options and picked
+  one, that reasoning goes in the commit message, the PR, or the issue - the
+  places a reader goes when they want to know *why this exists*. Above the line
+  it is noise to everyone who is just reading the code. This is the most common
+  way a comment grows past one line: it stops describing a constraint and starts
+  defending a choice.
+
+```blade
+{{-- NO - defending a product decision above a condition that already reads --}}
+{{-- Only where the stepper is shown, because this is its ceiling. A listing
+     sold as a set has a quantity too, and "3 available" would read as an
+     invitation to buy one of them. --}}
+@if ($listing->is_quantity_selection_available)
+
+{{-- YES - the condition was always enough --}}
+@if ($listing->is_quantity_selection_available)
+```
 
 ---
 

@@ -73,6 +73,9 @@
     "opus",
     "sonnet"
   ],
+  "skillOverrides": {
+    "test-driven-development": "off"
+  },
   "hooks": {
     "PreCompact": [
       {
@@ -122,13 +125,10 @@
   "tui": "fullscreen",
   "skipDangerousModePermissionPrompt": true,
   "precomputeCompactionEnabled": true,
+  "switchModelsOnFlag": true,
   "autoContinueAtUsageLimit": true,
   "teammateMode": "tmux",
   "remoteControlAtStartup": false,
   "agentPushNotifEnabled": true,
-  "voiceEnabled": true,
-  "switchModelsOnFlag": true,
-  "skillOverrides": {
-    "test-driven-development": "off"
-  }
+  "voiceEnabled": true
 }
