@@ -99,6 +99,18 @@
           }
         ]
       }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 ~/.claude/hooks/comment-gate.py",
+            "timeout": 15
+          }
+        ]
+      }
     ]
   },
   "statusLine": {
