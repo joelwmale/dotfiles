@@ -1,12 +1,9 @@
 # Review Policy (Strict)
 
-Applies whenever you are running a multi-task plan through
-`superpowers:subagent-driven-development`, `superpowers:executing-plans`, or any
-similar implement-then-review loop.
-
-**This rule overrides those skills.** They mandate a review gate plus a scoped
-re-review for every task, which is correct for code that can cause damage and
-wasteful for code that cannot. Rules beat skills; apply the tiers below instead.
+Applies whenever you run a multi-task plan as an implement-then-review loop,
+whether through subagents or inline. A review gate plus re-review on every task
+is right for code that can cause damage and wasteful for code that cannot, so
+tier the tasks instead.
 
 ---
 
