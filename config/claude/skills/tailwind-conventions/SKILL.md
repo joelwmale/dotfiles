@@ -58,7 +58,8 @@ Escape hatches are fine when justified, and a smell when frequent.
 - `w-[347px]` for a one-off that genuinely is not on the scale
 - Three arbitrary values on one element means the scale is wrong - fix the scale
 - Arbitrary values referencing tokens are better than raw values:
-  `bg-[--color-brand-500]`
+  `bg-(--color-brand-500)` - v4 uses parentheses; `bg-[--color-brand-500]`
+  emits invalid CSS
 - Never use an arbitrary value for something on the spacing scale already
 
 ## Class Ordering

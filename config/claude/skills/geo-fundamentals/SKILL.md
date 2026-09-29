@@ -44,13 +44,13 @@ allowed-tools: Read, Glob, Grep
 
 How AI engines select content to cite:
 
-| Factor | Weight |
-|--------|--------|
-| Semantic relevance | ~40% |
-| Keyword match | ~20% |
-| Authority signals | ~15% |
-| Freshness | ~10% |
-| Source diversity | ~15% |
+- Semantic relevance
+- Keyword match
+- Authority signals
+- Freshness
+- Source diversity
+
+Relative weights vary by engine and are not published.
 
 ---
 
@@ -108,7 +108,7 @@ How AI engines select content to cite:
 | Crawler | Engine |
 |---------|--------|
 | GPTBot | ChatGPT/OpenAI |
-| Claude-Web | Claude |
+| ClaudeBot / Claude-User / Claude-SearchBot | Claude |
 | PerplexityBot | Perplexity |
 | Googlebot | Gemini (shared) |
 
@@ -152,5 +152,5 @@ How AI engines select content to cite:
 
 | Script | Purpose | Command |
 |--------|---------|---------|
-| `scripts/geo_checker.py` | GEO audit (AI citation readiness) | `python scripts/geo_checker.py <project_path>` |
+| `scripts/geo_checker.py` | GEO audit (AI citation readiness) | `python ~/.claude/skills/geo-fundamentals/scripts/geo_checker.py <project_path>` |
 

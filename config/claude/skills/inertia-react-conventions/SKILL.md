@@ -53,12 +53,13 @@ export default function Show({ order, statuses }: Props) {
 - Send the minimum the page needs. A page prop is JSON on every visit.
 - Shape data in the controller or a Resource, not in the component
 - Never send a full model when the page renders three fields
-- Lazy props for anything expensive:
+- Optional props for anything expensive (`Inertia::optional()`; `lazy()` on
+  Inertia v1):
 
 ```php
 return Inertia::render('Orders/Show', [
     'order' => new OrderResource($order),
-    'history' => Inertia::lazy(fn () => $order->history),
+    'history' => Inertia::optional(fn () => $order->history),
 ]);
 ```
 

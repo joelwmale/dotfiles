@@ -5,7 +5,7 @@ description: Use when writing a pull request description or replying to review c
 
 # Pull Requests
 
-A PR is dev to dev. The reviewer is about to read the diff — the description
+A PR is dev to dev. The reviewer is about to read the diff - the description
 just tells them what changed and anything that would bite them. No essays.
 
 Everything posted to a PR, description and replies alike, goes out under Joel's
@@ -28,11 +28,11 @@ update from an assistant.
 - Only if there's something to say.
 ```
 
-**Summary** — bullets, 1-3 lines each. One per change, grouped by what it does,
+**Summary** - bullets, 1-3 lines each. One per change, grouped by what it does,
 not commit by commit. Say the mechanism in a clause ("switched X to Y", "now
 keyed by shipment") rather than explaining the feature from first principles.
 
-**Notes** — only what affects merging or running the branch:
+**Notes** - only what affects merging or running the branch:
 
 - migrations, especially destructive or needing a backfill
 - pre-existing failures, so a red suite isn't read as this branch's fault
@@ -57,13 +57,13 @@ worth mentioning, it's one line in Notes.
 
 Would a reviewer know what to expect without opening the diff? If they'd have
 to open it to understand a bullet, add the mechanism. If a bullet runs past
-three lines, it's an essay — cut it.
+three lines, it's an essay - cut it.
 
 ### Example
 
-<Bad — essay, explains the feature from scratch>
+<Bad - essay, explains the feature from scratch>
 Returns are now scoped to a shipment. An order shipped in two parts is invoiced
-twice, but the return flow only ever worked on the order as a whole — so a
+twice, but the return flow only ever worked on the order as a whole - so a
 return spanning both shipments could be requested and then never completed.
 `Cin7Service::invoiceForReturn()` throws unless the items map to one invoiced
 shipment, and the admin just saw "Failed to create Cin7 sale credit note" with
@@ -86,7 +86,7 @@ them on both the pharmacy and admin screens, and...
 ## Notes
 
 - Two migrations, nullable and additive. No backfill.
-- Discount apportionment is still wrong — returning 10% of an order deducts the
+- Discount apportionment is still wrong - returning 10% of an order deducts the
   whole discount. Pre-existing, worth its own ticket.
 </Good>
 
@@ -96,7 +96,7 @@ them on both the pharmacy and admin screens, and...
 
 Two short paragraphs, usually. Tag the reviewer, answer, done.
 
-1. **Answer the question first.** Agree plainly when they're right — "Good catch
+1. **Answer the question first.** Agree plainly when they're right - "Good catch
    @handle you're right!". Say so just as plainly when they're not, with the
    reason in a sentence.
 2. **Say what changed and where.** The commit SHA plus the mechanism in one
@@ -105,14 +105,14 @@ Two short paragraphs, usually. Tag the reviewer, answer, done.
 ### Always
 
 - Tag the reviewer by GitHub handle.
-- Write it as Joel — first person, casual, contractions.
+- Write it as Joel - first person, casual, contractions.
 - One idea per paragraph, and rarely more than two paragraphs.
 
 ### Never
 
 - Walk through the reproduction. They reported it; they don't need it re-proved
   at them with figures.
-- Narrate the process — mutation testing, how the baseline was verified, what
+- Narrate the process - mutation testing, how the baseline was verified, what
   was tried first. That's working-out, not an answer.
 - Volunteer follow-ups, caveats or adjacent problems nobody asked about. If it
   needs a ticket, raise a ticket.
@@ -120,8 +120,8 @@ Two short paragraphs, usually. Tag the reviewer, answer, done.
 
 ### Example
 
-<Bad — re-proves the bug, narrates process, tacks on a follow-up>
-Good catch — you're right, and there's no other part of the workflow stopping
+<Bad - re-proves the bug, narrates process, tacks on a follow-up>
+Good catch - you're right, and there's no other part of the workflow stopping
 it. Reproduced it before fixing. Return A pending with 50000c of credit, Return
 B completed for 40000c against a 30000c order discount:
 

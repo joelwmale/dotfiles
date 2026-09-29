@@ -6,18 +6,18 @@ description: Use when creating a ClickUp ticket to document completed or planned
 # Creating ClickUp Tickets
 
 Write for a product owner or non-technical project manager, not a future engineer.
-The commit message and code already hold the technical detail — the ticket doesn't
+The commit message and code already hold the technical detail - the ticket doesn't
 need to repeat it. A reader with zero codebase context should understand what
 changed and why it matters within one skim.
 
 ## Workflow
 
 1. Identify what actually changed and why it matters, from the recent
-   conversation, diff, or commits — not just the literal code edit.
+   conversation, diff, or commits - not just the literal code edit.
 2. Find the right workspace/list: search ClickUp for an existing ticket sharing
    this project's ticket prefix (e.g. `clickup_search` for "PX-" or whatever
    prefix recent commits use) and reuse its `list_id`/`workspace_id`. Ask the
-   user if none is found — never guess a list.
+   user if none is found - never guess a list.
 3. Translate to plain language using the checklist below.
 4. Create the task.
 5. Report back the ticket number/title/link. If the user is about to commit,
@@ -31,10 +31,10 @@ changed and why it matters within one skim.
 | Code blocks, config, YAML, env vars       | What the user or business now experiences differently                                     |
 | Conditionals/logic ("if X then Y")        | Why it matters: security, reliability, speed, cost, risk, compliance, customer experience |
 | Library/package/tool names, commit SHAs   | Plain outcome language a stakeholder already uses                                         |
-| Error messages, stack traces              | —                                                                                         |
+| Error messages, stack traces              |                                                                                           |
 
 If a term is something the user themselves used in plain speech (e.g. "GitHub
-releases"), it's fine to keep — the bar is "would a non-technical stakeholder
+releases"), it's fine to keep - the bar is "would a non-technical stakeholder
 already know this word," not "is this word ever technical."
 
 ## Title Formula

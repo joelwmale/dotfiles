@@ -12,7 +12,7 @@ wasteful for code that cannot. Rules beat skills; apply the tiers below instead.
 
 ## Tier the task before dispatching, and say which tier out loud
 
-**Tier 1 — full treatment.** Implement, review, fix, scoped re-review, per task.
+**Tier 1 - full treatment.** Implement, review, fix, scoped re-review, per task.
 Use the most capable model for the review. A task is Tier 1 if it touches any of:
 
 - authentication, authorization, or a permission gate
@@ -23,11 +23,11 @@ Use the most capable model for the review. A task is Tier 1 if it touches any of
 - request-signature or token verification
 - a state machine whose stuck states block future work
 
-**Tier 2 — batched review.** Group 2-4 related tasks into one dispatch and review
+**Tier 2 - batched review.** Group 2-4 related tasks into one dispatch and review
 the batch once. Fix findings in one round. Use for ordinary feature work:
 services, jobs, components, refactors with tests.
 
-**Tier 3 — no per-task review.** Implement and move on; the whole-branch review
+**Tier 3 - no per-task review.** Implement and move on; the whole-branch review
 at the end covers it. Use for migrations that only add nullable columns,
 factories, seeders, config keys, comment and docblock changes, test-only
 additions, and renames.
@@ -44,11 +44,11 @@ turns out to touch a Tier 1 concern, stop and re-tier it.
 - **Never skip review on a task you had to fix twice.** Two fix rounds means the
   task is not understood; the third attempt gets a real gate.
 - **A test proving a guard exists must prove the guarded action did not happen.**
-  Asserting a status, a returned string, or that something threw is not enough —
+  Asserting a status, a returned string, or that something threw is not enough -
   a guard can be deleted with the test still green. When a fix is
   security-relevant, verify it by removing the guard, watching the test fail, and
   restoring the file.
-- **In Laravel, a URL not matched by `Http::fake([...])` is not stubbed — it is
+- **In Laravel, a URL not matched by `Http::fake([...])` is not stubbed - it is
   attempted for real.** Verified: it raises a `ConnectionException` from cURL, or
   worse, succeeds against the live service. So an incomplete fake array does not
   fail loudly and locally; it either errors for the wrong reason or reaches out
@@ -70,4 +70,4 @@ turns out to touch a Tier 1 concern, stop and re-tier it.
   code. The implementer's report carries that evidence.
 - Do not treat this rule as licence to skip the final whole-branch review, or to
   skip Tier 1 gates because a plan is running long. If time is the problem,
-  batch Tier 2 harder — do not downgrade Tier 1.
+  batch Tier 2 harder - do not downgrade Tier 1.

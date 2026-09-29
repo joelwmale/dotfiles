@@ -1,10 +1,10 @@
 ## General
 
-Do not tell me I am right all the time. Be critical. We're equals. Try to be neutral and objective.
+Do not tell me I am right all the time. Be critical. We're equals. Be neutral and objective.
 
 Do not excessively use emojis.
 
-Prefer using browser agent skill over using playwright directly.
+Prefer the claude-in-chrome skill over calling the Playwright MCP tools directly.
 
 Use hyphens (-) instead of em dashes (—) in all copy and content. Em dashes read as AI-generated.
 
@@ -14,23 +14,26 @@ Use hyphens (-) instead of em dashes (—) in all copy and content. Em dashes re
 
 ### Rules (always-on)
 Always follow the rules in:
-- `config/claude/rules/php_coding_rules.md`
-- `config/claude/rules/git_workflow.md`
-- `config/claude/rules/review_policy.md`
-- `config/claude/rules/testing_policy.md`
-- `config/claude/rules/code_comments.md`
+- `~/.claude/rules/php_coding_rules.md`
+- `~/.claude/rules/git_workflow.md`
+- `~/.claude/rules/review_policy.md`
+- `~/.claude/rules/testing_policy.md`
+- `~/.claude/rules/code_comments.md`
 
 If there is any conflict:
 1. Project requirements in the prompt win
 2. Rules win
 3. Skills are guidance
 
+Personal skills here win over framework-shipped guidance (Laravel Boost, plugin skills)
+where they disagree.
+
 ### Skills (apply when relevant)
-Skills in `config/claude/skills/` are auto-discovered by name and description -
+Skills in `~/.claude/skills/` are auto-discovered by name and description -
 they do not need listing here. The house conventions are:
 
 - `laravel-conventions` (Laravel/PHP naming, structure, Eloquent, testing)
-- `livewire-conventions` (Livewire 3 components)
+- `livewire-conventions` (Livewire components; v4, with v3 differences flagged)
 - `inertia-react-conventions` (React as the Laravel view layer, via Inertia)
 - `react-native-conventions` (mobile)
 - `tailwind-conventions` (Tailwind v4)
@@ -53,15 +56,13 @@ the strict rules above. Rules win on any conflict.
 
 ## Agents
 
-When working on Laravel/PHP code that touches user input, authentication, authorization, file uploads, webhooks, external HTTP calls, or sensitive data:
+When Laravel/PHP changes touch user input, authentication, authorization, file uploads,
+webhooks, external HTTP calls, or sensitive data, run the `security-reviewer` agent
+afterwards. It checks `composer audit` and OWASP-style risks; include its short report and
+remediation notes in your response.
 
-- Run the `security-reviewer` agent after implementing changes.
-- Run the `docs` agent when you need to look up documentation.
-- Use framework-specific agents (e.g. Livewire) when working in that framework
-- Use Alpine agent when working with Alpine.js
-- Use Pest testing agent when working with tests
-- The security reviewer must check Composer dependencies (`composer audit`) and review code for OWASP-style risks.
-- Include a short security report and remediation notes as part of the response.
+The `docs`, `livewire`, `alpine` and `pest` agents are available for documentation
+lookups and framework-specific work.
 
 ## Using GitHub
 

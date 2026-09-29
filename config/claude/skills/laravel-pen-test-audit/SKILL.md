@@ -116,7 +116,7 @@ Use harmless proof payloads whenever possible.
 
 ---
 
-# Phase 0 — Establish Architecture and Threat Model
+# Phase 0 - Establish Architecture and Threat Model
 
 Before investigating vulnerabilities, understand the application.
 
@@ -201,7 +201,7 @@ Do not proceed until this boundary is understood.
 
 ---
 
-# Phase 1 — Complete Route Enumeration
+# Phase 1 - Complete Route Enumeration
 
 Do not inspect only `routes/web.php`.
 
@@ -304,7 +304,7 @@ Every route that mutates state must be investigated.
 
 ---
 
-# Phase 2 — Dangerous GET Requests
+# Phase 2 - Dangerous GET Requests
 
 GET and HEAD requests should retrieve information.
 
@@ -345,7 +345,7 @@ Add regression tests where changing GET semantics represents a security boundary
 
 ---
 
-# Phase 3 — Authentication Attack Surface
+# Phase 3 - Authentication Attack Surface
 
 Review every mechanism relating to account access.
 
@@ -445,7 +445,7 @@ The previous Canary assessment demonstrated that a six-digit registration verifi
 
 ---
 
-# Phase 4 — Password Reset Lifecycle
+# Phase 4 - Password Reset Lifecycle
 
 Do not merely verify that password reset URLs are random.
 
@@ -477,7 +477,7 @@ modified token fails
 
 ---
 
-# Phase 5 — Email Verification
+# Phase 5 - Email Verification
 
 Treat unverified email addresses as attacker-controlled.
 
@@ -497,7 +497,7 @@ If verification codes are regenerated, confirm old codes become invalid where ex
 
 ---
 
-# Phase 6 — Account Enumeration
+# Phase 6 - Account Enumeration
 
 Compare valid and invalid identifiers across:
 
@@ -528,7 +528,7 @@ Where enumeration cannot reasonably be avoided, document the accepted risk.
 
 ---
 
-# Phase 7 — Password Security
+# Phase 7 - Password Security
 
 Review password requirements.
 
@@ -555,7 +555,7 @@ Search logs, debugging code and events for accidental password capture.
 
 ---
 
-# Phase 8 — Session and Cookie Security
+# Phase 8 - Session and Cookie Security
 
 Review:
 
@@ -607,7 +607,7 @@ The Canary audit previously found a session cookie without the Secure flag enabl
 
 ---
 
-# Phase 9 — Authorization, IDOR and Tenant Isolation
+# Phase 9 - Authorization, IDOR and Tenant Isolation
 
 This is one of the highest-priority phases.
 
@@ -681,7 +681,7 @@ normal user cannot perform admin action
 
 ---
 
-# Phase 10 — Missing Authorization Test Strategy
+# Phase 10 - Missing Authorization Test Strategy
 
 For every protected controller/action/component method, ask:
 
@@ -712,7 +712,7 @@ ordinary user fails
 
 ---
 
-# Phase 11 — Broadcast Channel Authorization
+# Phase 11 - Broadcast Channel Authorization
 
 Treat `routes/channels.php` as security-sensitive code.
 
@@ -763,7 +763,7 @@ unexpected JSON/scalar types fail
 
 ---
 
-# Phase 12 — Type Juggling
+# Phase 12 - Type Juggling
 
 Search security-sensitive comparisons.
 
@@ -834,7 +834,7 @@ where type confusion may influence authentication or authorisation.
 
 ---
 
-# Phase 13 — Mass Assignment and Hidden Parameters
+# Phase 13 - Mass Assignment and Hidden Parameters
 
 Ignore what the UI sends.
 
@@ -883,7 +883,7 @@ Determine whether the current actor should be allowed to set each field.
 
 ---
 
-# Phase 14 — Livewire Attack Review
+# Phase 14 - Livewire Attack Review
 
 Livewire public properties must be treated like browser-submitted form values.
 
@@ -944,7 +944,7 @@ Securing Laravel specifically highlights the danger of treating public Livewire 
 
 ---
 
-# Phase 15 — Inertia / Vue Data Exposure
+# Phase 15 - Inertia / Vue Data Exposure
 
 Inspect:
 
@@ -987,7 +987,7 @@ Repeat protected requests directly without Vue.
 
 ---
 
-# Phase 16 — File Upload Security
+# Phase 16 - File Upload Security
 
 Treat every upload endpoint as potentially CRITICAL.
 
@@ -1073,7 +1073,7 @@ User-controlled uploads should ideally never be executable by PHP.
 
 ---
 
-# Phase 17 — File Downloads, Exports and Public Storage
+# Phase 17 - File Downloads, Exports and Public Storage
 
 Find:
 
@@ -1127,7 +1127,7 @@ Prefer private storage with authorised access or appropriately scoped temporary 
 
 ---
 
-# Phase 18 — Signed URL Security
+# Phase 18 - Signed URL Security
 
 Do not assume a signed URL means the underlying action is safe.
 
@@ -1175,7 +1175,7 @@ A cryptographically valid URL does not replace business-level authorisation.
 
 ---
 
-# Phase 19 — XSS and Browser Injection
+# Phase 19 - XSS and Browser Injection
 
 Search:
 
@@ -1220,7 +1220,7 @@ Review rich-text editors carefully.
 
 ---
 
-# Phase 20 — Content Security Policy
+# Phase 20 - Content Security Policy
 
 Review whether CSP exists.
 
@@ -1272,7 +1272,7 @@ first.
 
 ---
 
-# Phase 21 — Third-Party Browser Assets / SRI
+# Phase 21 - Third-Party Browser Assets / SRI
 
 Enumerate externally loaded:
 
@@ -1298,7 +1298,7 @@ The previous Canary audit specifically identified static third-party assets with
 
 ---
 
-# Phase 22 — CSRF and CORS
+# Phase 22 - CSRF and CORS
 
 Review all state-changing browser endpoints.
 
@@ -1327,7 +1327,7 @@ Test cross-origin behaviour rather than assuming configuration is correct.
 
 ---
 
-# Phase 23 — Security Headers
+# Phase 23 - Security Headers
 
 Inspect actual HTTP responses.
 
@@ -1357,7 +1357,7 @@ unless all relevant subdomains support HTTPS.
 
 ---
 
-# Phase 24 — Cryptography
+# Phase 24 - Cryptography
 
 Search for custom cryptography.
 
@@ -1394,7 +1394,7 @@ If encrypted data must be searchable, investigate appropriate cryptographic inde
 
 ---
 
-# Phase 25 — Secure Randomness
+# Phase 25 - Secure Randomness
 
 Search:
 
@@ -1434,7 +1434,7 @@ The previous Canary audit found `rand(100000, 999999)` being used for verificati
 
 ---
 
-# Phase 26 — Secrets and Git History
+# Phase 26 - Secrets and Git History
 
 Scanning the current working tree is NOT enough.
 
@@ -1480,7 +1480,7 @@ The Canary audit found active credentials in repository history, including crede
 
 ---
 
-# Phase 27 — PII and Production Data in Source Control
+# Phase 27 - PII and Production Data in Source Control
 
 Search repositories for information that looks like:
 
@@ -1514,7 +1514,7 @@ Review both current files and Git history.
 
 ---
 
-# Phase 28 — Configuration Exposure
+# Phase 28 - Configuration Exposure
 
 Validate security-critical configuration during application boot where appropriate.
 
@@ -1534,7 +1534,7 @@ Never print secret configuration values.
 
 ---
 
-# Phase 29 — Internal Laravel Tooling
+# Phase 29 - Internal Laravel Tooling
 
 Explicitly enumerate:
 
@@ -1572,7 +1572,7 @@ Verify actual authorisation.
 
 ---
 
-# Phase 30 — Error and Debug Information
+# Phase 30 - Error and Debug Information
 
 Trigger safe errors.
 
@@ -1612,7 +1612,7 @@ but also test actual responses.
 
 ---
 
-# Phase 31 — API and Token Security
+# Phase 31 - API and Token Security
 
 If APIs exist, inspect:
 
@@ -1645,7 +1645,7 @@ Never assume a long random token is acceptable indefinitely.
 
 ---
 
-# Phase 32 — Webhooks
+# Phase 32 - Webhooks
 
 For every webhook test:
 
@@ -1672,7 +1672,7 @@ A difficult-to-guess webhook path is not authentication.
 
 ---
 
-# Phase 33 — SSRF
+# Phase 33 - SSRF
 
 Find functionality accepting URLs.
 
@@ -1723,7 +1723,7 @@ Do not attack real internal services.
 
 ---
 
-# Phase 34 — SQL and Command Injection
+# Phase 34 - SQL and Command Injection
 
 Search:
 
@@ -1758,7 +1758,7 @@ rather than interpolating arbitrary strings.
 
 ---
 
-# Phase 35 — Open Redirects
+# Phase 35 - Open Redirects
 
 Identify redirects using user-supplied destinations.
 
@@ -1777,7 +1777,7 @@ Authentication flows are especially sensitive because open redirects can facilit
 
 ---
 
-# Phase 36 — Business Logic Attacks
+# Phase 36 - Business Logic Attacks
 
 Attempt sequences the UI normally prevents.
 
@@ -1806,7 +1806,7 @@ Those rules need server-side enforcement.
 
 ---
 
-# Phase 37 — Race Conditions
+# Phase 37 - Race Conditions
 
 Identify actions where concurrent requests matter:
 
@@ -1833,7 +1833,7 @@ Look for:
 
 ---
 
-# Phase 38 — Dependency Security
+# Phase 38 - Dependency Security
 
 Run:
 
@@ -1859,7 +1859,7 @@ Determine whether the vulnerable code path is reachable.
 
 ---
 
-# Phase 39 — Supply Chain Security
+# Phase 39 - Supply Chain Security
 
 Treat package installation itself as a security boundary.
 
@@ -1890,7 +1890,7 @@ Securing Laravel has recently highlighted both AI-driven slopsquatting and depen
 
 ---
 
-# Phase 40 — PHP / Framework Support Status
+# Phase 40 - PHP / Framework Support Status
 
 Determine:
 
@@ -1912,7 +1912,7 @@ Flag unsupported runtimes.
 
 ---
 
-# Phase 41 — Repository Security
+# Phase 41 - Repository Security
 
 Security does not stop at application code.
 
@@ -1938,7 +1938,7 @@ The previous audit specifically recommended branch protection because malicious 
 
 ---
 
-# Phase 42 — Deployment Keys
+# Phase 42 - Deployment Keys
 
 Review how production servers access source repositories.
 
@@ -1964,7 +1964,7 @@ The Canary audit specifically recommended repository-specific read-only deploy k
 
 ---
 
-# Phase 43 — Security Monitoring and Honeytokens
+# Phase 43 - Security Monitoring and Honeytokens
 
 For high-risk applications, consider whether compromise detection exists.
 
@@ -1986,7 +1986,7 @@ The previous assessment recommended Canary Tokens as an early-warning mechanism 
 
 ---
 
-# Phase 44 — Logging
+# Phase 44 - Logging
 
 Review security-relevant logging.
 
@@ -2018,7 +2018,7 @@ Review log retention and access boundaries where applicable.
 
 ---
 
-# Phase 45 — `security.txt`
+# Phase 45 - `security.txt`
 
 Check:
 
@@ -2032,7 +2032,7 @@ Treat absence as informational, not an exploitable vulnerability.
 
 ---
 
-# Phase 46 — External Passive Validation
+# Phase 46 - External Passive Validation
 
 When an authorised staging or production URL is available, perform passive checks.
 
@@ -2052,7 +2052,7 @@ The previous Canary assessment combined source review, passive production checks
 
 ---
 
-# Phase 47 — Active Staging Pentest
+# Phase 47 - Active Staging Pentest
 
 If an isolated authorised staging environment is available, behave like a penetration tester.
 
@@ -2084,11 +2084,9 @@ Every meaningful scanner result must be manually validated before being reported
 
 ---
 
-# Phase 48 — Security Regression Tests
+# Phase 48 - Security Regression Tests
 
-Every confirmed CRITICAL or HIGH vulnerability must receive an automated regression test wherever practical.
-
-MEDIUM vulnerabilities should generally receive tests where technically reasonable.
+Every confirmed vulnerability gets a regression test, written before the fix per `rules/testing_policy.md` (Tier 1).
 
 Examples:
 
@@ -2118,16 +2116,13 @@ it('prevents ordinary users viewing horizon', function () {
 });
 ```
 
-Each security test should ideally prove:
+Each security test proves the malicious operation did not happen (unchanged row, call count, `Http::assertNotSent`), not just a status code.
 
-```text
-legitimate operation succeeds
-malicious operation fails
-```
+Confirm it by removing the guard, watching the test fail, then restoring it.
 
 ---
 
-# Phase 49 — Verification
+# Phase 49 - Verification
 
 Run the project's actual quality gates.
 
@@ -2357,9 +2352,9 @@ REPRODUCE
     ↓
 ASSESS IMPACT
     ↓
-FIX
+WRITE FAILING REGRESSION TEST
     ↓
-WRITE REGRESSION TEST
+FIX
     ↓
 REPEAT ATTACK
     ↓
@@ -2557,7 +2552,7 @@ Do not conceal known weaknesses from the external tester.
 
 ---
 
-# Phase 50 — Generate Formal PDF Security Report
+# Phase 50 - Generate Formal PDF Security Report
 
 A completed security review MUST produce a professional PDF report.
 
@@ -2671,7 +2666,7 @@ Every vulnerability should use a consistent structure.
 Example:
 
 ```markdown
-## H-02 — Cross-Tenant Document Access
+## H-02 - Cross-Tenant Document Access
 
 **Severity:** High
 **Status:** Fixed

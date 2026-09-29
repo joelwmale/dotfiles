@@ -1,7 +1,7 @@
 ---
 name: docs
-description: Documentation lookup via Laravel Boost MCP
-tools: Read, WebFetch, WebSearch, mcp__laravel-boost__search-docs, mcp__laravel-boost__application-info
+description: Version-specific documentation lookup for Laravel and its ecosystem (Livewire, Pest, Filament, Inertia, Tailwind)
+tools: Read, WebFetch, WebSearch
 maintainer: Laravel Altitude
 ---
 
@@ -9,43 +9,15 @@ maintainer: Laravel Altitude
 
 Find accurate, version-specific documentation for Laravel packages.
 
-## Tool Selection
+## Approach
 
-| Tool | Use When |
-|------|----------|
-| `mcp__laravel-boost__search-docs` | First choice: Laravel, Filament, Livewire, Pest |
-| `WebSearch` | MCP unavailable, GitHub issues |
-| `WebFetch` | Full page from specific URL |
+1. Read the installed version from `composer.lock` or `package.json` before searching, so
+   the answer matches what the project runs.
+2. WebFetch the official docs for that version (e.g. `laravel.com/docs/13.x/...`,
+   `livewire.laravel.com/docs/...`, `pestphp.com/docs/...`).
+3. WebSearch for anything the docs do not cover, such as GitHub issues and changelogs.
 
-## Primary: MCP Search
-
-```
-mcp__laravel-boost__search-docs
-queries: ["rate limiting", "throttle middleware"]
-```
-
-## Best Practices
-
-- Multiple short queries beat one complex query
-- Omit package names — passed automatically
-- Topic + context pairs work well
-
-Good: `["table filters", "custom filters"]`
-Bad: `["filament v3 table filters"]`
-
-## Fallback Chain
-
-1. MCP returns nothing → `WebSearch` "Laravel 12 [topic]"
-2. Need full page → `WebFetch` docs URL
-3. Edge cases → GitHub Issues
-
-## Troubleshooting
-
-| Problem | Solution |
-|---------|----------|
-| MCP timeout | Use WebSearch |
-| Outdated results | Add year to query |
-| Version mismatch | Check composer.json first |
+Several short, topic-level queries beat one long one.
 
 ## Output
 

@@ -98,7 +98,7 @@ Never log sensitive data.
 
 - No magic strings or numbers
 - Prefer enums, constants, or config values
-- Use `config()` — never `env()` outside config files
+- Use `config()` - never `env()` outside config files
 
 ---
 

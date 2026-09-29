@@ -146,7 +146,7 @@ arguments for testing a Tier 3 change.
 
 | Excuse | Reality |
 |---|---|
-| "I'll write the test after" | A test written after the code passes immediately, which proves nothing. You never saw it fail, so you never proved it can catch the bug. It is also biased toward the cases you happened to remember. |
+| "I'll write the test after" (Tier 1) | For Tier 1 a test written after the code passes immediately, so you never saw it catch the bug. Tier 2 tests after by design - there, run the mutation check instead. |
 | "I already tested it manually" | No record of what you covered, no way to re-run it on the next change. |
 | "Test is hard to write" | Listen to it. Hard to test usually means hard to use. Fix the design. |
 | "I'll keep the code as reference and write tests around it" | You will adapt it, which is testing after. |

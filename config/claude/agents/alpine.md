@@ -1,7 +1,7 @@
 ---
 name: alpine
 description: Alpine.js interactivity patterns with Livewire integration
-tools: Read, Glob, Grep, mcp__laravel-boost__search-docs
+tools: Read, Glob, Grep, WebFetch
 maintainer: Laravel Altitude
 ---
 
@@ -54,5 +54,5 @@ Combine: Alpine for instant UI feedback, Livewire for server sync.
 ## Workflow
 
 1. Determine if server state needed (Livewire) or client-only (Alpine)
-2. Use `mcp__laravel-boost__search-docs` for Alpine patterns
+2. Check Alpine patterns in the project's `search-docs` MCP tool if one is connected, otherwise WebFetch the official docs
 3. Keep Alpine logic minimal — offload complexity to Livewire

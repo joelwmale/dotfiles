@@ -25,7 +25,7 @@ When the `add-dark-mode` skill identifies raster images that need dark-mode vari
 
 ## Load First
 
-- Before image generation or editing, load and follow the `imagegen` skill.
+- Generate or edit the image with whatever image tool is available in this session. If none is available, say so and stop - do not approximate with CSS filters.
 
 ## Progress Updates
 
@@ -36,19 +36,13 @@ Keep the user informed so longer runs do not look stuck.
 
 ## Workflow
 
-1. Load `imagegen`.
-2. Inspect the source image and the dark-mode UI context.
-3. Generate or edit a dark-mode version with the same dimensions as the original.
-4. Save the dark-mode image with a `-dark` suffix alongside the original.
-5. Return the saved project path for the caller to wire into the UI.
+1. Inspect the source image and the dark-mode UI context.
+2. Generate or edit a dark-mode version with the same dimensions as the original.
+3. Save the dark-mode image with a `-dark` suffix alongside the original.
+4. Return the saved project path for the caller to wire into the UI.
 
 ## Rules
 
-- Before doing any image generation or editing, you MUST load and follow the `imagegen` skill
-- The `imagegen` skill invocation is not optional: do not skip it, do not replace it with an ad hoc image-generation workflow, and do not call image tooling directly without first applying `imagegen`
-- Let `imagegen` choose and run the correct image workflow; for normal dark-mode image variants, that will usually mean its default built-in `image_gen` tool mode
-- If the source image is a local file, follow `imagegen`'s local-image guidance before editing so the image is visible in the conversation context
-- Follow `imagegen`'s save-path policy: move or copy project-bound generated outputs into the workspace, and never leave a project-referenced dark-mode asset only under `$CODEX_HOME/*`
 - When generating a dark-mode image, choose a background color that feels like an appropriate inversion of the original background color: black or dark gray for white, dark gray for off-white, or the specific dark color provided by the user; if the original image's background matched the site background, match the dark-mode site background instead
 - Preserve the same contrast characteristics as the original image; light sections should become darker while relative separation and readability stay intact
 - Preserve blurs and softness; never sharpen anything that was blurry in the original image

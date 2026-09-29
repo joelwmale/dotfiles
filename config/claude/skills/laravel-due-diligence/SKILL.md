@@ -1,6 +1,6 @@
 ---
 name: laravel-due-diligence
-description: Conduct a thorough due diligence check through a Laravel application
+description: Due-diligence review of an existing Laravel application before an agency takes it over - lifecycle, dependency, security, data, operations and takeover risk, ending in a takeover recommendation. Use when asked to assess, audit or take over an inherited Laravel codebase.
 ---
 
 # Laravel Application Due Diligence

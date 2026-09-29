@@ -74,7 +74,8 @@
     "sonnet"
   ],
   "skillOverrides": {
-    "test-driven-development": "off"
+    "test-driven-development": "off",
+    "superpowers:test-driven-development": "off"
   },
   "hooks": {
     "PreCompact": [

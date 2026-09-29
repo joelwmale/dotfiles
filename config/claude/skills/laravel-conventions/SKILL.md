@@ -6,7 +6,7 @@ description: Laravel and PHP conventions - naming, structure, Eloquent, routing,
 # Laravel Conventions
 
 Style guidance for Laravel work. The strict requirements live in
-`config/claude/rules/php_coding_rules.md` and win on any conflict - this
+`~/.claude/rules/php_coding_rules.md` and win on any conflict - this
 document covers the conventions those rules do not spell out.
 
 ## Core Principle

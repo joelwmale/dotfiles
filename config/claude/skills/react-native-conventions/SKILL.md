@@ -131,7 +131,7 @@ This is where mobile apps actually fall over.
 
 ## Testing
 
-- Unit-test hooks and services
+- Unit-test hooks and services when testing_policy says a test is warranted
 - React Native Testing Library for component behaviour; query by accessibility
   role and label, not test IDs, where possible
 - Detox or Maestro for the flows that carry money or auth

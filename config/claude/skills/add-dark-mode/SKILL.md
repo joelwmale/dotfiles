@@ -38,7 +38,7 @@ Keep the user informed so longer runs do not look stuck.
 1. Inspect the existing UI and project Tailwind conventions.
 2. Convert markup to include appropriate dark-mode classes.
 3. Audit rasterized images for dark-mode variants.
-4. For each rasterized image that needs a dark-mode variant, hand off to `dark-mode-image`, which MUST load and use the `imagegen` skill before creating or editing image assets.
+4. For each rasterized image that needs a dark-mode variant, hand off to `dark-mode-image`, which owns raster image generation.
 5. Save generated dark-mode images alongside the originals and wire them into the dark-mode UI.
 
 ## Dark Mode Rules
@@ -62,7 +62,7 @@ Keep the user informed so longer runs do not look stuck.
 
 - When adding or improving dark mode, audit the page for rasterized images that need dark-mode versions: photos, screenshots, product mockups, decorative backgrounds, textures, and rasterized illustrations
 - Never use CSS filters (`invert`, `brightness`, `contrast`, `opacity`) as the final dark-mode treatment for raster images; always create real dark-mode image files
-- Generate dark-mode raster image variants with the `dark-mode-image` skill, which MUST load and use the `imagegen` skill before creating or editing any raster image assets
+- Generate dark-mode raster image variants with the `dark-mode-image` skill, which owns raster image generation
 
 ### SVG Rules
 
@@ -71,8 +71,8 @@ Keep the user informed so longer runs do not look stuck.
 
 ## Guardrails
 
-- Do not generate, edit, or replace raster image assets directly from this skill; `dark-mode-image` owns that work and MUST use the `imagegen` skill.
-- Require the `dark-mode-image` + `imagegen` handoff even when the image change seems simple, decorative, or incidental.
+- Do not generate, edit, or replace raster image assets directly from this skill; `dark-mode-image` owns that work.
+- Require the `dark-mode-image` handoff even when the image change seems simple, decorative, or incidental.
 
 ## Verify
 

@@ -1,6 +1,6 @@
 ---
 name: react-native-due-diligence
-description: Conduct a thorough due diligence check through a React Native project
+description: Due-diligence review of an existing React Native application before an agency takes it over - platform lifecycle, dependency, build reproducibility, iOS/Android release, security and store-account risk, ending in a takeover recommendation. Use when asked to assess, audit or take over an inherited React Native codebase.
 ---
 
 # React Native Application Due Diligence
