@@ -327,52 +327,49 @@ function release() {
   trap cleanup INT
 
   if [ -z "$lastRelease" ]; then
-    diffRange="HEAD"; logRange="HEAD"; sinceDate=""
+    diffRange="HEAD"; logRange="HEAD"
   else
     diffRange="$lastRelease...HEAD"; logRange="$lastRelease..HEAD"
-    sinceDate=$(git log -1 --format=%aI "$lastRelease" 2>/dev/null || echo "")
   fi
 
-  repoName=$(gh repo view --json nameWithOwner --jq '.nameWithOwner' 2>/dev/null || echo "")
+  # PRs merged into develop land before the release tag's date, so a date search
+  # misses them. Read the PR numbers off merge and squash commits in the range.
+  prNumbers=$(git log $logRange --format=%s \
+    | sed -nE 's/^Merge pull request #([0-9]+).*/\1/p; s/.*\(#([0-9]+)\)$/\1/p' \
+    | sort -un)
 
-  contributors=""
-  if [ -n "$repoName" ] && [ -n "$sinceDate" ]; then
-    contributors=$(gh pr list --repo "$repoName" --state merged --search "merged:>=$sinceDate" \
-      --json number,title,author \
-      --jq '.[] | "- @\(.author.login) (PR #\(.number)): \(.title)"' 2>/dev/null | sort -u || echo "")
-  fi
+  pullRequests=""
+  for prNumber in ${(f)prNumbers}; do
+    pullRequests+=$(gh pr view "$prNumber" --json number,title,author,body \
+      --jq '"--- PR #\(.number) by @\(.author.login): \(.title)\n\(.body // "" | .[0:6000])\n"' 2>/dev/null)
+    pullRequests+=$'\n'
+  done
 
   releaseInfo=$(cat <<EOF
-=== Release Information ===
-Version: $newVersion
-Type: $releaseTypeLabel
-Previous Version: $lastVersion
+=== Pull Requests ===
+${pullRequests:-None found}
 
-=== Commit History ===
-$(git log $logRange --format="%h %an: %s" --no-decorate)
+=== Commits ===
+$(git log $logRange --no-merges --format="%h %an: %s")
 
-=== File Changes ===
-$(git diff $diffRange --stat)
-
-=== Detailed Changes (truncated if large) ===
-$(git diff $diffRange | head -c 100000)
-
-=== Contributors ===
-${contributors:-None found}
+=== Files Changed ===
+$(git diff $diffRange --stat=120 | tail -n 60)
 EOF
 )
 
-  releaseNotes=$(echo "$releaseInfo" | claude -p "Generate professional release notes for version $newVersion. Include:
-- Sections for: Added, Changed, Fixed (only include sections with actual changes)
-- Do NOT include a summary or intro paragraph - start directly with the first section heading
-- Use bullet points
-- Be concise but informative
-- Output in markdown format
-- Do not include the version number in the title (I'll add it)
-- Use the Contributors section to credit PR authors. For each bullet in Added/Changed/Fixed, append the relevant contributor handle(s) at the end in the format \" - @username\" (multiple contributors separated by spaces).
-- If you cannot confidently map a change to a specific contributor, still add a final \"Contributors\" subsection listing each handle on its own line as \"- @username\".
+  releaseNotes=$(echo "$releaseInfo" | claude -p "Write release notes for v$newVersion (previous release v$lastVersion) from the pull requests and commits below. They are read by the team and the client to learn what changed, not to audit every commit.
 
-Output ONLY the release notes content, no extra commentary.")
+Group by feature, not by commit. Most releases have one to four themes. Give each theme a ### heading named after the feature or area (e.g. \"Messaging\", \"Payouts\"), then two to five bullets on what a user or operator can now do or will notice. Many commits roll up into one bullet.
+
+A fix to something that was built in this same release is part of building it - fold it into that feature, or leave it out. Only call something a fix when it was broken in v$lastVersion. Put those under a final ### Fixes heading, one line each, and only if there are any.
+
+Leave out test-only changes, refactors, renames, internal tooling and dependency bumps, unless one changes how the team works (e.g. a new command they will run). Those go in a single ### Internal bullet list, at most three bullets, and only if they matter.
+
+Each bullet is one short sentence. Say what changed for the user, not how it was built - no security internals, queue names or implementation detail. If the release needs a manual step to deploy (a migration that cannot be undone, new env values, infrastructure to enable), add a ### Deploy notes heading with one line per step.
+
+Write plainly. No intro or summary paragraph, no version number title, no per-bullet author handles. Use hyphens, never em dashes. If the pull requests have more than one author, end with a ### Contributors list of @handles.
+
+Output only the markdown.")
 
   trap - INT
   { kill $spinner_pid; wait $spinner_pid; } 2>/dev/null
