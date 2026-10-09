@@ -365,7 +365,7 @@ A fix to something that was built in this same release is part of building it - 
 
 Leave out test-only changes, refactors, renames, internal tooling and dependency bumps, unless one changes how the team works (e.g. a new command they will run). Those go in a single ### Internal bullet list, at most three bullets, and only if they matter.
 
-Each bullet is one short sentence. Say what changed for the user, not how it was built - no security internals, queue names or implementation detail. If the release needs a manual step to deploy (a migration that cannot be undone, new env values, infrastructure to enable), add a ### Deploy notes heading with one line per step.
+Each bullet is one short sentence. Say what changed for the user, not how it was built - no security internals, queue names or implementation detail. Leave out deploy steps, env values and infrastructure setup.
 
 Write plainly. No intro or summary paragraph, no version number title, no per-bullet author handles. Use hyphens, never em dashes. If the pull requests have more than one author, end with a ### Contributors list of @handles.
 
