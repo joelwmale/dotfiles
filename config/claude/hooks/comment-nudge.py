@@ -13,6 +13,7 @@ import os
 import subprocess
 import sys
 
+sys.dont_write_bytecode = True
 HERE = os.path.dirname(os.path.realpath(__file__))
 spec = importlib.util.spec_from_file_location('comment_gate', os.path.join(HERE, 'comment-gate.py'))
 gate = importlib.util.module_from_spec(spec)
