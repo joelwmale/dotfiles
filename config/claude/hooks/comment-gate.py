@@ -13,7 +13,9 @@ and it passes, so keeping a comment costs one look rather than an argument.
 import hashlib
 import json
 import os
+import fnmatch
 import re
+import shlex
 import subprocess
 import sys
 import tempfile
@@ -40,13 +42,43 @@ def git(cwd, *args):
     return result.stdout if result.returncode == 0 else ''
 
 
-def comment_lines(cwd, stages_everything):
+ADD_COMMAND = re.compile(r'\bgit\s+(?:-\S+\s+)*add\b([^&;|\n]*)')
+STAGES_ALL_FLAG = re.compile(r'-[A-Za-z]*A[A-Za-z]*|--all')
+
+
+def staged_pathspecs(command):
+    """Return None if no `git add` runs, 'all' if one stages everything, else its pathspecs."""
+    found = False
+    pathspecs = []
+    for match in ADD_COMMAND.finditer(command):
+        found = True
+        try:
+            tokens = shlex.split(match.group(1))
+        except ValueError:
+            return 'all'
+        for token in tokens:
+            if STAGES_ALL_FLAG.fullmatch(token) or token in ('.', '*') or token.startswith(':'):
+                return 'all'
+            if not token.startswith('-'):
+                pathspecs.append(os.path.normpath(token))
+    return pathspecs if found else None
+
+
+def is_staged(rel, pathspecs):
+    return any(
+        rel == spec or rel.startswith(spec + '/') or fnmatch.fnmatch(rel, spec)
+        for spec in pathspecs
+    )
+
+
+def comment_lines(cwd, staged):
     """Return [(path, text)] for comment lines this commit would add.
 
     Diffs against HEAD rather than the index: the hook runs before the tool, so
     a `git add -A && git commit` has not staged anything yet and --cached would
-    read empty. Untracked files are only read when the command stages them,
-    since otherwise they are not part of the commit.
+    read empty. Untracked files are only read when a `git add` in the command
+    stages them - everything, or the paths it names - since otherwise they are
+    not part of the commit.
     """
     found = []
     path = None
@@ -59,10 +91,12 @@ def comment_lines(cwd, stages_everything):
         if path and path.endswith(CHECKED_SUFFIXES) and COMMENT_START.match(line[1:]):
             found.append((path, line[1:].strip()))
 
-    if stages_everything:
+    if staged is not None:
         untracked = git(cwd, 'ls-files', '--others', '--exclude-standard').split()
         for rel in untracked:
             if not rel.endswith(CHECKED_SUFFIXES):
+                continue
+            if staged != 'all' and not is_staged(rel, staged):
                 continue
             try:
                 with open(os.path.join(cwd, rel), encoding='utf-8', errors='replace') as f:
@@ -95,7 +129,7 @@ def main():
     cwd = payload.get('cwd') or os.getcwd()
 
     try:
-        comments = comment_lines(cwd, stages_everything=bool(re.search(r'\bgit\s+add\b', command)))
+        comments = comment_lines(cwd, staged_pathspecs(command))
     except Exception:
         allow()
 
