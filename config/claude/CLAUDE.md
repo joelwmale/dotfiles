@@ -17,6 +17,7 @@ Always follow the rules in:
 - `~/.claude/rules/php_coding_rules.md`
 - `~/.claude/rules/git_workflow.md`
 - `~/.claude/rules/review_policy.md`
+- `~/.claude/rules/agent_recovery.md`
 - `~/.claude/rules/testing_policy.md`
 - `~/.claude/rules/code_comments.md`
 

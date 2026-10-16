@@ -1,5 +1,8 @@
 # Review Policy (Strict)
 
+Delegated reviews stall. Follow `agent_recovery.md` for how they are scoped,
+timed and recovered.
+
 Applies whenever you run a multi-task plan as an implement-then-review loop,
 whether through subagents or inline. A review gate plus re-review on every task
 is right for code that can cause damage and wasteful for code that cannot, so
@@ -10,7 +13,7 @@ tier the tasks instead.
 ## Tier the task before dispatching, and say which tier out loud
 
 **Tier 1 - full treatment.** Implement, review, fix, scoped re-review, per task.
-Use the most capable model for the review. A task is Tier 1 if it touches any of:
+Review on the model you are already running on. A task is Tier 1 if it touches any of:
 
 - authentication, authorization, or a permission gate
 - money, billing, or anything a customer is charged for
@@ -36,8 +39,12 @@ turns out to touch a Tier 1 concern, stop and re-tier it.
 
 ## Always, regardless of tier
 
-- **One whole-branch review at the end**, on the most capable model, before any
-  push. This is never skipped and never batched away.
+- **One final review when everything is done**, before any push: the finished
+  work plus the code it touched (changed files and their direct callers), on the
+  model the session is already using. Split it into focused slices per
+  `agent_recovery.md` rather than one sweeping pass. Never skipped, never
+  batched away - but it is not a re-review of the whole branch or an upgrade
+  to a bigger model.
 - **Never skip review on a task you had to fix twice.** Two fix rounds means the
   task is not understood; the third attempt gets a real gate.
 - **A test proving a guard exists must prove the guarded action did not happen.**
@@ -65,6 +72,9 @@ turns out to touch a Tier 1 concern, stop and re-tier it.
   or only formatting.
 - Do not ask a reviewer to re-run tests the implementer already ran on the same
   code. The implementer's report carries that evidence.
-- Do not treat this rule as licence to skip the final whole-branch review, or to
+- Do not send a review to a more capable model than the session is on. Cost and
+  stalls grow with the model; the final review's job is to cover touched code,
+  not to be the most expensive pass.
+- Do not treat this rule as licence to skip the final review, or to
   skip Tier 1 gates because a plan is running long. If time is the problem,
   batch Tier 2 harder - do not downgrade Tier 1.

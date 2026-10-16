@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+# Hard wall-clock limit for any subprocess a review shells out to (claude -p,
+# codex, test runs). Unlike the subagent watchdog this genuinely kills the
+# process: SIGTERM at the limit, SIGKILL 15s later.
+#
+#   claude-timeout [seconds] -- command args...     (default 1200)
+#
+# Exit 124 means it timed out; 137 means it had to be killed.
+
+set -u
+limit=1200
+if [[ "${1:-}" =~ ^[0-9]+$ ]]; then
+    limit=$1
+    shift
+fi
+[[ "${1:-}" == "--" ]] && shift
+[[ $# -eq 0 ]] && { echo "usage: claude-timeout [seconds] -- command..." >&2; exit 64; }
+
+exec /usr/bin/timeout --kill-after=15 "$limit" "$@"

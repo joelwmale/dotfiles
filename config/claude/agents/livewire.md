@@ -2,6 +2,7 @@
 name: livewire
 description: Livewire 3 component implementation
 tools: Read, Write, Edit, Glob, Grep, Bash, WebFetch
+maxTurns: 60
 maintainer: Laravel Altitude
 ---
 

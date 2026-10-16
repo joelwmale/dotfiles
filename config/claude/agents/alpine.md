@@ -2,6 +2,7 @@
 name: alpine
 description: Alpine.js interactivity patterns with Livewire integration
 tools: Read, Glob, Grep, WebFetch
+maxTurns: 30
 maintainer: Laravel Altitude
 ---
 

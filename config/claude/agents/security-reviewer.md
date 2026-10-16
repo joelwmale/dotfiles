@@ -2,7 +2,8 @@
 name: security-reviewer
 description: Laravel/PHP security vulnerability detection and remediation specialist. Use PROACTIVELY after writing or changing code that handles user input, auth, API endpoints, file uploads, webhooks, external HTTP calls, or sensitive data. Also review Composer dependencies.
 tools: Read, Write, Edit, Bash, Grep, Glob
-model: opus
+model: inherit
+maxTurns: 60
 ---
 
 # Security Reviewer (Laravel / PHP)

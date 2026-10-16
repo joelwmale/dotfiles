@@ -105,6 +105,65 @@
             "type": "command",
             "command": "python3 ~/.claude/hooks/comment-gate.py",
             "timeout": 15
+          },
+          {
+            "type": "command",
+            "command": "python3 ~/.claude/hooks/agent-watchdog.py bash-guard",
+            "timeout": 5
+          }
+        ]
+      },
+      {
+        "matcher": "Agent",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 ~/.claude/hooks/agent-watchdog.py pre-agent",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Agent",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 ~/.claude/hooks/agent-watchdog.py post-agent",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "SubagentStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 ~/.claude/hooks/agent-watchdog.py start",
+            "timeout": 5
+          },
+          {
+            "type": "command",
+            "command": "python3 ~/.claude/hooks/agent-watchdog.py sleeper partial",
+            "asyncRewake": true
+          },
+          {
+            "type": "command",
+            "command": "python3 ~/.claude/hooks/agent-watchdog.py sleeper hard",
+            "asyncRewake": true
+          }
+        ]
+      }
+    ],
+    "SubagentStop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 ~/.claude/hooks/agent-watchdog.py stop",
+            "timeout": 5
           }
         ]
       }

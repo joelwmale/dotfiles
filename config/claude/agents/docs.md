@@ -2,6 +2,7 @@
 name: docs
 description: Version-specific documentation lookup for Laravel and its ecosystem (Livewire, Pest, Filament, Inertia, Tailwind)
 tools: Read, WebFetch, WebSearch
+maxTurns: 30
 maintainer: Laravel Altitude
 ---
 

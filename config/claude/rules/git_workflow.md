@@ -31,7 +31,7 @@ When creating PRs:
    - No coverage target
 
 2. **Code Review**
-   - Review per `review_policy.md`: tier the task, and always run a whole-branch review before pushing
+   - Review per `review_policy.md`: tier the task, and always run one final review of the finished work and the code it touched before pushing, on the session's own model
    - Address CRITICAL and HIGH issues; fix MEDIUM issues when possible
 
 3. **Commit & Push**

@@ -2,6 +2,7 @@
 name: pest
 description: Pest testing for Laravel
 tools: Read, Write, Edit, Bash, Glob, Grep, WebFetch
+maxTurns: 60
 maintainer: Laravel Altitude
 ---
 
