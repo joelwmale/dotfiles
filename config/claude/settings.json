@@ -126,6 +126,16 @@
     ],
     "PostToolUse": [
       {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 ~/.claude/hooks/comment-nudge.py",
+            "timeout": 10
+          }
+        ]
+      },
+      {
         "matcher": "Agent",
         "hooks": [
           {

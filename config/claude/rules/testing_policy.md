@@ -83,6 +83,15 @@ absence of one:
 
 ---
 
+## Running the suite
+
+- While iterating, run the scoped test (`--filter`, one file). Run the full suite once, when the
+  change is finished.
+- A suite that takes over two minutes runs with `run_in_background`, output to a file. A
+  foreground run passes the 120 second Bash limit and is moved to the background mid-run.
+
+---
+
 ## Coverage
 
 **There is no coverage target.** A percentage drives tests written to move a

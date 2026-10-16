@@ -12,6 +12,17 @@ Types: feat, fix, refactor, docs, test, chore, perf, ci
 
 Note: Attribution disabled globally via ~/.claude/settings.json.
 
+## Branches and Pushing
+
+- Run `git branch --show-current` before the first commit. On `master`, `main` or `develop`,
+  create a feature branch first unless the project's CLAUDE.md says to commit there.
+- Start a branch from a fresh base: `git fetch`, then branch from `origin/<base>`. A stale local
+  base silently reverts work that landed since.
+- Push a feature branch when the work is finished. Push a long-lived branch only where the
+  project's CLAUDE.md says that is the workflow, or when asked. A hotfix the user calls out is
+  the user's override.
+- Match the recent log's ticket prefix (`PX-1234 feat: ...`) when the repo uses one.
+
 ## Pull Request Workflow
 
 When creating PRs:

@@ -26,8 +26,9 @@ If there is any conflict:
 2. Rules win
 3. Skills are guidance
 
-Personal skills here win over framework-shipped guidance (Laravel Boost, plugin skills)
-where they disagree.
+Personal skills here win over framework-shipped guidance (Laravel Boost, plugin skills,
+and the generated guideline blocks inside a project's CLAUDE.md) where they disagree -
+for example a block demanding a test for every change loses to `testing_policy.md`.
 
 ### Skills (apply when relevant)
 Skills in `~/.claude/skills/` are auto-discovered by name and description -
@@ -65,13 +66,28 @@ remediation notes in your response.
 The `docs`, `livewire`, `alpine` and `pest` agents are available for documentation
 lookups and framework-specific work.
 
+## Shell
+
+- Wait for background work with `Monitor` or a background Bash run. `sleep N; cat` is blocked.
+- Run commands from the working directory as it is; a `cd <project root> &&` prefix
+  adds nothing and breaks allowlist matching.
+- Give every command that could prompt a non-interactive form (`--no-interaction`,
+  `--force`, `< /dev/null`) and a timeout (`~/.claude/hooks/claude-timeout 300 -- <cmd>`).
+  Two minutes of silence from a command means it is waiting for input.
+
+## Working style
+
+When a request will take over 15 minutes or spans repos, say so up front, then give a
+one-line status after each completed step.
+
 ## Using GitHub
 
 For questions about GitHub, use the `gh` tool.
 
 ## Committing
 
-When you have finished working on a request, commit the changes and push them to the remote repository.
+When you have finished working on a request, commit the changes. Branch, push and ticket-prefix
+rules are in `git_workflow.md`.
 
 Write a commit message that makes sense for the changes you have made. Always prefix the commit message with the type of change you have made, for example:
 
