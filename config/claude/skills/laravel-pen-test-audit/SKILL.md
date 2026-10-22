@@ -19,6 +19,13 @@ Apply these unless the user says otherwise:
 - **Finding IDs** are severity plus a counter: C1, C2, H1, H2, M1, L1. Keep them stable across
   the JSON, Markdown and PDF outputs.
 - **Copy the PDF to `~/Desktop`** as well as `security-reports/`.
+- **Inventories, not impressions.** For Livewire actions, signed-URL sites, stored strings that
+  reach a browser sink, TLS-verification settings, and live cookies and headers, write out a table
+  of every instance with a verdict. A phase that says "reviewed" with no table did not happen.
+  Independent pentests find these by exhaustive enumeration; sampling misses them.
+- **Check the live response when any URL is available** (staging, or production passively).
+  Cookie flags, security headers and `security.txt` often live in the proxy or host config, not in
+  the repo, so code review alone cannot clear them. See Phase 46.
 
 You are acting as a senior Laravel application security engineer immediately before an independent penetration test.
 
@@ -452,6 +459,21 @@ A six-digit verification code with no meaningful throttling should be treated as
 
 The previous Canary assessment demonstrated that a six-digit registration verification code could be brute-forced through the Livewire endpoint when no limiter existed.
 
+A per-code attempt limit is not a rate limit on guessing. Check what happens when the code is
+exhausted:
+
+- If exhausting attempts **burns the code and issues a replacement**, the attacker gets a fresh
+  allowance each cycle. Compute guesses per day across replacement cycles (for example 3 wrong
+  guesses per code, 3 codes per 15 minutes = about 9 guesses per 15 minutes, indefinitely).
+- Look for a **cumulative failure counter keyed on the account** that survives code replacement and
+  ends in a lockout or an admin/re-invite step. A counter that resets on every new code is not one.
+- Check that the onboarding state that permits code sign-in (invited, no password set, passwordless
+  first login) **expires**. Open-ended eligibility turns a slow guess rate into a certain eventual
+  success.
+- Prefer a high-entropy single-use link over a short code for first sign-in.
+
+Test it by driving the full burn-and-replace loop, not one code.
+
 ---
 
 # Phase 4 - Password Reset Lifecycle
@@ -562,6 +584,32 @@ Never log plaintext passwords.
 
 Search logs, debugging code and events for accidental password capture.
 
+## Re-authentication for sensitive changes
+
+Enumerate every code path that changes the primary email, the password, MFA settings, recovery
+codes, or creates an API token. Include Livewire profile actions, Fortify/Breeze overrides, admin
+and supplier/staff profile screens, and any "update profile" method that saves `email` alongside
+harmless fields.
+
+```bash
+rg "'email' =>|->email =|update\(\[.*email|updateProfile|updatePassword|updateEmail" app
+```
+
+For each, verify it requires the current password (`current_password` rule, `password.confirm`
+middleware, or `Hash::check`) or an existing MFA challenge, and that it does so on every role's
+variant of the screen, not just the main one. A stolen session cookie, an unattended device, shared
+logins, or a stored-XSS payload otherwise becomes full account takeover: a new email redirects
+password resets, a new password locks the owner out.
+
+Also verify:
+
+- the new email must be verified before it replaces the old one (see Phase 5)
+- the **previous** email address is notified of the change
+- other sessions are invalidated after a password change
+
+The three profile screens (customer, supplier, admin) in one real app each had their own copy of
+this gap. Check every copy.
+
 ---
 
 # Phase 8 - Session and Cookie Security
@@ -613,6 +661,31 @@ Investigate long-lived remember-me behaviour.
 For sensitive actions consider password confirmation or re-authentication.
 
 The Canary audit previously found a session cookie without the Secure flag enabled.
+
+Do not clear this from `config/session.php` alone. `'secure' => env('SESSION_SECURE_COOKIE')`
+resolves to `null` when the variable is unset, and Laravel then only sets Secure if it believes the
+request is HTTPS. Behind a TLS-terminating proxy or load balancer with trusted proxies not
+configured, it believes the request is HTTP and omits the flag.
+
+Request a real response and list **every** `Set-Cookie`:
+
+```bash
+curl -sI https://<host>/login | grep -i '^set-cookie'
+```
+
+Check each cookie, not just the session cookie:
+
+```text
+XSRF-TOKEN
+<app>_session
+remember_web_<hash>
+any custom cookie set with Cookie::make / response()->cookie / setcookie
+```
+
+Each must carry `Secure` and, except `XSRF-TOKEN` (which JavaScript legitimately reads), `HttpOnly`,
+with an explicit `SameSite`. Set `'secure'` explicitly (`true`, or `env(..., true)` with a safe
+default) outside local development, configure trusted proxies, and combine with HSTS. Missing Secure
+on a session cookie is MEDIUM.
 
 ---
 
@@ -951,6 +1024,52 @@ Every Livewire action that modifies protected data should independently enforce 
 
 Securing Laravel specifically highlights the danger of treating public Livewire properties as trusted internal state.
 
+## Action inventory (mandatory)
+
+Every public method on a Livewire component is an HTTP endpoint. Build a table of **all** of them:
+
+```bash
+rg -n "public function \w+\(" app/Livewire
+```
+
+Columns: component, method, what it writes or reveals, authorisation inside the method (policy,
+gate, role check, scoped query, or none), and the client-writable properties it reads.
+
+Rules for the verdict:
+
+- Authorisation in `mount()`, in a Blade `@if`/`@can`, or in a `$user->can_x` flag on a button does
+  **not** cover the method. Grep the views for the permission flags they check, then confirm the
+  action method repeats the same check. A rule that exists only in the template is a finding.
+- **Dead actions count.** A method with no button, or whose inputs are `disabled`/`readonly` in the
+  view, is still callable with `$wire.$call()` / `$wire.$set()`. A save method for fields the UI
+  shows as read-only is a privilege escalation, and a stored-XSS or data-integrity vector.
+- A component mounted in a shared layout (cart, notifications, search) is reachable by **every**
+  authenticated role, so its actions need role checks even though the page "belongs" to one role.
+- Validation is not authorisation. `rules()` proving a field is a string under 255 characters says
+  nothing about whether this user may write it.
+- Public properties that carry ids, paths, or prices into an action must be `#[Locked]` or
+  re-derived server-side. Properties that hold arrays of records (stocks, documents, line items) are
+  client-writable all the way down, including nested keys.
+
+### Middleware does not follow Livewire updates
+
+Livewire replays only its **persistent middleware** (by default auth and `can`-style) on
+`/livewire/update`. Check:
+
+```bash
+rg "addPersistentMiddleware|isLivewireRequest|routeIs\('livewire|is\('livewire|expectsJson" app bootstrap
+```
+
+- Custom role/status/onboarding middleware not registered via `Livewire::addPersistentMiddleware()`
+  does not run on actions.
+- Middleware that lets Livewire requests through (`isLivewireRequest()`, `is('livewire/*')`)
+  provides no protection on those requests.
+- Middleware that skips its check when `$request->expectsJson()` can be bypassed by sending
+  `Accept: application/json`. Test with that header.
+
+Prove each gap by calling the action as a lower role with `Livewire::test()->call()` and asserting
+the data is unchanged.
+
 ---
 
 # Phase 15 - Inertia / Vue Data Exposure
@@ -1134,6 +1253,19 @@ guessed URL
 
 Prefer private storage with authorised access or appropriately scoped temporary URLs.
 
+For every download endpoint also check:
+
+- **Path normalisation.** A prefix guard such as `str_starts_with($path, 'exports/')` is bypassed by
+  `exports\file`, `./exports/`, `a/../exports/`, or encoded variants, because Flysystem normalises
+  after the guard ran. Normalise (`/` and `\`, dot segments) and resolve before checking, then
+  allow-list directories rather than deny-listing them.
+- **Per-file authorisation.** A valid signature or "user is logged in" is not permission to read a
+  specific file. Check that the route authorises the requester against the file's owning record, and
+  that sensitive categories (identity documents, registration certificates, exports) have their own
+  gate.
+- Prefer signing an **identifier** (record id) and resolving the path server-side, never signing a
+  path string.
+
 ---
 
 # Phase 18 - Signed URL Security
@@ -1182,6 +1314,47 @@ time-limited
 
 A cryptographically valid URL does not replace business-level authorisation.
 
+## Signature versus input source
+
+The `signed` middleware and `hasValidSignature()` verify the **query string only**. `$request->all()`,
+`$request->input()` and `$request->get()` prefer the **request body**, including a JSON body on a
+`GET`. An attacker holding any one valid signed URL can replay it with a body that overrides the
+signed parameter, and the signature still passes.
+
+```bash
+rg -n "'signed'|signed\b|hasValidSignature" routes app
+```
+
+For every signed route, open the handler and flag any use of `$request->all()`, `input()`,
+`get()`, `only()`, `validated()` or magic property access (`$request->path`) for a signed
+parameter. Signed values must come from `$request->query('x')` or a route parameter. Test it:
+
+```text
+GET <valid signed url>
+Content-Type: application/json
+{"path":"<other file>"}
+```
+
+and assert the response is still the originally signed resource (or a 4xx), and that the other file
+was not returned.
+
+## Signing oracles
+
+Search for every place the application **creates** a signed URL from a value it did not generate:
+
+```bash
+rg -n "temporarySignedRoute|signedRoute|temporaryUrl" app resources
+```
+
+If the signed value (a path, filename, document id) comes from a client-writable source (a Livewire
+public property or array, a request field, a form-submitted JSON blob), any user can set it to a
+file they should not see and let the application hand back a signed link. The app has become a
+signing oracle. Check also that every generator adds the same permission/scope parameters as the
+others; one generator that omits the gate defeats the gate on all links.
+
+Build an inventory of every signing site with: value source, is the source client-writable,
+parameters signed, and what the download handler authorises.
+
 ---
 
 # Phase 19 - XSS and Browser Injection
@@ -1226,6 +1399,36 @@ Test harmless payloads such as:
 Where HTML is intentionally supported, sanitise rather than blindly escape.
 
 Review rich-text editors carefully.
+
+## JavaScript library sinks
+
+`{{ }}` escaping does not protect a value handed to a JavaScript library. Libraries such as
+ApexCharts, Chart.js, DataTables, Select2, Tom Select, tippy.js, Flatpickr and Tiptap render labels,
+categories, tooltips, legends, option text and titles through `innerHTML` unless configured not to.
+Escaped-in-Blade, JSON-encoded, then rendered unescaped by the library is still stored XSS.
+
+Find them:
+
+```bash
+rg -n "categories:|labels:|tooltip|formatter|series:|x-data|Js::from|@json|wire:ignore|new (Apex)?Chart|DataTable\(" resources app
+```
+
+For each place a **stored string** feeds a chart, table, tooltip, autocomplete or select:
+
+1. Identify the field and every role that can write it (supplier names, product names, org names,
+   usernames, categories, notes). Include fields the UI shows as disabled but a Livewire action
+   still saves (Phase 14).
+2. Identify who views it: other tenants, admins, and "log in as" / impersonation sessions. Low
+   privilege writing, high privilege reading is the critical shape.
+3. Check the **pinned library version's** own source for the sink, for example
+   `rg "innerHTML" node_modules/<lib>/src` around tooltip and label code. Do not assume a library
+   escapes because its docs say nothing.
+4. Fix by escaping or plain-text-normalising the labels server-side (`e()`, `strip_tags`), and by
+   configuring the library to render text (custom `formatter` using `textContent`, or the option
+   that disables HTML). Update the library where a patched version exists.
+
+Prove it with a harmless payload (`<img src=x onerror=...>`) and a hover or click; tooltips only
+render on interaction, so a static page load will not reveal them.
 
 ---
 
@@ -1278,6 +1481,12 @@ Content-Security-Policy-Report-Only
 ```
 
 first.
+
+Absence of a CSP is a reportable finding (LOW) in its own right, not a footnote. Confirm it from the
+live response (Phase 46) and from code (`rg -i "content-security-policy|csp" app config bootstrap
+public`), including reverse-proxy and host config. A CSP with `unsafe-inline` in `script-src` does
+not stop injected inline scripts. Note that Alpine's default build needs `unsafe-eval`; the
+CSP-compatible Alpine build and nonces are the route to a strict policy.
 
 ---
 
@@ -1351,6 +1560,20 @@ Permissions-Policy
 frame-ancestors
 ```
 
+Report each missing header as its own line item, with the severity below, instead of omitting it for
+being "only hardening":
+
+```text
+Content-Security-Policy missing        LOW
+Permissions-Policy missing             INFORMATIONAL
+Strict-Transport-Security missing      LOW (MEDIUM if cookies also lack Secure)
+X-Content-Type-Options / Referrer-Policy missing   INFORMATIONAL
+```
+
+Suggest a concrete `Permissions-Policy` that disables features the app does not use, for example
+`camera=(), microphone=(), geolocation=(), payment=(), usb=()`, adjusted for what the app needs
+(a payment page needs `payment`).
+
 Do not assign inflated severity to missing defence-in-depth headers.
 
 Assess practical impact.
@@ -1388,6 +1611,31 @@ key derivation
 Strongly prefer established Laravel or reputable cryptography libraries.
 
 Avoid custom encryption schemes.
+
+## Disabled TLS verification
+
+Search config and code for switched-off certificate or hostname checks:
+
+```bash
+rg -n -i "verify_peer|verify_peer_name|allow_self_signed|verify.?=>\s*false|withoutVerifying|CURLOPT_SSL_VERIFY|SSL_VERIFY_SERVER_CERT|'verify'\s*=>|sslmode|ssl_mode|stream_context" config app bootstrap
+```
+
+Typical hits:
+
+```text
+config/database.php   redis 'context' => ['ssl' => ['verify_peer' => false, 'verify_peer_name' => false]]
+config/database.php   MySQL PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT => false, Postgres sslmode=require
+config/mail.php       SMTP stream options with verify_peer false
+Http::withoutVerifying(), Guzzle 'verify' => false
+```
+
+These are often copied from a managed-Redis tutorial to make a self-signed or hostname-mismatched
+endpoint "just work". With verification off, TLS gives no protection against an active
+man-in-the-middle, and for Redis that includes cache and **queue** payloads (PHP-serialised job
+objects), which makes tampering a deserialisation concern. Rate it LOW unless the network path is
+untrusted or the data is sensitive, state what you could not establish (effective URL, whether TLS
+is used at all, network isolation), and recommend enabling verification with the provider's CA
+bundle and the correct hostname. Never leave `Http::withoutVerifying()` in non-test code.
 
 Check:
 
@@ -1813,6 +2061,46 @@ Ask:
 
 Those rules need server-side enforcement.
 
+## Client-chosen selectors for price-affecting options
+
+Find every request or Livewire argument by which the client **selects** something that changes
+money or entitlement: discount, promotion, coupon, concession, plan, tier, shipping method, tax
+status, credit, points, reward.
+
+```bash
+rg -n -i "discount|promo|coupon|voucher|concession|credit|reward|loyalty|tier|plan" app/Livewire app/Http
+```
+
+For each selector:
+
+1. Where is it matched? Matching by id alone (`"type_{$discount->id}" === $request->type`) means the
+   client can name any option that exists, including ones not offered to it.
+2. Does the server **re-derive eligibility when applying it**: targeting, enabled/date window,
+   promotion type, and the stored conditions (minimum quantity, minimum spend, product scope,
+   first-order-only, customer group)? Checking a subset (for example only "targeted at this
+   account") lets a client apply a discount whose conditions it does not meet, or reuse one type's
+   discount through another type's code path.
+3. Is eligibility checked again at checkout and order placement, not only when the cart is built?
+4. Oracle check: if the UI does not offer the option to this account, can the request still apply
+   it? Compare cart and checkout totals with the baseline value versus the substituted value.
+
+Tamper the Livewire `__dispatch` / `callMethod` payload or form value and diff the totals. The
+Livewire snapshot checksum protects state, not the arguments of a call.
+
+## Client-reported outcomes
+
+Any endpoint that accepts `passed`, `score`, `won`, `correct`, `completed`, `paid`, `approved` or
+similar from the client and grants a reward or state change on that basis is broken. The server must
+re-derive the outcome from stored answers or server-held state.
+
+## Validate after the cast
+
+A numeric bound checked while the value is still a string or float, then cast to `int`, can wrap on
+64-bit platforms and pass the check as a negative number. A negative amount inverts the arithmetic
+and credits the account the operation was meant to debit. Cast to the final type first, validate the
+cast value, reject negatives explicitly, bound both sides, and re-assert the invariant inside the
+transaction that applies the change.
+
 ---
 
 # Phase 37 - Race Conditions
@@ -1866,6 +2154,22 @@ Do not blindly upgrade.
 
 Determine whether the vulnerable code path is reachable.
 
+Run the audits fresh against the lockfile, and cover **both ecosystems**. Advisories are published
+daily, so a clean result from an earlier run is not evidence. Also run `composer audit --abandoned`
+and `npm audit --omit=dev` alongside the full `npm audit`.
+
+Report in a form the owner can act on:
+
+- one line per vulnerable package with installed version, advisory id, severity and title
+  (framework packages, `league/commonmark`, `league/flysystem`, `axios`, `moment`, build tooling)
+- direct versus transitive, and runtime versus dev-only
+- counts of outdated direct and transitive packages, plus the notable ones that are majors behind
+- for front-end libraries, whether the vulnerable feature is reachable (a Node-only axios adapter
+  issue is not exploitable in the browser; a markdown renderer bypass on user content is)
+
+Rate by reachability, not by the advisory's headline severity. A dependency finding that is purely
+unpatched-but-unreachable is LOW; a reachable XSS, deserialisation or auth issue is not.
+
 ---
 
 # Phase 39 - Supply Chain Security
@@ -1918,6 +2222,36 @@ Do not rely merely on the minimum version in `composer.json`.
 Confirm what production actually runs where possible.
 
 Flag unsupported runtimes.
+
+Read the **constraints**, not only the installed versions:
+
+```bash
+jq '.require | {php, "laravel/framework", "livewire/livewire"}' composer.json
+php -v; php artisan --version
+```
+
+A floor such as `"php": "^8.2"` or `"laravel/framework": "^12.0"` permits every release down to that
+version, so it is a finding if that floor is out of active support, even when the server happens to
+run something newer. Recommend raising the floor so no environment can run an old version.
+
+Compare against the **current** support tables, fetched at audit time, not recalled:
+
+```text
+https://www.php.net/supported-versions.php
+https://laravel.com/docs/releases#support-policy
+```
+
+Rules of thumb for the date maths: PHP gets about 2 years of active support then 2 years of security
+fixes; Laravel gets about 18 months of bug fixes then security fixes to roughly 24 months after
+release. Use today's date, and state in the report the release date, the date bug fixes ended, the
+date security fixes end, and the current supported version.
+
+```text
+security-only support (no bug fixes)     LOW   - plan the upgrade, give the end date
+end of life (no security fixes)          HIGH  (MEDIUM if internet-facing exposure is limited)
+```
+
+Do the same for Livewire, the major front-end framework, and Node in CI/build.
 
 ---
 
@@ -2037,7 +2371,12 @@ Check:
 
 For public/high-risk systems, consider exposing an appropriate security contact using RFC 9116.
 
-Treat absence as informational, not an exploitable vulnerability.
+Treat absence as informational, not an exploitable vulnerability. Still report it, with the exact
+URLs checked (`/.well-known/security.txt` and `/security.txt`) and on every app domain, not only the
+marketing site.
+
+A usable file needs `Contact:` and `Expires:` (RFC 9116 requires both). Serve it from
+`public/.well-known/security.txt` and confirm the web server does not block dotfile paths.
 
 ---
 
@@ -2056,6 +2395,21 @@ TLS configuration scanners
 Do not rely on scanner results alone.
 
 Investigate every finding manually.
+
+Whenever a staging or production hostname is known (config, CI, README, `APP_URL`), run these
+read-only checks and record the raw output as evidence. They are what an external tester reports
+first, and none can be settled from the repo:
+
+```bash
+curl -sI https://<host>/                         # security headers
+curl -sI https://<host>/login | grep -i '^set-cookie'   # every cookie and its flags
+curl -s -o /dev/null -w '%{http_code}\n' https://<host>/.well-known/security.txt
+curl -sI http://<host>/                          # HTTP redirects to HTTPS, HSTS present
+```
+
+Tabulate: each header present or missing, each cookie with Secure/HttpOnly/SameSite, security.txt
+status. If no URL is known, say so in the report and mark these as unverified rather than passing
+them.
 
 The previous Canary assessment combined source review, passive production checks, automated Burp scanning and manual staging exploitation.
 
@@ -2269,6 +2623,43 @@ Do production deployment credentials have excessive Git access?
 Can important business operations be replayed?
 
 Can race conditions create duplicate sensitive actions?
+
+Does every public Livewire method authorise inside itself, including methods
+the UI never calls and fields it renders disabled?
+
+Does custom middleware actually run on Livewire update requests, and does any
+of it skip checks for Livewire or Accept: application/json requests?
+
+Can a signed URL parameter be overridden with a request body or JSON on a GET?
+
+Can the application be made to sign a URL for a file I should not see?
+
+Can a path guard be bypassed with backslashes, dot segments or encoding?
+
+Can a stored name or label reach a chart, tooltip, select or table library
+that renders it as HTML, and who views it?
+
+Can I choose a discount, promotion or other price-affecting option the server
+did not offer me, or whose conditions I do not meet?
+
+Does any endpoint trust a client-reported result, or validate a number before
+casting it?
+
+Do sign-in code attempts reach a cumulative, account-level lockout across
+code replacements, and does passwordless onboarding expire?
+
+Does every email, password, MFA and API-token change require the current
+password, on every role's screen, and notify the old address?
+
+Does every live Set-Cookie carry Secure (and HttpOnly where applicable)?
+
+Are CSP, Permissions-Policy and security.txt present on the live app domain?
+
+Is TLS certificate or hostname verification disabled for Redis, database,
+mail or HTTP clients?
+
+Do the composer.json PHP and Laravel constraints permit versions that are
+security-only or end-of-life?
 ```
 
 No item should be marked verified without evidence.
@@ -2299,8 +2690,9 @@ Examples:
 ```text
 significant IDOR
 privilege escalation
-stored XSS reaching administrators
-private file disclosure
+stored XSS reaching administrators (CRITICAL when it executes in an admin or impersonated session)
+private file disclosure, including signed-URL bypass or signing oracles
+client-chosen discount or price option applied without eligibility checks
 missing authorisation on critical actions
 serious password reset weakness
 SSRF with meaningful internal access
@@ -2316,7 +2708,8 @@ Examples:
 meaningful account enumeration
 missing throttling
 limited reflected XSS
-session configuration weakness
+session configuration weakness (session cookie missing Secure)
+Livewire actions missing server-side authorisation (HIGH where they reach money, admin data or other tenants)
 open redirect
 limited information disclosure
 security-sensitive dependency vulnerability
@@ -2329,7 +2722,12 @@ Examples:
 ```text
 minor information disclosure
 limited hardening gaps
-lower-impact headers
+missing Content-Security-Policy
+sensitive email/password change without re-authentication
+code-guessing limits that reset on replacement
+disabled TLS verification (Redis, database, mail)
+PHP or Laravel constraint permitting security-only versions
+vulnerable Composer or npm packages (rated by reachability)
 ```
 
 ## INFORMATIONAL
@@ -2338,6 +2736,7 @@ Examples:
 
 ```text
 security.txt
+missing Permissions-Policy
 defence-in-depth improvements
 operational recommendations
 ```
