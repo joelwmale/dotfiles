@@ -20,6 +20,8 @@ Always follow the rules in:
 - `~/.claude/rules/agent_recovery.md`
 - `~/.claude/rules/testing_policy.md`
 - `~/.claude/rules/code_comments.md`
+- `~/.claude/rules/reply_style.md`
+- `~/.claude/rules/generated_copy.md`
 
 If there is any conflict:
 1. Project requirements in the prompt win
