@@ -34,13 +34,22 @@ for example a block demanding a test for every change loses to `testing_policy.m
 Skills in `~/.claude/skills/` are auto-discovered by name and description -
 they do not need listing here. The house conventions are:
 
-- `laravel-conventions` (Laravel/PHP naming, structure, Eloquent, testing)
+- `laravel-conventions` (Laravel/PHP naming, structure, Eloquent, queues, HTTP, caching, security)
 - `livewire-conventions` (Livewire components; v4, with v3 differences flagged)
-- `inertia-react-conventions` (React as the Laravel view layer, via Inertia)
-- `react-native-conventions` (mobile)
+- `inertia-react-conventions` and `vue-inertia-conventions` (React or Vue as the Laravel view layer, via Inertia)
+- `react-native-conventions`, `animate-expo`, `expo-design-system` (mobile)
 - `tailwind-conventions` (Tailwind v4)
+- `writing-tests` (how to write a test; whether to is `testing_policy.md`)
 - `web-design-guidelines` (UI review against Web Interface Guidelines)
 - `seo-audit` (SEO reviews and audits)
+
+Review and diagnosis, used on request or at the end of a piece of work:
+
+- `review-branch` (standards and spec, two axes), `differential-review` (security review of a
+  diff or release), `laravel-pen-test-audit` (whole-app audit), `sharp-edges` (footgun review
+  of a config or interface), `comment-analyzer` (stale or noisy comments)
+- `diagnosing-bugs` (build a feedback loop first), `improve-codebase-architecture` with
+  `codebase-design` (deep-module vocabulary), `retro`
 
 Apply the conventions skill for whatever stack the work touches, in addition to
 the strict rules above. Rules win on any conflict.
@@ -63,8 +72,8 @@ webhooks, external HTTP calls, or sensitive data, run the `security-reviewer` ag
 afterwards. It checks `composer audit` and OWASP-style risks; include its short report and
 remediation notes in your response.
 
-The `docs`, `livewire`, `alpine` and `pest` agents are available for documentation
-lookups and framework-specific work.
+The `docs` agent looks up version-specific documentation; it prefers a connected Context7 or
+Laravel Boost docs tool and falls back to the official docs.
 
 ## Shell
 
