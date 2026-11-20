@@ -193,7 +193,6 @@ brew_install composer
 brew_install jordanbaird-ice
 brew_install go
 brew_install git-filter-repo
-brew_install tesseract
 
 # Productivity tools
 brew_install fzf
@@ -214,11 +213,11 @@ brew_install python@3.14
 brew_install betterdisplaycli
 brew_install clickhouse
 
-brew_install mysql@8.0
-service_start mysql@8.0
+brew_install mysql@8.4
+service_start mysql@8.4
 
 # configure mysql
-mysql -e "ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'root';"
+"$(brew --prefix mysql@8.4)/bin/mysql" -u root -e "ALTER USER 'root'@'localhost' IDENTIFIED WITH caching_sha2_password BY 'root';"
 
 brew_install redis
 service_start redis

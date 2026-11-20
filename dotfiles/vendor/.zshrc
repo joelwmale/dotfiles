@@ -85,7 +85,7 @@ export HERD_PHP_83_INI_SCAN_DIR="/Users/joel/Library/Application Support/Herd/co
 # Herd injected PHP 8.4 configuration.
 export HERD_PHP_84_INI_SCAN_DIR="/Users/joel/Library/Application Support/Herd/config/php/84/"
 
-export PATH="/opt/homebrew/opt/mysql@8.0/bin:$PATH"
+export PATH="/opt/homebrew/opt/mysql@8.4/bin:$PATH"
 export PATH="$HOME/bin:$PATH"
 
 # Herd injected PHP 8.5 configuration.
