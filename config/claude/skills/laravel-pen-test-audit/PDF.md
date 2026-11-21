@@ -80,7 +80,7 @@ Where available also include:
 
 ```text
 Prepared For: <client/project>
-Prepared By: Pixel
+Prepared By: <your company>
 ```
 
 Do not fabricate client names or company details.

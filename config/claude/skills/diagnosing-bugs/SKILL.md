@@ -30,7 +30,7 @@ Ways to build one, roughly in this order:
 
 1. **A failing Pest test** at whatever seam reaches the bug: `bin/test --filter=...`. A
    Livewire test with `->set()` and `->call()`, or a feature test through the route.
-2. **`curl` against the running app** - `https://rethread.test` under Herd, or the dev
+2. **`curl` against the running app** - `https://app.test` under Herd, or the dev
    server - with a real session cookie or token read from the environment.
 3. **`php artisan tinker --execute='...'`** calling the action, query or job directly
    against the local database. Never `migrate:fresh` it.

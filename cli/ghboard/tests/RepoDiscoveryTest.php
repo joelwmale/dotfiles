@@ -23,7 +23,7 @@ function removeFakeRepo(string $baseDir, string $name): void
 it('detects single-repo mode when cwd contains a .git directory', function (): void {
     $dir = sys_get_temp_dir() . '/ghboard-' . uniqid();
     mkdir($dir . '/.git', recursive: true);
-    file_put_contents("$dir/.git/config", "[remote \"origin\"]\n\turl = git@github.com:joelwmale/test-repo.git\n");
+    file_put_contents("$dir/.git/config", "[remote \"origin\"]\n\turl = git@github.com:owner/test-repo.git\n");
 
     $discovery = new RepoDiscovery(cwd: $dir, baseDir: $dir);
     expect($discovery->isSingleRepoMode())->toBeTrue();
@@ -31,7 +31,7 @@ it('detects single-repo mode when cwd contains a .git directory', function (): v
     $repos = $discovery->discover(ignored: []);
     expect($repos)->toHaveCount(1)
         ->and($repos[0]->name)->toBe('test-repo')
-        ->and($repos[0]->owner)->toBe('joelwmale');
+        ->and($repos[0]->owner)->toBe('owner');
 
     unlink("$dir/.git/config");
     rmdir("$dir/.git");

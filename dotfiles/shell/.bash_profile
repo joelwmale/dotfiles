@@ -99,18 +99,11 @@ alias desktop='clear && cd ~/Desktop && ls'
 # composer fix
 export COMPOSER_MEMORY_LIMIT=-1
 
-export LDFLAGS="-L/usr/local/opt/libffi/lib"
-export CPPFLAGS="-I/usr/local/opt/libffi/include"
 
 export PATH="./vendor/bin:$PATH"
-export PATH="/.npm-packages/bin:$PATH"
 export PATH="/usr/local/bin:$PATH"
-export PATH="/usr/local/opt/mysql@5.7/bin:$PATH"
-export PATH="/Users/joel/.gem/ruby/2.6.0/bin:$PATH"
-export PATH="/Users/joel/Code/cli:$PATH"
+export PATH="$HOME/Code/cli:$PATH"
 
-# export GEM_HOME="$HOME/.gem"
-# export PATH="$GEM_HOME/bin:$PATH"
 
 eval $(/opt/homebrew/bin/brew shellenv)
 
@@ -119,6 +112,6 @@ ssh-add --apple-load-keychain >> /dev/null 2>&1
 
 export SPACESHIP_CONFIG="$HOME/.config/spaceship.zsh"
 
-export PATH="$PATH:/Users/joel/.dotnet/tools"
+export PATH="$PATH:$HOME/.dotnet/tools"
 export PATH="$HOME/.local/bin:$PATH"
-. "$HOME/.cargo/env"
+[ -f "$HOME/.cargo/env" ] && . "$HOME/.cargo/env"

@@ -14,3 +14,11 @@ config/claude/skills/deploying-laravel-cloud/*
 
 # macOS
 .DS_Store
+
+# claude.ai-synced skills and trash regenerate on their own
+config/claude/skills/synced/
+config/claude/skills/.trash/
+
+# machine-specific files never belong in the repo
+*.local
+.dotfiles-backup/

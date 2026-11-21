@@ -17,9 +17,6 @@ plugins=(
 # disable git stash symbol
 SPACESHIP_GIT_STATUS_SHOW_STASH=false
 
-# Alias hub to git
-eval "$(hub alias -s)"
-
 ZSH_DISABLE_COMPFIX="true"
 source $ZSH/oh-my-zsh.sh
 source ~/.bash_profile
@@ -37,7 +34,7 @@ else
   compinit -C
 fi
 
-source ~/.zsh/zsh-autosuggestions/zsh-autosuggestions.zsh 2> /dev/null
+source "$(brew --prefix)/share/zsh-autosuggestions/zsh-autosuggestions.zsh" 2> /dev/null
 
 # randomize suggest color
 randomSuggestColor=$(( $RANDOM % 2 + 1 ));
@@ -47,9 +44,7 @@ else
   export ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE="fg=#BB766C,bold"
 fi
 
-# fpath=($fpath "/Users/joelmale/.zfunctions")
 eval "$(/opt/homebrew/bin/brew shellenv)"
-export PATH="${HOME}/.pyenv/shims:${PATH}"
 
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
@@ -77,19 +72,19 @@ add-zsh-hook chpwd nvm_auto_use
 nvm_auto_use
 
 # Herd injected PHP binary.
-export PATH="/Users/joel/Library/Application Support/Herd/bin/":$PATH
+export PATH="$HOME/Library/Application Support/Herd/bin/:$PATH"
 
 # Herd injected PHP 8.3 configuration.
-export HERD_PHP_83_INI_SCAN_DIR="/Users/joel/Library/Application Support/Herd/config/php/83/"
+export HERD_PHP_83_INI_SCAN_DIR="$HOME/Library/Application Support/Herd/config/php/83/"
 
 # Herd injected PHP 8.4 configuration.
-export HERD_PHP_84_INI_SCAN_DIR="/Users/joel/Library/Application Support/Herd/config/php/84/"
+export HERD_PHP_84_INI_SCAN_DIR="$HOME/Library/Application Support/Herd/config/php/84/"
 
-export PATH="/opt/homebrew/opt/mysql@8.0/bin:$PATH"
+export PATH="/opt/homebrew/opt/mysql@8.4/bin:$PATH"
 export PATH="$HOME/bin:$PATH"
 
 # Herd injected PHP 8.5 configuration.
-export HERD_PHP_85_INI_SCAN_DIR="/Users/joel/Library/Application Support/Herd/config/php/85/"
+export HERD_PHP_85_INI_SCAN_DIR="$HOME/Library/Application Support/Herd/config/php/85/"
 
 # fzf - Fuzzy finder
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
@@ -111,11 +106,14 @@ bindkey '^G' fzf-cd-widget    # Ctrl+G for directories
 eval "$(zoxide init zsh)"
 
 # Trust Herd/Valet CA for Node.js (required for local HTTPS MCP servers)
-export NODE_EXTRA_CA_CERTS="/Users/joel/Library/Application Support/Herd/config/valet/CA/LaravelValetCASelfSigned.pem"
+export NODE_EXTRA_CA_CERTS="$HOME/Library/Application Support/Herd/config/valet/CA/LaravelValetCASelfSigned.pem"
 
 # bun completions
-[ -s "/Users/joel/.bun/_bun" ] && source "/Users/joel/.bun/_bun"
+[ -s "$HOME/.bun/_bun" ] && source "$HOME/.bun/_bun"
 
 # bun
 export BUN_INSTALL="$HOME/.bun"
 export PATH="$BUN_INSTALL/bin:$PATH"
+
+# Machine-specific config (gcloud, work paths) lives outside the repo.
+[ -f ~/.zshrc.local ] && source ~/.zshrc.local

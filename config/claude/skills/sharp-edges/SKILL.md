@@ -30,7 +30,7 @@ The most productive probe. For every number, string and list an interface accept
 `0`, `-1`, `""`, `null` and `[]` mean.
 
 - `consignor_hold_days = 0`: does "no hold" mean never release, or release everything now?
-  (Rethread's expiry command refuses anything under 1 for exactly this reason.)
+  (An expiry command that refuses anything under 1 does so for exactly this reason.)
 - `max_attempts = 0` or `timeout = 0`: unlimited, or disabled?
 - `rate_limit = 0`: blocks everyone, or switches the limiter off?
 - A commission or cut percent that is negative, over 100, or `null`: free, or a credit?

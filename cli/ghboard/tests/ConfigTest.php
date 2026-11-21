@@ -28,14 +28,14 @@ it('loads values from existing config file', function (): void {
     file_put_contents($this->tmpPath, json_encode([
         'ignored' => ['noise-repo'],
         'refresh_interval' => 120,
-        'base_dir' => '/Users/joel/Projects',
+        'base_dir' => '/home/user/Projects',
     ]));
 
     $config = Config::load($this->tmpPath);
 
     expect($config->ignored)->toBe(['noise-repo'])
         ->and($config->refreshInterval)->toBe(120)
-        ->and($config->baseDir)->toBe('/Users/joel/Projects');
+        ->and($config->baseDir)->toBe('/home/user/Projects');
 });
 
 it('adds a repo to ignored and persists to disk', function (): void {

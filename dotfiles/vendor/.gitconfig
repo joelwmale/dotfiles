@@ -23,23 +23,13 @@
 	colorMoved = default
 [alias]
 	permission-reset = !git diff -p -R --no-color | grep -E \"^(diff|(old|new) mode)\" --color=never | git apply
-[hub]
-	protocol = ssh
-[user]
-	email = joel@joelmale.com
-	name = Joel Male
-	signingkey = 8C43FD2C9426C3AC
 [pull]
 	rebase = false
 [init]
 	defaultBranch = master
-[hub]
-	protocol = ssh
 [push]
 	autoSetupRemote = true
-[commit]
-	gpgsign = true
-[tag]
-	gpgsign = true
-[gpg]
-	format = openpgp
+
+# Identity and signing live outside the repo; scripts/git.sh writes this file.
+[include]
+	path = ~/.gitconfig.local
