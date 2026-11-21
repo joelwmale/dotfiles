@@ -17,6 +17,9 @@ interface cannot say on its own.
 - badges ("New", "AI", "Beta") and pulsing status dots not bound to real state
 - decorative emoji or icons in headings, buttons and feature lists
 - a chart title that names the chart, or a caption that explains how to read it
+- status strings chained with a dot ("12 items · Updated 2m ago · Synced") - keep the one fact the user acts on
+- staccato slogans ("Ship faster. Think less.")
+- chart clutter: a legend where each line could carry its name, a value on every point plus axis plus gridlines, frame boxes, 3D
 - helper text that repeats the label or placeholder
 - placeholders that repeat the label
 - app-UI marketing filler: "Welcome to your dashboard", "Everything in one place"
@@ -25,6 +28,9 @@ interface cannot say on its own.
 - success prose: "Your changes have been saved successfully!" becomes "Saved"
 - HTML or Blade comments that name a section: `<!-- Header -->`
 - descriptive filler in seed, sample or demo data
+
+Delete before rewriting. Never invent a number, speed, integration or benefit the
+code does not show. In an app screen a heading or card title stays at 5 words or fewer.
 
 ## Do write copy for
 

@@ -3,6 +3,8 @@
 git|core|1|Version control
 gh|core|1|GitHub CLI
 jq|core|1|JSON processor
+hub|core|1|Wraps git with GitHub commands (git alias in .zshrc)
+httpie|core|1|HTTP client
 fzf|shell|1|Fuzzy finder (Ctrl+R, Ctrl+P, Ctrl+G)
 zoxide|shell|1|Smarter cd (z)
 eza|shell|1|ls replacement (ls, ll, lt aliases)

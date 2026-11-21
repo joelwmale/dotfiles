@@ -1,5 +1,4 @@
 # name|group|default (1 on, 0 off)|description
-# Groups with default 0 are suggestions: in daily use on the author's machine, not required.
 1password|core|1|Password manager
 alfred|core|1|Launcher
 brave-browser|core|1|Browser
@@ -9,20 +8,16 @@ setapp|core|1|App subscription (CleanShot X, ForkLift, TablePlus, Paste)
 ghostty|dev|1|Terminal
 visual-studio-code|dev|1|Editor
 fork|dev|1|Git GUI
+transmit|dev|1|SFTP client
+httpie|dev|1|HTTP client app
 herd|dev|1|PHP, Nginx and Composer for Laravel
 font-jetbrains-mono-nerd-font|dev|1|Terminal font
+docker-desktop|dev|1|Containers
+android-studio|dev|1|Android SDK and emulator
 slack|comms|1|Slack
 discord|comms|1|Discord
 betterdisplay|system|1|Display manager (includes betterdisplaycli)
 rectangle-pro|system|1|Window manager (paid)
 claude|ai|1|Claude desktop app
-figma|suggested|0|Design
-docker-desktop|suggested|0|Containers
-android-studio|suggested|0|Android SDK and emulator
-google-chrome|suggested|0|Browser for testing
-obsidian|suggested|0|Notes
-linear-linear|suggested|0|Issue tracker
-wispr-flow|suggested|0|Voice dictation
-chatgpt|suggested|0|ChatGPT desktop app
-zoom|suggested|0|Video calls
-expo-orbit|suggested|0|Install Expo builds on simulators
+chatgpt|ai|1|ChatGPT desktop app
+figma|design|1|Design

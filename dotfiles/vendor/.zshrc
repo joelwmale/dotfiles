@@ -17,6 +17,9 @@ plugins=(
 # disable git stash symbol
 SPACESHIP_GIT_STATUS_SHOW_STASH=false
 
+# Alias hub to git
+command -v hub >/dev/null 2>&1 && eval "$(hub alias -s)"
+
 ZSH_DISABLE_COMPFIX="true"
 source $ZSH/oh-my-zsh.sh
 source ~/.bash_profile
