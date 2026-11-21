@@ -13,6 +13,10 @@ interface cannot say on its own.
   "Click the button to save", "Enter your email to continue"
 - an intro that restates the title: heading "Users" over "Manage your users here"
 - a subtitle under every heading; one heading is the default
+- eyebrow labels (small uppercase text above a heading) and `01 //` numbering with no real order
+- badges ("New", "AI", "Beta") and pulsing status dots not bound to real state
+- decorative emoji or icons in headings, buttons and feature lists
+- a chart title that names the chart, or a caption that explains how to read it
 - helper text that repeats the label or placeholder
 - placeholders that repeat the label
 - app-UI marketing filler: "Welcome to your dashboard", "Everything in one place"
@@ -31,6 +35,11 @@ interface cannot say on its own.
 - copy the user supplied
 
 Icon-only controls still get an accessible name. That is a label, not fluff.
+
+## Cleanup
+
+For a screen that already exists, run `/unslop-ui <path>`. This file prevents the
+tells at write time; that skill removes them and reports what it cut.
 
 ## Density
 
