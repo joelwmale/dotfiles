@@ -1,30 +1,95 @@
-#!/bin/bash
+#!/usr/bin/env bash
+#
+# Sets up a Mac. Pick the steps you want, then each step asks about its own choices.
+#
+#   ./bootstrap                 interactive
+#   ./bootstrap --yes           accept every default without asking
+#   ./bootstrap --dry-run       print what would run, change nothing
+#   ./bootstrap --only packages,dock
+#   ./bootstrap --list          show the steps
 
-# load helpers
-source ./helpers.sh
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+export ROOT
+source "$ROOT/helpers.sh"
 
-# bootstrap installs things.
-bot 'joelwmale/dotfiles'
+STEPS=(
+    "system|System: Xcode tools, Rosetta, computer name, hosts file|1"
+    "defaults|macOS preferences|1"
+    "shell|Shell: oh-my-zsh, prompt, symlinked dotfiles|1"
+    "git|Git identity and SSH key|1"
+    "packages|Homebrew tools, apps and Mac App Store|1"
+    "dev|Node (nvm), Composer tools, ghboard, CLI scripts|1"
+    "claude|Claude Code and its config|1"
+    "repos|Clone your repositories|0"
+    "dock|Rebuild the Dock|1"
+)
 
-if ask 'This will reset configure defaults and install some useful applications. Are you sure you want to continue?' Y; then
-    source ./scripts/defaults.sh
-    source ./scripts/install.sh
-    source ./scripts/clone.sh
-    source ./scripts/dock.sh
-else
-    error 'Cancelled...'
+ONLY=""
+while [ $# -gt 0 ]; do
+    case "$1" in
+        --yes|-y)   ASSUME_YES=1 ;;
+        --dry-run)  DRY_RUN=1 ;;
+        --only)     shift; ONLY="${1:?--only needs a step list}" ;;
+        --list)
+            for s in "${STEPS[@]}"; do rest="${s#*|}"; echo "${s%%|*}  ${rest%|*}"; done
+            exit 0
+            ;;
+        -h|--help)
+            sed -n '2,10p' "$0" | sed 's/^# \{0,1\}//'
+            exit 0
+            ;;
+        *) error "unknown option: $1"; exit 1 ;;
+    esac
+    shift
+done
+export ASSUME_YES DRY_RUN
+
+if [ "$ASSUME_YES" != 1 ] && [ ! -t 0 ]; then
+    error 'no terminal to ask questions on; run in a terminal or pass --yes'
+    exit 1
 fi
 
-bot 'Finished configuring details and installing applications!'
+bot 'joelwmale/dotfiles'
+[ "$DRY_RUN" = 1 ] && warn 'dry run: nothing will be changed'
 
-if ask 'You should restart your computer to apply all of the changes. Restart now?' Y; then
-    sudo -s shutdown -r now
+if [ -n "$ONLY" ]; then
+    CHOSEN="${ONLY//,/ }"
 else
-    action 'restarting affected applications'
-    for app in "Activity Monitor" "Address Book" "Calendar" "Contacts" "cfprefsd" \
-        "Dock" "Finder" "Mail" "Messages" "Safari" "SizeUp" "SystemUIServer" \
-        "Terminal"; do
-        killall "${app}" > /dev/null 2>&1
-    done
-    ok
+    menu 'What do you want to set up?' "${STEPS[@]}"
+    CHOSEN="$MENU_RESULT"
+fi
+
+[ -n "$CHOSEN" ] || { say 'Nothing selected.'; exit 0; }
+
+if [ "$DRY_RUN" != 1 ]; then
+    sudo -v
+    while true; do sudo -n true; sleep 60; kill -0 "$$" || exit; done 2>/dev/null &
+fi
+
+for step in $CHOSEN; do
+    case "$step" in
+        claude) script="$ROOT/scripts/install-claude-code.sh" ;;
+        *)      script="$ROOT/scripts/$step.sh" ;;
+    esac
+    if [ ! -f "$script" ]; then
+        error "no such step: $step"
+        continue
+    fi
+    if [ "$step" = claude ] && [ "$DRY_RUN" = 1 ]; then
+        echo "  [dry-run] $script"
+        continue
+    fi
+    bash "$script"
+    rc=$?
+    if [ "$rc" = 2 ]; then
+        warn "$step needs you to finish something first; stopping"
+        exit 2
+    fi
+    [ "$rc" = 0 ] || warn "$step finished with errors"
+done
+
+bot 'Done.'
+
+if [ "$DRY_RUN" != 1 ] && ask 'Restart now to apply everything?' N; then
+    sudo shutdown -r now
 fi

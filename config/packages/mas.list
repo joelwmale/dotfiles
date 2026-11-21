@@ -1,0 +1,5 @@
+# id|group|default (1 on, 0 off)|description
+937984704|core|1|Amphetamine (keep Mac awake)
+1091189122|core|1|Bear (notes)
+1475387142|core|1|Tailscale
+497799835|dev|0|Xcode (large download)

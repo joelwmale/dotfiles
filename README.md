@@ -1,10 +1,8 @@
-# 🚀 Dotfiles
+# Dotfiles
 
-Personal dotfiles and scripts to configure a fresh Mac for Laravel/PHP development.
+Scripts and config to set up a Mac for Laravel and PHP development. Review before running: it changes system settings and installs software.
 
-**Warning**: This will modify system settings and install applications. Review before running.
-
-## ✨ Quick Start
+## Quick start
 
 ```bash
 git clone git@github.com:joelwmale/dotfiles.git ~/Code/dotfiles
@@ -12,117 +10,48 @@ cd ~/Code/dotfiles
 ./bootstrap
 ```
 
-The bootstrap script runs three main components:
-- `scripts/install.sh` - Installs applications and tools
-- `scripts/defaults.sh` - Configures macOS system preferences
-- `scripts/dock.sh` - Sets up your Dock
+`bootstrap` shows a checklist of steps. Each step then asks about its own choices, so nothing is installed or changed without a yes.
 
-## 📦 What's Installed
+| Flag | Effect |
+|---|---|
+| `--dry-run` | Print every command, change nothing |
+| `--yes` | Accept every default without asking |
+| `--only packages,dock` | Run just these steps |
+| `--list` | List the steps |
 
-### Development Tools
-- **Languages**: PHP (Herd), Node.js (NVM), Go, Python
-- **Databases**: MySQL 8.0, Redis
-- **Version Control**: Git, GitHub CLI, Fork (GUI), Lazygit (TUI)
-- **Laravel**: Composer, Laravel Installer
+Steps: `system`, `defaults`, `shell`, `git`, `packages`, `dev`, `claude`, `repos`, `dock`. Each is also a script in `scripts/` you can run on its own.
 
-### Terminal Setup
-- **Ghostty** - Fast, GPU-accelerated terminal with split panes
-- **Oh My Zsh** - Zsh framework with Spaceship theme
-- **Productivity Tools**: fzf, zoxide, eza, fd, ripgrep, bat, yazi, tmux
-- **Font**: JetBrains Mono Nerd Font
+## Packages
 
-### Applications
-- **Browsers**: Brave
-- **Development**: Cursor (VS Code fork), Hyper, Warp
-- **Productivity**: Alfred, Rectangle, Things, Fantastical, 1Password
-- **Communication**: Slack, Discord, Telegram
-- **Media**: Spotify
-- **Utilities**: Setapp, BetterTouchTool, DaisyDisk, Google Drive, Dropbox
+Homebrew tools, casks and Mac App Store apps are listed in `config/packages/*.list`, one per line as `name|group|default|description`. The installer shows the groups, lets you toggle them, and can review item by item. Groups with default `0` are suggestions and stay off until you pick them.
 
-### CLI Utilities
-- **File Operations**: eza (modern ls), fd (fast find), ripgrep (fast grep), bat (better cat)
-- **Navigation**: zoxide (smart cd), fzf (fuzzy finder)
-- **Git**: git-delta (beautiful diffs), lazygit (TUI), diff-so-fancy
-- **Development**: jq, httpie, wget, tree, ncdu, htop
-- **Cloud**: AWS CLI, DigitalOcean CLI
+To add or remove a package, edit the list.
 
-## 🎯 Key Features
+## Local files
 
-### Terminal Shortcuts (fzf)
-- `Ctrl+R` - Search command history
-- `Ctrl+P` - Search files (like VS Code)
-- `Ctrl+G` - Jump to directory
+Personal details are never committed. These files live on the machine and are gitignored or outside the repo:
 
-### Custom Shell Functions
-- `p` - Run Pest/PHPUnit tests
-- `gss` - Switch between projects
-- `gho` - Open current repo in browser
-- `commit [message]` - Smart git commit (generates message if empty)
-- `release` - Create GitHub release with auto-generated notes
-- `db` - Open Laravel .env database in GUI
-- `tc` - Create/run test command
+| File | Holds | Written by |
+|---|---|---|
+| `~/.gitconfig.local` | Git name, email, signing key | `scripts/git.sh` |
+| `~/.zshrc.local` | Machine-specific shell config | you |
+| `~/.config/dotfiles/repos` | Repositories to clone, one `owner/repo` per line | `scripts/clone.sh` |
 
-### Ghostty Terminal
-- `Cmd+D` - Split pane right
-- `Cmd+Shift+D` - Split pane down
-- `Cmd+T` - New tab
-- `Cmd+1-9` - Jump to tab
-- `Cmd+K` - Clear screen
-- `Cmd+F` - Search scrollback
+## What is configured
 
-### Navigation Tools
-- `z [partial]` - Jump to directory (zoxide)
-- `ll` - Beautiful ls with git status (eza)
-- `lg` - Launch lazygit
+- **Shell**: zsh, oh-my-zsh, Spaceship prompt, fzf, zoxide, eza, bat. Config is symlinked from `dotfiles/`; anything already there is moved to `~/.dotfiles-backup/`.
+- **Terminal**: Ghostty, config in `config/ghostty/`.
+- **Languages**: PHP, Composer and Node via Herd and nvm.
+- **macOS**: keyboard, Finder, Dock, screenshots and privacy defaults in `scripts/defaults.sh`, grouped so you can skip any.
+- **Claude Code**: rules, skills and settings in `config/claude/`, symlinked into `~/.claude`.
+- **CLI**: `cli/displays` (BetterDisplay layouts) and `cli/ghboard` (GitHub status dashboard).
 
-## 🔧 Manual Installs Required
+## Updating
 
-After bootstrap completes, manually install:
-
-### Setapp Applications
-Sign into Setapp, then install:
-- CleanShot X, ForkLift, iStat Menus, Paste, PixelSnap, Session, TablePlus
-
-### Purchased Software
-- Affinity Designer/Photo/Publisher 2
-- DaVinci Resolve
-- Aseprite
-
-## ⚙️ macOS Defaults Applied
-
-The `defaults.sh` script configures:
-- **Finder**: Show hidden files, extensions, path bar, disable warnings
-- **Dock**: Auto-hide, no bouncing, hide recents, faster animations
-- **Keyboard**: Fast key repeat, disable auto-correct/smart quotes
-- **Screenshots**: Save to ~/Screenshots as PNG without shadow
-- **Trackpad**: Disable natural scrolling, enable right-click
-- **Performance**: Disable animations, faster window resize
-- **Developer**: Show full paths, disable .DS_Store on network drives
-- **Privacy**: Disable Siri, Handoff, Spotlight web search
-
-## 📁 Directory Structure
-
-```
-~/Code/              # All projects
-~/Code/cli/          # Custom CLI scripts
-~/Screenshots/       # Screenshot location
-~/.config/ghostty/   # Ghostty config
-~/.config/claude/    # Claude Code config
-```
-
-## 🔄 Updates
-
-To update installed tools:
 ```bash
 brew update && brew upgrade
-composer global update
-npm update -g
 ```
 
-## 📝 Customization
+## Third-party
 
-Key files to customize:
-- `dotfiles/shell/.functions` - Shell functions
-- `dotfiles/vendor/.zshrc` - Zsh configuration
-- `config/ghostty/config` - Terminal settings
-- `scripts/dock.sh` - Dock applications
+Some Claude skills are copied from MIT-licensed repositories. Notices are in `config/claude/skills/THIRD_PARTY_LICENSES.md`.

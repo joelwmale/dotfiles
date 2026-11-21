@@ -1,39 +1,52 @@
-#!/bin/sh
+#!/usr/bin/env bash
+# Clones the repositories listed in ~/.config/dotfiles/repos (one owner/repo per line).
+# The list stays on the machine so private project names never reach this repo.
 
-bot 'cloning repositories'
+ROOT="${ROOT:-$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)}"
+source "$ROOT/helpers.sh"
 
-CODE=$HOME/Code
+bot 'Cloning repositories'
 
-# create an list of repositories to clone
-personalSites=(
-    "joelmale.com"
-    "pingwire" 
-)
+LIST="$HOME/.config/dotfiles/repos"
+CODE="$HOME/Code"
+export GIT_SSH_COMMAND="ssh -o StrictHostKeyChecking=accept-new"
+warn "private repos need your SSH key added to GitHub first (gh auth login)"
 
-pixelSites=(
-    "careerlane"
-    "wearepixel.com.au"
-)
+if [ ! -f "$LIST" ]; then
+    prompt 'Repositories to clone (owner/repo, space separated, blank to skip)' ''
+    [ -z "$ANSWER" ] && { ok 'nothing to clone'; exit 0; }
+    run mkdir -p "$(dirname "$LIST")"
+    if [ "$DRY_RUN" != 1 ]; then
+        for repo in $ANSWER; do echo "$repo"; done > "$LIST"
+    fi
+fi
 
-# loop through the list and clone each repository
-for site in "${personalSites[@]}"
-do
-    action "cloning $site"
-    git clone git@github.com:joelwmale/$site.git $CODE/$site > /dev/null 2>&1;ok
+[ -f "$LIST" ] || exit 0
 
-    action "configuring $site"
-    cd $CODE/$site
-    composer install > /dev/null 2>&1
-    npm install > /dev/null 2>&1;ok
-done
+ENTRIES=()
+while read -r repo; do
+    case "$repo" in ''|\#*) continue ;; esac
+    ENTRIES+=("$repo|$repo|1")
+done < "$LIST"
 
-for site in "${pixelSites[@]}"
-do
-    action "cloning $site"
-    git clone git@github.com:wearepixel/$site.git $CODE/$site > /dev/null 2>&1;ok
+[ ${#ENTRIES[@]} -gt 0 ] || { ok 'list is empty'; exit 0; }
 
-    action "configuring $site"
-    cd $CODE/$site
-    composer install > /dev/null 2>&1
-    npm install > /dev/null 2>&1;ok
+menu 'Repositories' "${ENTRIES[@]}"
+
+INSTALL_DEPS=0
+ask 'Install composer and npm dependencies after cloning?' Y && INSTALL_DEPS=1
+
+for repo in $MENU_RESULT; do
+    dest="$CODE/${repo##*/}"
+    action "cloning $repo"
+    if [ -d "$dest/.git" ]; then
+        ok 'already cloned'
+    else
+        run git clone "git@github.com:$repo.git" "$dest" || { error "clone failed: $repo"; continue; }
+    fi
+
+    if [ "$INSTALL_DEPS" = 1 ] && [ -d "$dest" ]; then
+        [ -f "$dest/composer.json" ] && run composer install --working-dir="$dest" --quiet
+        [ -f "$dest/package.json" ] && run npm install --prefix "$dest" --silent
+    fi
 done

@@ -1,0 +1,39 @@
+# name|group|default (1 on, 0 off)|description
+# Groups with default 0 are suggestions: installed on the author's machine, not required.
+git|core|1|Version control
+gh|core|1|GitHub CLI
+jq|core|1|JSON processor
+fzf|shell|1|Fuzzy finder (Ctrl+R, Ctrl+P, Ctrl+G)
+zoxide|shell|1|Smarter cd (z)
+eza|shell|1|ls replacement (ls, ll, lt aliases)
+bat|shell|1|cat with syntax highlighting (fzf preview)
+fd|shell|1|find replacement (fzf source)
+ripgrep|shell|1|Fast grep
+htop|shell|1|Process viewer (top alias)
+zsh-autosuggestions|shell|1|Fish-style command suggestions
+lazygit|git|1|Git TUI (l and lg aliases)
+git-delta|git|1|Diff filter for git add -p
+diff-so-fancy|git|1|Git pager
+mas|system|1|Mac App Store CLI
+dockutil|system|1|Dock layout CLI (scripts/dock.sh)
+mysql@8.4|services|1|MySQL
+redis|services|1|Redis
+awscli|cloud|1|AWS CLI
+stripe-cli|cloud|1|Stripe CLI
+gitleaks|security|0|Scan repos for committed secrets
+nmap|security|0|Network scanner
+postgresql@17|laravel-extras|0|PostgreSQL
+meilisearch|laravel-extras|0|Search engine for Laravel Scout
+imagemagick|laravel-extras|0|Image processing
+ffmpeg|laravel-extras|0|Audio and video processing
+jpegoptim|laravel-extras|0|JPEG optimiser
+watchman|mobile|0|File watcher for React Native and Expo
+cocoapods|mobile|0|iOS dependency manager
+openjdk@17|mobile|0|Java for Android builds
+swiftlint|mobile|0|Swift linter
+xcodegen|mobile|0|Xcode project generator
+mobile-dev-inc/tap/maestro|mobile|0|Mobile UI testing
+hashicorp/tap/terraform|infra|0|Infrastructure as code
+cloudflared|infra|0|Cloudflare tunnels
+rclone|infra|0|Cloud storage sync
+uv|python|0|Python package and version manager

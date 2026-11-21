@@ -22,7 +22,7 @@ DEFAULT_PROFILE="default"
 die() { echo "error: $*" >&2; exit 1; }
 
 require_cli() {
-  command -v "$CLI" &>/dev/null || die "betterdisplaycli not found. Install via: brew install betterdisplaycli"
+  command -v "$CLI" &>/dev/null || die "betterdisplaycli not found. It ships with the BetterDisplay app: brew install --cask betterdisplay"
 }
 
 profile_path() {
