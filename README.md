@@ -4,13 +4,21 @@ Scripts and config to set up a Mac for Laravel and PHP development. Review befor
 
 ## Quick start
 
+On a blank Mac (installs the command line tools, clones over HTTPS, runs `bootstrap`):
+
+```bash
+bash -c "$(curl -fsSL https://raw.githubusercontent.com/joelwmale/dotfiles/master/install.sh)"
+```
+
+Or from an existing clone:
+
 ```bash
 git clone git@github.com:joelwmale/dotfiles.git ~/Code/dotfiles
 cd ~/Code/dotfiles
 ./bootstrap
 ```
 
-`bootstrap` shows a checklist of steps. Each step then asks about its own choices, so nothing is installed or changed without a yes.
+`bootstrap` ends with a list of what cannot be scripted (sign-ins, permissions, first launches). It shows a checklist of steps. Each step then asks about its own choices, so nothing is installed or changed without a yes.
 
 | Flag | Effect |
 |---|---|

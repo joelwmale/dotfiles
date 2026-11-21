@@ -7,6 +7,7 @@
 #   ./bootstrap --dry-run       print what would run, change nothing
 #   ./bootstrap --only packages,dock
 #   ./bootstrap --list          show the steps
+#   Blank Mac: bash -c "$(curl -fsSL https://raw.githubusercontent.com/joelwmale/dotfiles/master/install.sh)"
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 export ROOT
@@ -35,7 +36,7 @@ while [ $# -gt 0 ]; do
             exit 0
             ;;
         -h|--help)
-            sed -n '2,10p' "$0" | sed 's/^# \{0,1\}//'
+            sed -n '2,11p' "$0" | sed 's/^# \{0,1\}//'
             exit 0
             ;;
         *) error "unknown option: $1"; exit 1 ;;
@@ -60,6 +61,12 @@ else
 fi
 
 [ -n "$CHOSEN" ] || { say 'Nothing selected.'; exit 0; }
+
+case " $CHOSEN " in
+    *" packages "*)
+        [ "$DRY_RUN" = 1 ] || say 'Before continuing: sign in to the Mac App Store, or those apps will be skipped.'
+        ;;
+esac
 
 if [ "$DRY_RUN" != 1 ]; then
     sudo -v
@@ -89,6 +96,7 @@ for step in $CHOSEN; do
 done
 
 bot 'Done.'
+bash "$ROOT/scripts/checklist.sh"
 
 if [ "$DRY_RUN" != 1 ] && ask 'Restart now to apply everything?' N; then
     sudo shutdown -r now
