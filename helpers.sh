@@ -68,11 +68,11 @@ prompt() {
     return 0
 }
 
-# menu "Title" "key|label|1" ...  - numbered toggle list. Sets MENU_RESULT to the chosen keys.
-# Type numbers to toggle, a for all, n for none, enter to continue. --yes keeps the defaults.
+# menu "Title" "key|label|1" ...  - checklist. Sets MENU_RESULT to the chosen keys.
+# Up/down (or k/j) move, space toggles, a = all, n = none, enter confirms. --yes keeps the defaults.
 menu() {
     local title="$1"; shift
-    local keys=() labels=() states=() entry rest i n input token idx mark
+    local keys=() labels=() states=() entry rest i n cur=0 key seq
 
     for entry in "$@"; do
         keys+=("${entry%%|*}")
@@ -82,33 +82,50 @@ menu() {
     done
     n=${#keys[@]}
 
-    if [ "$ASSUME_YES" != 1 ]; then
-        while true; do
-            echo -e "\n$COL_GREEN$title$COL_RESET"
+    if [ "$ASSUME_YES" != 1 ] && [ "$n" -gt 0 ]; then
+        _menu_draw() {
+            local mark pointer
             for ((i = 0; i < n; i++)); do
-                mark=" "
+                mark=" "; pointer=" "
                 [ "${states[$i]}" = 1 ] && mark="x"
-                printf '  %2d) [%s] %s\n' $((i + 1)) "$mark" "${labels[$i]}"
+                [ "$i" = "$cur" ] && pointer=">"
+                printf '\033[2K'
+                if [ "$i" = "$cur" ]; then
+                    printf '  %b%s [%s] %s%b\n' "$COL_GREEN" "$pointer" "$mark" "${labels[$i]}" "$COL_RESET"
+                else
+                    printf '  %s [%s] %s\n' "$pointer" "$mark" "${labels[$i]}"
+                fi
             done
-            echo -n "  toggle numbers (1 3 5), a = all, n = none, enter = continue: "
-            read -r input </dev/tty || break
-            case "$input" in
+            printf '\033[2K  up/down move, space toggles, a all, n none, enter continues\n'
+        }
+
+        echo -e "\n$COL_GREEN$title$COL_RESET"
+        printf '\033[?25l'
+        trap 'printf "\033[?25h"; exit 130' INT
+        _menu_draw
+        while true; do
+            IFS= read -rsn1 key </dev/tty || break
+            case "$key" in
                 '') break ;;
+                ' ') if [ "${states[$cur]}" = 1 ]; then states[$cur]=0; else states[$cur]=1; fi ;;
                 a|A) for ((i = 0; i < n; i++)); do states[$i]=1; done ;;
                 n|N) for ((i = 0; i < n; i++)); do states[$i]=0; done ;;
-                *)
-                    for token in $input; do
-                        case "$token" in
-                            ''|*[!0-9]*) continue ;;
-                        esac
-                        idx=$((10#$token - 1))
-                        if [ "$idx" -ge 0 ] && [ "$idx" -lt "$n" ]; then
-                            if [ "${states[$idx]}" = 1 ]; then states[$idx]=0; else states[$idx]=1; fi
-                        fi
-                    done
+                k) cur=$(( (cur + n - 1) % n )) ;;
+                j) cur=$(( (cur + 1) % n )) ;;
+                $'\033')
+                    IFS= read -rsn2 seq </dev/tty
+                    case "$seq" in
+                        '[A') cur=$(( (cur + n - 1) % n )) ;;
+                        '[B') cur=$(( (cur + 1) % n )) ;;
+                    esac
                     ;;
+                *) continue ;;
             esac
+            printf '\033[%dA' $((n + 1))
+            _menu_draw
         done
+        printf '\033[?25h'
+        trap - INT
     fi
 
     MENU_RESULT=""
