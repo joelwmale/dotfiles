@@ -23,8 +23,6 @@
 	colorMoved = default
 [alias]
 	permission-reset = !git diff -p -R --no-color | grep -E \"^(diff|(old|new) mode)\" --color=never | git apply
-[hub]
-	protocol = ssh
 [pull]
 	rebase = false
 [init]
