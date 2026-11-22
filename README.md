@@ -18,7 +18,7 @@ cd ~/Code/dotfiles
 ./bootstrap
 ```
 
-`bootstrap` ends with a list of what cannot be scripted (sign-ins, permissions, first launches). It shows a checklist of steps. Each step then asks about its own choices, so nothing is installed or changed without a yes.
+`bootstrap` shows a checklist of steps. Each step then asks about its own choices, so nothing is installed or changed without a yes. It ends with a list of what cannot be scripted: sign-ins, permissions and first launches.
 
 | Flag | Effect |
 |---|---|
@@ -41,7 +41,7 @@ Personal details are never committed. These files live on the machine and are gi
 
 | File | Holds | Written by |
 |---|---|---|
-| `~/.gitconfig.local` | Git name, email, signing key | `scripts/git.sh` |
+| `~/.gitconfig.local` | Git name, email, signing key (1Password SSH or GPG) | `scripts/git.sh` |
 | `~/.zshrc.local` | Machine-specific shell config | you |
 | `~/.config/dotfiles/repos` | Repositories to clone, one `owner/repo` per line | `scripts/clone.sh` |
 
